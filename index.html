@@ -14,6 +14,9 @@
       --text: #e5e7eb;
       --muted: #9ca3af;
       --danger: #f87171;
+      --primary: #22c55e;
+      --primary-soft: #bbf7d0;
+      --blue-soft: #dbeafe;
     }
 
     * {
@@ -52,15 +55,34 @@
     }
 
     h1 span.logo-dot {
-      width: 10px;
-      height: 10px;
+      width: 14px;
+      height: 14px;
       border-radius: 999px;
-      background: var(--accent);
-      box-shadow: 0 0 12px rgba(34,197,94,0.7);
+      background: radial-gradient(circle, #4ade80, #16a34a);
+      box-shadow: 0 0 20px rgba(34,197,94,0.9);
+    }
+
+    .brand-sub {
+      font-size: 13px;
+      color: var(--muted);
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px;
+      margin-top: 2px;
+    }
+
+    .brand-chip {
+      padding: 2px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,0.4);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
     }
 
     .subtitle {
-      margin-top: 4px;
+      margin-top: 8px;
       color: var(--muted);
       font-size: 14px;
     }
@@ -73,7 +95,7 @@
     }
 
     .card {
-      background: rgba(15,23,42,0.8);
+      background: rgba(15,23,42,0.9);
       border-radius: 14px;
       padding: 16px 16px 18px;
       border: 1px solid rgba(148,163,184,0.2);
@@ -144,21 +166,20 @@
       gap: 10px;
     }
 
-    .pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 12px;
-      padding: 3px 8px;
-      border-radius: 999px;
-      background: rgba(15,23,42,0.8);
-      border: 1px solid rgba(148,163,184,0.4);
+    .note {
+      font-size: 11px;
       color: var(--muted);
+      margin-top: 6px;
     }
 
-    .pill span {
-      color: var(--accent);
-      font-weight: 600;
+    .badge-ok {
+      color: #4ade80;
+      font-size: 11px;
+    }
+
+    .badge-warn {
+      color: #facc15;
+      font-size: 11px;
     }
 
     .summary-bar {
@@ -232,28 +253,6 @@
       opacity: 0.9;
     }
 
-    .danger-text {
-      color: var(--danger);
-      font-size: 12px;
-      margin-top: 4px;
-    }
-
-    .note {
-      font-size: 11px;
-      color: var(--muted);
-      margin-top: 6px;
-    }
-
-    .badge-ok {
-      color: #4ade80;
-      font-size: 11px;
-    }
-
-    .badge-warn {
-      color: #facc15;
-      font-size: 11px;
-    }
-
     @media (max-width: 900px) {
       body {
         padding: 12px;
@@ -262,18 +261,29 @@
         grid-template-columns: repeat(1, minmax(0,1fr));
       }
     }
-
-    /* Quotation styles (used in popup) */
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>
-      <span class="logo-dot"></span>
-      Solar Quote Generator
-    </h1>
-    <div class="subtitle">
-      Enter plant details, choose components and generate a detailed or summary quotation instantly.
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:12px;">
+      <div>
+        <h1>
+          <span class="logo-dot"></span>
+          Solar Quote Generator
+        </h1>
+        <div class="brand-sub">
+          <span>Brand: <strong>V-Sustain Solar Solutions</strong></span>
+          <span class="brand-chip">Authorized Luminous Partner</span>
+        </div>
+        <div class="subtitle">
+          Enter plant details, choose components and generate professional quotations with GST in one click.
+        </div>
+      </div>
+      <div style="text-align:right; font-size:12px; color:var(--muted);">
+        <div style="font-weight:600;">V-Sustain Solar Solutions</div>
+        <div>vsustainsolarsolutions@gmail.com</div>
+        <div>📞 +91 99-000-00476</div>
+      </div>
     </div>
 
     <!-- Top controls -->
@@ -298,7 +308,7 @@
         <label for="marginPercent">Margin over dealer price (%)</label>
         <input type="number" id="marginPercent" min="0" max="200" step="1" value="20" />
         <div class="note">
-          Applied to items with a fixed dealer price list (inverters, ACDB, DCDB, etc.).
+          Applied on inverters, panels, ACDB, DCDB and other dealer-priced items. GST is added on top.
         </div>
       </div>
 
@@ -340,10 +350,11 @@
             <input type="text" id="inverterDealer" readonly />
           </div>
           <div>
-            <label>Billing price with margin (₹)</label>
+            <label>Billing price (excl. GST, with margin)</label>
             <input type="text" id="inverterSell" readonly />
           </div>
         </div>
+        <div class="note">GST on inverter: <strong>5%</strong> extra.</div>
       </div>
 
       <!-- Panels -->
@@ -372,7 +383,19 @@
           </div>
         </div>
 
+        <div class="inline-fields-2" style="margin-top:8px;">
+          <div>
+            <label>Dealer price per panel (₹)</label>
+            <input type="text" id="panelDealer" readonly />
+          </div>
+          <div>
+            <label>Billing price per panel (excl. GST)</label>
+            <input type="text" id="panelSell" readonly />
+          </div>
+        </div>
+
         <div id="panelCapacityNote" class="note"></div>
+        <div class="note">GST on panels: <strong>5%</strong> extra.</div>
       </div>
 
       <!-- Meter -->
@@ -393,10 +416,11 @@
             <input type="number" id="meterQty" min="0" step="1" value="1" />
           </div>
           <div>
-            <label>Price per unit (₹)</label>
+            <label>Price per unit (₹, excl. GST)</label>
             <input type="number" id="meterPrice" min="0" step="1" placeholder="Enter price" />
           </div>
         </div>
+        <div class="note">GST on meter: <strong>18%</strong> extra.</div>
       </div>
     </div>
 
@@ -417,10 +441,11 @@
             <input type="number" id="acdbQty" value="1" min="0" step="1" />
           </div>
           <div>
-            <label>Billing price per unit (₹)</label>
+            <label>Billing price per unit (excl. GST)</label>
             <input type="text" id="acdbSell" readonly />
           </div>
         </div>
+        <div class="note">GST on ACDB: <strong>18%</strong> extra.</div>
       </div>
 
       <!-- DCDB -->
@@ -439,10 +464,11 @@
             <input type="number" id="dcdbQty" value="1" min="0" step="1" />
           </div>
           <div>
-            <label>Billing price per unit (₹)</label>
+            <label>Billing price per unit (excl. GST)</label>
             <input type="text" id="dcdbSell" readonly />
           </div>
         </div>
+        <div class="note">GST on DCDB: <strong>18%</strong> extra.</div>
       </div>
 
       <!-- AC Cable -->
@@ -461,10 +487,11 @@
             <input type="number" id="acCableQty" min="0" step="1" />
           </div>
           <div>
-            <label>Rate per unit (₹)</label>
+            <label>Rate per unit (₹, excl. GST)</label>
             <input type="number" id="acCablePrice" min="0" step="1" />
           </div>
         </div>
+        <div class="note">GST on AC cable: <strong>18%</strong> extra.</div>
       </div>
     </div>
 
@@ -485,10 +512,11 @@
             <input type="number" id="earthCableQty" min="0" step="1" />
           </div>
           <div>
-            <label>Rate per unit (₹)</label>
+            <label>Rate per unit (₹, excl. GST)</label>
             <input type="number" id="earthCablePrice" min="0" step="1" />
           </div>
         </div>
+        <div class="note">GST on earthing cable: <strong>18%</strong> extra.</div>
       </div>
 
       <!-- Installation -->
@@ -499,16 +527,16 @@
         </div>
         <div class="inline-fields-2">
           <div>
-            <label>Rate (₹/kW)</label>
+            <label>Rate (₹/kW, excl. GST)</label>
             <input type="number" id="installRate" value="5000" />
           </div>
           <div>
-            <label>Installation total (₹)</label>
+            <label>Installation total (excl. GST)</label>
             <input type="text" id="installTotal" readonly />
           </div>
         </div>
         <div class="note">
-          Calculated as <strong>kW × rate</strong>. Default 5,000 ₹/kW.
+          Calculated as <strong>kW × rate</strong>. GST on installation: <strong>18%</strong>.
         </div>
       </div>
 
@@ -520,16 +548,16 @@
         </div>
         <div class="inline-fields-2">
           <div>
-            <label>Rate (₹/kW)</label>
+            <label>Rate (₹/kW, excl. GST)</label>
             <input type="number" id="structureRate" value="8000" />
           </div>
           <div>
-            <label>Structure total (₹)</label>
+            <label>Structure total (excl. GST)</label>
             <input type="text" id="structureTotal" readonly />
           </div>
         </div>
         <div class="note">
-          Calculated as <strong>kW × rate</strong>. Default 8,000 ₹/kW.
+          Calculated as <strong>kW × rate</strong>. GST on structure: <strong>18%</strong>.
         </div>
       </div>
     </div>
@@ -547,17 +575,18 @@
             <input type="number" id="earthingSetQty" min="0" step="1" value="3" />
           </div>
           <div>
-            <label>Price per set (₹)</label>
+            <label>Price per set (₹, excl. GST)</label>
             <input type="number" id="earthingSetPrice" min="0" step="1" />
           </div>
         </div>
+        <div class="note">GST on earthing set: <strong>18%</strong> extra.</div>
       </div>
     </div>
 
     <!-- Summary + buttons -->
     <div class="summary-bar">
       <div>
-        Project total (incl. margin items): <strong id="summaryTotal">₹0</strong>
+        Project total (incl. GST): <strong id="summaryTotal">₹0</strong>
       </div>
       <div class="summary-items">
         <span id="summaryPlant">Plant: –</span>
@@ -605,15 +634,16 @@
       { model: "NXI A3250-HV(350KW)", capacityKw: 350, dealerPrice: 555492 }
     ];
 
-    // Mock solar panels based on common wattages in India (approx. 440–550 Wp)
+    // Mock solar panels based on common wattages, with Bangalore-ish market prices
+    // 550Wp actual (dealer) price provided by you: ₹1800
     const panels = [
-      { name: "Mono PERC 440Wp (Half-Cut)", watt: 440 },
-      { name: "Mono PERC 500Wp", watt: 500 },
-      { name: "Mono PERC 540Wp", watt: 540 },
-      { name: "Mono PERC 550Wp (Bifacial)", watt: 550 }
+      { name: "Mono PERC 440Wp (Half-Cut)", watt: 440, dealerPrice: 1500 },
+      { name: "Mono PERC 500Wp", watt: 500, dealerPrice: 1650 },
+      { name: "Mono PERC 540Wp", watt: 540, dealerPrice: 1750 },
+      { name: "Mono PERC 550Wp (Bifacial)", watt: 550, dealerPrice: 1800 }
     ];
 
-    // ACDB & DCDB dealer price list (₹ inc tax)
+    // ACDB & DCDB dealer price list (₹ inc tax in sheet, treated as dealer price ex-GST for margin)
     const acdbItems = [
       { sku: "TSAD0AC32PH1", desc: "ACDB Single Phase 32 Amp (0-5 kW)", dealerPrice: 1899.80 },
       { sku: "TSAD0AC63PH1", desc: "ACDB Single Phase 63 Amp (7 kW)", dealerPrice: 2312.80 },
@@ -638,7 +668,7 @@
     // ---------- HELPERS ----------
 
     const formatMoney = (value) => {
-      if (isNaN(value) || !isFinite(value)) return "0";
+      if (isNaN(value) || !isFinite(value)) return "₹0";
       return value.toLocaleString("en-IN", {
         style: "currency",
         currency: "INR",
@@ -659,6 +689,12 @@
       return isNaN(kW) ? 0 : kW;
     };
 
+    const getGstRateForType = (type) => {
+      // 5% for inverter & panels, 18% for rest
+      if (type === "inverter" || type === "panel") return 5;
+      return 18;
+    };
+
     const recalcInverterOptions = () => {
       const plantKw = getPlantKw();
       const inverterSelect = document.getElementById("inverterSelect");
@@ -666,14 +702,13 @@
       inverterSelect.innerHTML = '<option value="">Select inverter</option>';
 
       const eligible = inverters.filter(i => plantKw === 0 || i.capacityKw >= plantKw);
-      eligible.forEach((inv, index) => {
+      eligible.forEach((inv) => {
         const opt = document.createElement("option");
         opt.value = inv.model;
         opt.textContent = `${inv.model} (${inv.capacityKw} kW)`;
         inverterSelect.appendChild(opt);
       });
 
-      // Try to keep previous selection if still valid
       const stillExists = Array.from(inverterSelect.options).some(o => o.value === currentValue);
       if (stillExists) inverterSelect.value = currentValue;
       recalcInverterPrice();
@@ -712,19 +747,28 @@
       const panelWattEl = document.getElementById("panelWatt");
       const panelQtyEl = document.getElementById("panelQty");
       const panelCapEl = document.getElementById("panelCapacity");
+      const panelDealerEl = document.getElementById("panelDealer");
+      const panelSellEl = document.getElementById("panelSell");
       const noteEl = document.getElementById("panelCapacityNote");
 
       const selected = panels.find(p => p.name === panelSelect.value);
       const plantKw = getPlantKw();
+      const marginFactor = getMarginFactor();
+
       if (!selected || plantKw <= 0) {
         panelWattEl.value = "";
         panelQtyEl.value = "";
         panelCapEl.value = "";
+        panelDealerEl.value = "";
+        panelSellEl.value = "";
         noteEl.innerHTML = "";
         return;
       }
 
       panelWattEl.value = selected.watt;
+      panelDealerEl.value = Math.round(selected.dealerPrice).toLocaleString("en-IN");
+      const sellPrice = selected.dealerPrice * marginFactor;
+      panelSellEl.value = Math.round(sellPrice).toLocaleString("en-IN");
 
       const requiredWatt = plantKw * 1000;
       const qty = Math.ceil(requiredWatt / selected.watt);
@@ -736,9 +780,9 @@
 
       const maxKw = plantKw * 1.1;
       if (totalKw <= maxKw) {
-        noteEl.innerHTML = `<span class="badge-ok">✔ Within 10% limit.</span> Panel DC capacity = ${totalKw.toFixed(2)} kWp (max allowed ${maxKw.toFixed(2)} kWp).`;
+        noteEl.innerHTML = `<span class="badge-ok">✔ Within 10% limit.</span> Panel DC capacity ≈ ${totalKw.toFixed(2)} kWp (max allowed ${maxKw.toFixed(2)} kWp).`;
       } else {
-        noteEl.innerHTML = `<span class="badge-warn">⚠ Above 10% limit.</span> Panel DC capacity = ${totalKw.toFixed(2)} kWp (max allowed ${maxKw.toFixed(2)} kWp).`;
+        noteEl.innerHTML = `<span class="badge-warn">⚠ Above 10% limit.</span> Panel DC capacity ≈ ${totalKw.toFixed(2)} kWp (max allowed ${maxKw.toFixed(2)} kWp).`;
       }
     };
 
@@ -805,60 +849,198 @@
       return isNaN(val) ? 0 : val;
     };
 
-    const calcTotals = () => {
-      const plantKw = getPlantKw();
+    // Build line items for quotations and totals
+    const buildLineItems = () => {
+      const items = [];
       const marginFactor = getMarginFactor();
+      const plantKw = getPlantKw();
+
+      // Panels
+      const panelSel = document.getElementById("panelSelect");
+      const panel = panels.find(p => p.name === panelSel.value);
+      const panelQty = parseFloat(document.getElementById("panelQty").value || "0");
+      const panelCapKw = parseFloat(document.getElementById("panelCapacity").value || "0");
+
+      if (panel && panelQty > 0) {
+        const baseRate = panel.dealerPrice * marginFactor;
+        items.push({
+          type: "panel",
+          item: "Solar PV Modules",
+          desc: `${panelQty} × ${panel.name} (${panel.watt} Wp) | DC capacity ≈ ${panelCapKw.toFixed(2)} kWp`,
+          qty: panelQty,
+          unit: "Nos",
+          baseRate,
+          gstPercent: getGstRateForType("panel")
+        });
+      }
 
       // Inverter
-      const invSel = document.getElementById("inverterSelect");
-      const selectedInv = inverters.find(i => i.model === invSel.value);
-      const inverterQty = selectedInv ? 1 : 0;
-      const inverterLine = selectedInv ? selectedInv.dealerPrice * marginFactor * inverterQty : 0;
+      const inverterSel = document.getElementById("inverterSelect");
+      const inv = inverters.find(i => i.model === inverterSel.value);
+      if (inv) {
+        const baseRate = inv.dealerPrice * marginFactor;
+        items.push({
+          type: "inverter",
+          item: "Solar Inverter",
+          desc: `${inv.model} (${inv.capacityKw} kW)`,
+          qty: 1,
+          unit: "Nos",
+          baseRate,
+          gstPercent: getGstRateForType("inverter")
+        });
+      }
 
       // ACDB
       const acdbSel = document.getElementById("acdbSelect");
       const acdbQty = parseFloat(document.getElementById("acdbQty").value || "0");
       const acdbItem = acdbItems.find(i => i.sku === acdbSel.value);
-      const acdbLine = acdbItem ? acdbItem.dealerPrice * marginFactor * acdbQty : 0;
+      if (acdbItem && acdbQty > 0) {
+        const baseRate = acdbItem.dealerPrice * marginFactor;
+        items.push({
+          type: "acdb",
+          item: "ACDB",
+          desc: `${acdbItem.desc} (${acdbItem.sku})`,
+          qty: acdbQty,
+          unit: "Nos",
+          baseRate,
+          gstPercent: getGstRateForType("acdb")
+        });
+      }
 
       // DCDB
       const dcdbSel = document.getElementById("dcdbSelect");
       const dcdbQty = parseFloat(document.getElementById("dcdbQty").value || "0");
       const dcdbItem = dcdbItems.find(i => i.sku === dcdbSel.value);
-      const dcdbLine = dcdbItem ? dcdbItem.dealerPrice * marginFactor * dcdbQty : 0;
+      if (dcdbItem && dcdbQty > 0) {
+        const baseRate = dcdbItem.dealerPrice * marginFactor;
+        items.push({
+          type: "dcdb",
+          item: "DCDB",
+          desc: `${dcdbItem.desc} (${dcdbItem.sku})`,
+          qty: dcdbQty,
+          unit: "Nos",
+          baseRate,
+          gstPercent: getGstRateForType("dcdb")
+        });
+      }
 
       // Meter
+      const meterType = document.getElementById("meterType").value || "";
       const meterQty = parseFloat(document.getElementById("meterQty").value || "0");
       const meterPrice = parseFloat(document.getElementById("meterPrice").value || "0");
-      const meterLine = meterQty * meterPrice;
+      if (meterType && meterQty > 0 && meterPrice > 0) {
+        items.push({
+          type: "meter",
+          item: "Bi-directional Energy Meter",
+          desc: meterType,
+          qty: meterQty,
+          unit: "Nos",
+          baseRate: meterPrice,
+          gstPercent: getGstRateForType("meter")
+        });
+      }
 
       // AC cable
+      const acCableGauge = document.getElementById("acCableGauge").value || "";
       const acCableQty = parseFloat(document.getElementById("acCableQty").value || "0");
       const acCablePrice = parseFloat(document.getElementById("acCablePrice").value || "0");
-      const acCableLine = acCableQty * acCablePrice;
+      if (acCableQty > 0 && acCablePrice > 0) {
+        items.push({
+          type: "acCable",
+          item: "AC Cable",
+          desc: acCableGauge || "AC Cable",
+          qty: acCableQty,
+          unit: "Mtr",
+          baseRate: acCablePrice,
+          gstPercent: getGstRateForType("acCable")
+        });
+      }
 
       // Earthing cable
+      const earthCableGauge = document.getElementById("earthCableGauge").value || "";
       const earthCableQty = parseFloat(document.getElementById("earthCableQty").value || "0");
       const earthCablePrice = parseFloat(document.getElementById("earthCablePrice").value || "0");
-      const earthCableLine = earthCableQty * earthCablePrice;
+      if (earthCableQty > 0 && earthCablePrice > 0) {
+        items.push({
+          type: "earthCable",
+          item: "Earthing Cable",
+          desc: earthCableGauge || "Earthing Cable",
+          qty: earthCableQty,
+          unit: "Mtr",
+          baseRate: earthCablePrice,
+          gstPercent: getGstRateForType("earthCable")
+        });
+      }
 
-      // Installation & structure (already final)
-      const installLine = parseIndianNumber(document.getElementById("installTotal").value);
-      const structureLine = parseIndianNumber(document.getElementById("structureTotal").value);
+      // Installation
+      const installRate = parseFloat(document.getElementById("installRate").value || "0");
+      if (plantKw > 0 && installRate > 0) {
+        items.push({
+          type: "installation",
+          item: "Installation & Commissioning",
+          desc: `Complete installation @ ${formatMoney(installRate)} per kW`,
+          qty: plantKw,
+          unit: "kW",
+          baseRate: installRate,
+          gstPercent: getGstRateForType("installation")
+        });
+      }
+
+      // Structure
+      const structureRate = parseFloat(document.getElementById("structureRate").value || "0");
+      if (plantKw > 0 && structureRate > 0) {
+        items.push({
+          type: "structure",
+          item: "Module Mounting Structure",
+          desc: `Hot dipped galvanized structure @ ${formatMoney(structureRate)} per kW`,
+          qty: plantKw,
+          unit: "kW",
+          baseRate: structureRate,
+          gstPercent: getGstRateForType("structure")
+        });
+      }
 
       // Earthing set
       const earthingSetQty = parseFloat(document.getElementById("earthingSetQty").value || "0");
       const earthingSetPrice = parseFloat(document.getElementById("earthingSetPrice").value || "0");
-      const earthingSetLine = earthingSetQty * earthingSetPrice;
+      if (earthingSetQty > 0 && earthingSetPrice > 0) {
+        items.push({
+          type: "earthingSet",
+          item: "Earthing Set",
+          desc: "Earthing arrangement as per design (chemical / GI / copper bonded)",
+          qty: earthingSetQty,
+          unit: "Set",
+          baseRate: earthingSetPrice,
+          gstPercent: getGstRateForType("earthingSet")
+        });
+      }
 
-      const grandTotal = inverterLine + acdbLine + dcdbLine + meterLine +
-        acCableLine + earthCableLine + installLine + structureLine + earthingSetLine;
+      return items;
+    };
 
+    const calcTotals = () => {
+      const items = buildLineItems();
+      let subtotal = 0;
+      let totalGst = 0;
+
+      items.forEach(item => {
+        const amount = item.baseRate * item.qty;
+        const gstAmt = amount * item.gstPercent / 100;
+        subtotal += amount;
+        totalGst += gstAmt;
+      });
+
+      const grandTotal = subtotal + totalGst;
+
+      // Update summary bar
       document.getElementById("summaryTotal").textContent = formatMoney(grandTotal);
 
-      // Summary texts
+      const plantKw = getPlantKw();
       const panelSelect = document.getElementById("panelSelect");
       const panelQty = document.getElementById("panelQty").value || "";
+      const inverterSelect = document.getElementById("inverterSelect");
+      const selectedInv = inverters.find(i => i.model === inverterSelect.value);
+
       document.getElementById("summaryPlant").textContent =
         plantKw > 0 ? `Plant: ${plantKw} kW` : "Plant: –";
       document.getElementById("summaryPanels").textContent =
@@ -866,18 +1048,7 @@
       document.getElementById("summaryInverter").textContent =
         selectedInv ? `Inverter: ${selectedInv.model}` : "Inverter: –";
 
-      return {
-        grandTotal,
-        inverterLine,
-        acdbLine,
-        dcdbLine,
-        meterLine,
-        acCableLine,
-        earthCableLine,
-        installLine,
-        structureLine,
-        earthingSetLine
-      };
+      return { items, subtotal, totalGst, grandTotal };
     };
 
     const validateCore = () => {
@@ -894,6 +1065,115 @@
       return true;
     };
 
+    // ---------- COMMON SECTIONS FOR QUOTES ----------
+
+    const buildCommonFooterSections = () => {
+      return `
+      <div class="footer-sections">
+
+        <section class="block">
+          <h2>🔒 Warranty Snapshot</h2>
+          <div class="warranty-grid">
+            <div class="w-card">
+              <div class="w-label">PV Modules</div>
+              <div class="w-value">30 Years*</div>
+            </div>
+            <div class="w-card">
+              <div class="w-label">Inverter</div>
+              <div class="w-value">8 Years*</div>
+            </div>
+            <div class="w-card">
+              <div class="w-label">System</div>
+              <div class="w-value">5 Years*</div>
+            </div>
+          </div>
+          <div class="fine-print">
+            *Please refer to OEM warranty documents and T&C for full details.  
+            *Inverter warranty period depends on the specific make and model.
+          </div>
+        </section>
+
+        <section class="block">
+          <h2>💰 Payment Terms</h2>
+          <ul class="bullets">
+            <li>40% advance along with Purchase Order.</li>
+            <li>50% on material delivery at site.</li>
+            <li>10% after successful commissioning of the system.</li>
+          </ul>
+        </section>
+
+        <section class="block">
+          <h2>🌞 Why Luminous Solar with V-Sustain</h2>
+          <div class="why-grid">
+            <div class="why-card">
+              <div class="why-icon">🧩</div>
+              <div class="why-title">Customized Solution</div>
+              <div class="why-text">System engineered for your roof, load profile and future expansion.</div>
+            </div>
+            <div class="why-card">
+              <div class="why-icon">🛠️</div>
+              <div class="why-title">Minimal Maintenance</div>
+              <div class="why-text">Rugged components with low downtime and easy serviceability.</div>
+            </div>
+            <div class="why-card">
+              <div class="why-icon">🛡️</div>
+              <div class="why-title">Highest Safety Standards</div>
+              <div class="why-text">Proper earthing, protection devices and best-practice installation.</div>
+            </div>
+            <div class="why-card">
+              <div class="why-icon">🏅</div>
+              <div class="why-title">Quality Products</div>
+              <div class="why-text">Genuine Luminous products with proven field performance.</div>
+            </div>
+            <div class="why-card">
+              <div class="why-icon">⚡</div>
+              <div class="why-title">Quick ROI</div>
+              <div class="why-text">Reliable power generation that pays back in a few years.</div>
+            </div>
+            <div class="why-card">
+              <div class="why-icon">♻️</div>
+              <div class="why-title">Smart & Eco-Friendly</div>
+              <div class="why-text">Green energy, better branding and a sustainable future.</div>
+            </div>
+          </div>
+        </section>
+
+        <section class="block">
+          <h2>📜 General Terms & Conditions</h2>
+          <ul class="bullets">
+            <li><strong>Taxes & Duties:</strong> Any change in government policy or new taxes, duties or levies will be to the customer’s account.</li>
+            <li><strong>Validity:</strong> This quotation is valid for 15 days from the date of issue.</li>
+            <li><strong>Packing:</strong> Standard packing is included. Non-standard packing, if required, will be charged extra.</li>
+            <li><strong>Delivery Period:</strong> As per mutually agreed terms in the accepted Purchase Order, subject to force majeure conditions.</li>
+            <li><strong>Exclusions:</strong> The warranty does not cover defects arising from customer-supplied materials, improper installation by third parties, misuse, experiments, or operation not in line with manufacturer’s manuals and industry practice.</li>
+            <li><strong>Cancellation:</strong> Orders once accepted cannot be cancelled without our consent and may attract cancellation charges as per company policy.</li>
+            <li><strong>Force Majeure:</strong> Conditions beyond reasonable control (war, strikes, natural calamities, supply disruptions, etc.) may impact delivery schedules.</li>
+          </ul>
+        </section>
+
+        <section class="block">
+          <h2>🤝 Proposal By</h2>
+          <div class="proposal-grid">
+            <div>
+              <div class="proposal-title">V-Sustain Solar Solutions</div>
+              <div class="proposal-sub">Authorized Luminous Partner</div>
+              <div class="proposal-line">📧 vsustainsolarsolutions@gmail.com</div>
+              <div class="proposal-line">📞 Pravesh Kumar Tiwari – +91 99-000-00476</div>
+              <div class="proposal-line">📍 NO.33/1, 6th Main, Kanteerava Studio Peenya,<br/>Rajagopalnagar Main Rd, Nandini Layout, Bengaluru, Karnataka 560096</div>
+            </div>
+            <div>
+              <div class="proposal-title">Bank Details</div>
+              <div class="proposal-line"><strong>Bank:</strong> BANK OF INDIA (SANJAY NAGAR)</div>
+              <div class="proposal-line"><strong>Account No:</strong> 849330150000010</div>
+              <div class="proposal-line"><strong>IFSC:</strong> BKID0008493</div>
+            </div>
+          </div>
+        </section>
+
+      </div>
+      `;
+    };
+
     // ---------- QUOTATION TEMPLATES ----------
 
     const buildDetailedQuotationHtml = (totals) => {
@@ -903,178 +1183,33 @@
       const projectDate = document.getElementById("projectDate").value || "";
       const margin = parseFloat(document.getElementById("marginPercent").value || "0");
 
-      const inverterSel = document.getElementById("inverterSelect");
-      const inv = inverters.find(i => i.model === inverterSel.value);
-
       const panelSel = document.getElementById("panelSelect");
       const panel = panels.find(p => p.name === panelSel.value);
       const panelQty = parseFloat(document.getElementById("panelQty").value || "0");
       const panelCapKw = parseFloat(document.getElementById("panelCapacity").value || "0");
 
-      const acdbSel = document.getElementById("acdbSelect");
-      const acdbItem = acdbItems.find(i => i.sku === acdbSel.value);
-      const acdbQty = parseFloat(document.getElementById("acdbQty").value || "0");
+      const inverterSel = document.getElementById("inverterSelect");
+      const inv = inverters.find(i => i.model === inverterSel.value);
 
-      const dcdbSel = document.getElementById("dcdbSelect");
-      const dcdbItem = dcdbItems.find(i => i.sku === dcdbSel.value);
-      const dcdbQty = parseFloat(document.getElementById("dcdbQty").value || "0");
-
-      const meterType = document.getElementById("meterType").value || "";
-      const meterQty = parseFloat(document.getElementById("meterQty").value || "0");
-      const meterPrice = parseFloat(document.getElementById("meterPrice").value || "0");
-
-      const acCableGauge = document.getElementById("acCableGauge").value || "";
-      const acCableQty = parseFloat(document.getElementById("acCableQty").value || "0");
-      const acCablePrice = parseFloat(document.getElementById("acCablePrice").value || "0");
-
-      const earthCableGauge = document.getElementById("earthCableGauge").value || "";
-      const earthCableQty = parseFloat(document.getElementById("earthCableQty").value || "0");
-      const earthCablePrice = parseFloat(document.getElementById("earthCablePrice").value || "0");
-
-      const installRate = parseFloat(document.getElementById("installRate").value || "0");
-      const structureRate = parseFloat(document.getElementById("structureRate").value || "0");
-
-      const earthingSetQty = parseFloat(document.getElementById("earthingSetQty").value || "0");
-      const earthingSetPrice = parseFloat(document.getElementById("earthingSetPrice").value || "0");
-
-      const marginFactor = getMarginFactor();
-
-      const rows = [];
-
-      if (panel && panelQty > 0) {
-        rows.push({
-          sr: 1,
-          item: "Solar PV Modules",
-          desc: `${panelQty} × ${panel.name} (${panel.watt} Wp) | DC capacity ≈ ${panelCapKw.toFixed(2)} kWp`,
-          qty: panelQty,
-          unit: "Nos",
-          unitRate: formatMoney(0), // you can plug panel cost later
-          amount: formatMoney(0)
-        });
-      }
-
-      if (inv) {
-        const invSell = inv.dealerPrice * marginFactor;
-        rows.push({
-          sr: rows.length + 1,
-          item: "Solar Inverter",
-          desc: `${inv.model} (${inv.capacityKw} kW)`,
-          qty: 1,
-          unit: "Nos",
-          unitRate: formatMoney(invSell),
-          amount: formatMoney(totals.inverterLine)
-        });
-      }
-
-      if (acdbItem && acdbQty > 0) {
-        const sell = acdbItem.dealerPrice * marginFactor;
-        rows.push({
-          sr: rows.length + 1,
-          item: "ACDB",
-          desc: `${acdbItem.desc} (${acdbItem.sku})`,
-          qty: acdbQty,
-          unit: "Nos",
-          unitRate: formatMoney(sell),
-          amount: formatMoney(totals.acdbLine)
-        });
-      }
-
-      if (dcdbItem && dcdbQty > 0) {
-        const sell = dcdbItem.dealerPrice * marginFactor;
-        rows.push({
-          sr: rows.length + 1,
-          item: "DCDB",
-          desc: `${dcdbItem.desc} (${dcdbItem.sku})`,
-          qty: dcdbQty,
-          unit: "Nos",
-          unitRate: formatMoney(sell),
-          amount: formatMoney(totals.dcdbLine)
-        });
-      }
-
-      if (meterType && meterQty > 0) {
-        rows.push({
-          sr: rows.length + 1,
-          item: "Bi-directional Energy Meter",
-          desc: meterType,
-          qty: meterQty,
-          unit: "Nos",
-          unitRate: formatMoney(meterPrice),
-          amount: formatMoney(totals.meterLine)
-        });
-      }
-
-      if (acCableQty > 0) {
-        rows.push({
-          sr: rows.length + 1,
-          item: "AC Cable",
-          desc: acCableGauge || "AC Cable",
-          qty: acCableQty,
-          unit: "Mtr",
-          unitRate: formatMoney(acCablePrice),
-          amount: formatMoney(totals.acCableLine)
-        });
-      }
-
-      if (earthCableQty > 0) {
-        rows.push({
-          sr: rows.length + 1,
-          item: "Earthing Cable",
-          desc: earthCableGauge || "Earthing Cable",
-          qty: earthCableQty,
-          unit: "Mtr",
-          unitRate: formatMoney(earthCablePrice),
-          amount: formatMoney(totals.earthCableLine)
-        });
-      }
-
-      if (plantKw > 0 && installRate > 0) {
-        rows.push({
-          sr: rows.length + 1,
-          item: "Installation & Commissioning",
-          desc: `Complete installation @ ${formatMoney(installRate)} per kW`,
-          qty: plantKw.toFixed(2),
-          unit: "kW",
-          unitRate: formatMoney(installRate),
-          amount: formatMoney(totals.installLine)
-        });
-      }
-
-      if (plantKw > 0 && structureRate > 0) {
-        rows.push({
-          sr: rows.length + 1,
-          item: "Module Mounting Structure",
-          desc: `Hot dipped galvanized structure @ ${formatMoney(structureRate)} per kW`,
-          qty: plantKw.toFixed(2),
-          unit: "kW",
-          unitRate: formatMoney(structureRate),
-          amount: formatMoney(totals.structureLine)
-        });
-      }
-
-      if (earthingSetQty > 0) {
-        rows.push({
-          sr: rows.length + 1,
-          item: "Earthing Set",
-          desc: "Chemical earthing / GI / copper bonded as per design",
-          qty: earthingSetQty,
-          unit: "Set",
-          unitRate: formatMoney(earthingSetPrice),
-          amount: formatMoney(totals.earthingSetLine)
-        });
-      }
-
-      const rowsHtml = rows.map(r => `
-        <tr>
-          <td>${r.sr}</td>
-          <td>${r.item}</td>
-          <td>${r.desc}</td>
-          <td style="text-align:right;">${r.qty}</td>
-          <td>${r.unit}</td>
-          <td style="text-align:right;">${r.unitRate}</td>
-          <td style="text-align:right;">${r.amount}</td>
-        </tr>
-      `).join("");
+      const rowsHtml = totals.items.map((item, idx) => {
+        const amount = item.baseRate * item.qty;
+        const gstAmt = amount * item.gstPercent / 100;
+        const lineTotal = amount + gstAmt;
+        return `
+          <tr>
+            <td>${idx + 1}</td>
+            <td>${item.item}</td>
+            <td>${item.desc}</td>
+            <td style="text-align:right;">${item.qty.toFixed(2).replace(/\.00$/,"")}</td>
+            <td>${item.unit}</td>
+            <td style="text-align:right;">${formatMoney(item.baseRate)}</td>
+            <td style="text-align:right;">${formatMoney(amount)}</td>
+            <td style="text-align:center;">${item.gstPercent}%</td>
+            <td style="text-align:right;">${formatMoney(gstAmt)}</td>
+            <td style="text-align:right;">${formatMoney(lineTotal)}</td>
+          </tr>
+        `;
+      }).join("");
 
       return `
 <!DOCTYPE html>
@@ -1088,19 +1223,58 @@
     background: #f3f4f6;
     margin: 0;
     padding: 24px;
+    color: #0f172a;
   }
   .quote {
-    max-width: 900px;
+    max-width: 960px;
     margin: 0 auto;
     background: #ffffff;
-    border-radius: 12px;
+    border-radius: 14px;
     padding: 24px 28px;
     box-shadow: 0 10px 40px rgba(15,23,42,0.18);
-    color: #0f172a;
+    position: relative;
+  }
+  .print-btn {
+    position: fixed;
+    top: 18px;
+    right: 24px;
+    padding: 6px 12px;
+    border-radius: 999px;
+    border: none;
+    background: #22c55e;
+    color: #022c22;
+    font-size: 12px;
+    cursor: pointer;
+    box-shadow: 0 8px 20px rgba(34,197,94,0.4);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .print-btn span {
+    font-size: 14px;
+  }
+  @media print {
+    .print-btn { display:none; }
+    body { background:#ffffff; padding:0; }
+    .quote { box-shadow:none; border-radius:0; margin:0; }
   }
   h1 {
     margin: 0 0 4px;
     font-size: 24px;
+  }
+  .brand-line {
+    font-size: 13px;
+    color: #6b7280;
+  }
+  .brand-pill {
+    display: inline-block;
+    font-size: 11px;
+    border-radius: 999px;
+    padding: 2px 8px;
+    border: 1px solid #22c55e;
+    color: #166534;
+    background: #dcfce7;
+    margin-top: 4px;
   }
   .meta {
     font-size: 13px;
@@ -1111,26 +1285,15 @@
     display: inline-block;
     margin-right: 16px;
   }
-  .badge {
-    display: inline-block;
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 0.12em;
-    padding: 3px 8px;
-    border-radius: 999px;
-    border: 1px solid #22c55e;
-    color: #166534;
-    background: #dcfce7;
-  }
   table {
     width: 100%;
     border-collapse: collapse;
     margin-top: 18px;
-    font-size: 13px;
+    font-size: 12px;
   }
   th, td {
     border: 1px solid #e5e7eb;
-    padding: 6px 8px;
+    padding: 6px 6px;
     vertical-align: top;
   }
   th {
@@ -1139,40 +1302,131 @@
   }
   tfoot td {
     font-weight: 600;
+  }
+  tfoot tr.subtotal-row td {
     border-top: 2px solid #0f172a;
   }
   .totals {
-    margin-top: 16px;
+    margin-top: 12px;
     text-align: right;
   }
   .totals strong {
     font-size: 18px;
     color: #16a34a;
   }
-  .footnote {
-    margin-top: 16px;
+  .footer-sections {
+    margin-top: 24px;
+    border-top: 1px solid #e5e7eb;
+    padding-top: 18px;
+    font-size: 12px;
+    color: #374151;
+  }
+  .block {
+    margin-bottom: 16px;
+  }
+  .block h2 {
+    margin: 0 0 6px;
+    font-size: 14px;
+    display:flex;
+    align-items:center;
+    gap:6px;
+  }
+  .warranty-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .w-card {
+    flex: 0 0 120px;
+    background: #ecfdf5;
+    border-radius: 10px;
+    padding: 8px 10px;
+    border: 1px solid #bbf7d0;
+  }
+  .w-label {
+    font-size: 11px;
+    color: #166534;
+  }
+  .w-value {
+    font-size: 16px;
+    font-weight: 600;
+    color: #16a34a;
+  }
+  .fine-print {
     font-size: 11px;
     color: #6b7280;
+    margin-top: 6px;
+  }
+  .bullets {
+    margin: 0;
+    padding-left: 18px;
+  }
+  .bullets li {
+    margin-bottom: 4px;
+  }
+  .why-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px,1fr));
+    gap: 8px;
+  }
+  .why-card {
+    background: #eff6ff;
+    border-radius: 10px;
+    padding: 8px 10px;
+    border: 1px solid #bfdbfe;
+  }
+  .why-icon {
+    font-size: 16px;
+  }
+  .why-title {
+    font-size: 12px;
+    font-weight: 600;
+    margin-top: 2px;
+  }
+  .why-text {
+    font-size: 11px;
+    color: #4b5563;
+    margin-top: 2px;
+  }
+  .proposal-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px,1fr));
+    gap: 10px;
+  }
+  .proposal-title {
+    font-weight: 600;
+    font-size: 13px;
+  }
+  .proposal-sub {
+    font-size: 11px;
+    color: #6b7280;
+    margin-bottom: 4px;
+  }
+  .proposal-line {
+    font-size: 11px;
+    margin-bottom: 2px;
   }
 </style>
 </head>
 <body>
+  <button class="print-btn" onclick="window.print()"><span>📥</span> Download / Print PDF</button>
   <div class="quote">
     <div style="display:flex; justify-content:space-between; align-items:flex-start;">
       <div>
         <h1>Quotation – ${projectName}</h1>
+        <div class="brand-line">
+          V-Sustain Solar Solutions <span class="brand-pill">Authorized Luminous Partner</span>
+        </div>
         <div class="meta">
           <span><strong>Project size:</strong> ${plantKw.toFixed(2)} kW</span>
           ${panel ? `<span><strong>DC Capacity:</strong> ${panelCapKw.toFixed(2)} kWp</span>` : ""}
         </div>
       </div>
-      <div style="text-align:right;">
-        <div class="badge">Detailed quotation</div>
-        <div class="meta" style="margin-top:6px;">
-          ${projectLocation ? `<div><strong>Location:</strong> ${projectLocation}</div>` : ""}
-          ${projectDate ? `<div><strong>Date:</strong> ${projectDate}</div>` : ""}
-          <div><strong>Margin:</strong> ${margin.toFixed(1)} % over dealer</div>
-        </div>
+      <div style="text-align:right; font-size:12px; color:#6b7280;">
+        ${projectLocation ? `<div><strong>Location:</strong> ${projectLocation}</div>` : ""}
+        ${projectDate ? `<div><strong>Date:</strong> ${projectDate}</div>` : ""}
+        <div><strong>Margin:</strong> ${margin.toFixed(1)} % over dealer</div>
+        <div><strong>GST:</strong> 5% on inverter & modules, 18% on others</div>
       </div>
     </div>
 
@@ -1186,31 +1440,38 @@
           <th>Unit</th>
           <th style="text-align:right;">Rate (₹)</th>
           <th style="text-align:right;">Amount (₹)</th>
+          <th style="text-align:center;">GST %</th>
+          <th style="text-align:right;">GST Amt (₹)</th>
+          <th style="text-align:right;">Line Total (₹)</th>
         </tr>
       </thead>
       <tbody>
         ${rowsHtml}
       </tbody>
       <tfoot>
+        <tr class="subtotal-row">
+          <td colspan="6" style="text-align:right;">Subtotal (before GST)</td>
+          <td style="text-align:right;">${formatMoney(totals.subtotal)}</td>
+          <td colspan="3"></td>
+        </tr>
         <tr>
-          <td colspan="6" style="text-align:right;">Total</td>
+          <td colspan="6" style="text-align:right;">Total GST</td>
+          <td style="text-align:right;">${formatMoney(totals.totalGst)}</td>
+          <td colspan="3"></td>
+        </tr>
+        <tr>
+          <td colspan="6" style="text-align:right;">Grand Total (incl. GST)</td>
           <td style="text-align:right;">${formatMoney(totals.grandTotal)}</td>
+          <td colspan="3"></td>
         </tr>
       </tfoot>
     </table>
 
     <div class="totals">
-      Total contract value (excl. taxes, if applicable): <strong>${formatMoney(totals.grandTotal)}</strong>
+      Total contract value (incl. GST): <strong>${formatMoney(totals.grandTotal)}</strong>
     </div>
 
-    <div class="footnote">
-      <strong>Notes:</strong>
-      <ul>
-        <li>Prices are indicative and subject to change based on actual site conditions, DISCOM requirements and final design.</li>
-        <li>Any civil work, additional cabling, trenching, net-meter charges or approvals are excluded unless specifically mentioned.</li>
-        <li>Taxes and duties (if applicable) are extra at actuals.</li>
-      </ul>
-    </div>
+    ${buildCommonFooterSections()}
   </div>
 </body>
 </html>
@@ -1231,64 +1492,110 @@
       const inverterSel = document.getElementById("inverterSelect");
       const inv = inverters.find(i => i.model === inverterSel.value);
 
+      const linesHtml = totals.items.map((item, idx) => `
+        <tr>
+          <td>${idx + 1}</td>
+          <td>${item.item}</td>
+          <td>${item.desc}</td>
+          <td style="text-align:right;">${item.qty.toFixed(2).replace(/\.00$/,"")}</td>
+          <td>${item.unit}</td>
+        </tr>
+      `).join("");
+
       return `
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8" />
-<title>Summary Quotation - ${projectName}</title>
+<title>Quotation - ${projectName}</title>
 <style>
   body {
     font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     background: #f9fafb;
     margin: 0;
     padding: 24px;
+    color: #0f172a;
   }
   .quote {
-    max-width: 700px;
+    max-width: 760px;
     margin: 0 auto;
     background: #ffffff;
-    border-radius: 12px;
+    border-radius: 14px;
     padding: 24px 28px;
     box-shadow: 0 10px 36px rgba(15,23,42,0.15);
-    color: #0f172a;
+    position: relative;
+  }
+  .print-btn {
+    position: fixed;
+    top: 18px;
+    right: 24px;
+    padding: 6px 12px;
+    border-radius: 999px;
+    border: none;
+    background: #22c55e;
+    color: #022c22;
+    font-size: 12px;
+    cursor: pointer;
+    box-shadow: 0 8px 20px rgba(34,197,94,0.4);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .print-btn span {
+    font-size: 14px;
+  }
+  @media print {
+    .print-btn { display:none; }
+    body { background:#ffffff; padding:0; }
+    .quote { box-shadow:none; border-radius:0; margin:0; }
   }
   h1 {
     margin: 0 0 4px;
     font-size: 24px;
+  }
+  .brand-line {
+    font-size: 13px;
+    color: #6b7280;
+  }
+  .brand-pill {
+    display: inline-block;
+    font-size: 11px;
+    border-radius: 999px;
+    padding: 2px 8px;
+    border: 1px solid #0ea5e9;
+    color: #0369a1;
+    background: #e0f2fe;
+    margin-top: 4px;
   }
   .meta {
     font-size: 13px;
     color: #6b7280;
     margin-bottom: 18px;
   }
-  .badge {
-    display: inline-block;
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 0.12em;
-    padding: 3px 8px;
-    border-radius: 999px;
-    border: 1px solid #0ea5e9;
-    color: #0369a1;
-    background: #e0f2fe;
+  .meta div {
+    margin-bottom: 2px;
   }
   .section-title {
     font-size: 13px;
     text-transform: uppercase;
     letter-spacing: 0.14em;
     color: #6b7280;
-    margin-bottom: 4px;
+    margin-bottom: 6px;
   }
-  .line {
-    display: flex;
-    justify-content: space-between;
-    padding: 6px 0;
-    border-bottom: 1px dashed #e5e7eb;
-    font-size: 13px;
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    font-size: 12px;
   }
-  .line span:last-child {
-    font-weight: 500;
+  th, td {
+    border: 1px solid #e5e7eb;
+    padding: 6px 6px;
+    vertical-align: top;
+  }
+  th {
+    background: #f9fafb;
+    text-align: left;
   }
   .total {
     margin-top: 16px;
@@ -1297,47 +1604,154 @@
     text-align: right;
   }
   .total strong {
-    font-size: 20px;
+    font-size: 18px;
     color: #16a34a;
   }
-  .footnote {
-    margin-top: 14px;
+  .hint {
+    margin-top: 6px;
     font-size: 11px;
     color: #6b7280;
+  }
+  .footer-sections {
+    margin-top: 24px;
+    border-top: 1px solid #e5e7eb;
+    padding-top: 18px;
+    font-size: 12px;
+    color: #374151;
+  }
+  .block {
+    margin-bottom: 16px;
+  }
+  .block h2 {
+    margin: 0 0 6px;
+    font-size: 14px;
+    display:flex;
+    align-items:center;
+    gap:6px;
+  }
+  .warranty-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .w-card {
+    flex: 0 0 120px;
+    background: #ecfdf5;
+    border-radius: 10px;
+    padding: 8px 10px;
+    border: 1px solid #bbf7d0;
+  }
+  .w-label {
+    font-size: 11px;
+    color: #166534;
+  }
+  .w-value {
+    font-size: 16px;
+    font-weight: 600;
+    color: #16a34a;
+  }
+  .fine-print {
+    font-size: 11px;
+    color: #6b7280;
+    margin-top: 6px;
+  }
+  .bullets {
+    margin: 0;
+    padding-left: 18px;
+  }
+  .bullets li {
+    margin-bottom: 4px;
+  }
+  .why-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px,1fr));
+    gap: 8px;
+  }
+  .why-card {
+    background: #eff6ff;
+    border-radius: 10px;
+    padding: 8px 10px;
+    border: 1px solid #bfdbfe;
+  }
+  .why-icon {
+    font-size: 16px;
+  }
+  .why-title {
+    font-size: 12px;
+    font-weight: 600;
+    margin-top: 2px;
+  }
+  .why-text {
+    font-size: 11px;
+    color: #4b5563;
+    margin-top: 2px;
+  }
+  .proposal-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px,1fr));
+    gap: 10px;
+  }
+  .proposal-title {
+    font-weight: 600;
+    font-size: 13px;
+  }
+  .proposal-sub {
+    font-size: 11px;
+    color: #6b7280;
+    margin-bottom: 4px;
+  }
+  .proposal-line {
+    font-size: 11px;
+    margin-bottom: 2px;
   }
 </style>
 </head>
 <body>
+  <button class="print-btn" onclick="window.print()"><span>📥</span> Download / Print PDF</button>
   <div class="quote">
     <div style="display:flex; justify-content:space-between; align-items:flex-start;">
       <div>
-        <h1>Summary – ${projectName}</h1>
+        <h1>Quotation – ${projectName}</h1>
+        <div class="brand-line">
+          V-Sustain Solar Solutions <span class="brand-pill">Quotation (Summary)</span>
+        </div>
         <div class="meta">
           <div><strong>Project size:</strong> ${plantKw.toFixed(2)} kW</div>
           ${panel ? `<div><strong>Panels:</strong> ${panelQty} × ${panel.name} (${panelCapKw.toFixed(2)} kWp DC)</div>` : ""}
           ${inv ? `<div><strong>Inverter:</strong> ${inv.model} (${inv.capacityKw} kW)</div>` : ""}
         </div>
       </div>
-      <div style="text-align:right;">
-        <div class="badge">Summary quotation</div>
-        <div class="meta" style="margin-top:6px;">
-          ${projectLocation ? `<div><strong>Location:</strong> ${projectLocation}</div>` : ""}
-          ${projectDate ? `<div><strong>Date:</strong> ${projectDate}</div>` : ""}
-        </div>
+      <div style="text-align:right; font-size:12px; color:#6b7280;">
+        ${projectLocation ? `<div><strong>Location:</strong> ${projectLocation}</div>` : ""}
+        ${projectDate ? `<div><strong>Date:</strong> ${projectDate}</div>` : ""}
+        <div><strong>GST:</strong> 5% on inverter & modules, 18% on others</div>
       </div>
     </div>
 
-    <div class="section-title">Scope overview</div>
-    <div class="line"><span>Design, supply & installation of grid-tied solar PV system</span><span>${plantKw.toFixed(2)} kW</span></div>
-    <div class="line"><span>Balance of system (ACDB, DCDB, cabling, earthing, structure etc.)</span><span>As per design</span></div>
+    <div class="section-title">Scope overview & bill of quantities</div>
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Item</th>
+          <th>Description</th>
+          <th style="text-align:right;">Qty</th>
+          <th>Unit</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${linesHtml}
+      </tbody>
+    </table>
 
     <div class="total">
-      Total project value (approx): <strong>${formatMoney(totals.grandTotal)}</strong>
+      Total project value (incl. GST): <strong>${formatMoney(totals.grandTotal)}</strong>
+    </div>
+    <div class="hint">
+      This is a summary view without item-wise price breakup. A detailed component-wise quotation is also available.
     </div>
 
-    <div class="footnote">
-      This is a summary quotation. Detailed component-wise breakup with individual prices is available in the detailed quotation.
-    </div>
+    ${buildCommonFooterSections()}
   </div>
 </body>
 </html>
@@ -1365,44 +1779,47 @@
         recalcInverterOptions();
         recalcPanels();
         recalcInstallAndStructure();
-        const totals = calcTotals();
+        calcTotals();
       });
 
       document.getElementById("marginPercent").addEventListener("input", () => {
         recalcInverterPrice();
         recalcAcdbPrice();
         recalcDcdbPrice();
-        const totals = calcTotals();
+        recalcPanels();
+        calcTotals();
       });
 
       document.getElementById("inverterSelect").addEventListener("change", () => {
         recalcInverterPrice();
-        const totals = calcTotals();
+        calcTotals();
       });
 
       document.getElementById("panelSelect").addEventListener("change", () => {
         recalcPanels();
-        const totals = calcTotals();
+        calcTotals();
       });
 
       document.getElementById("acdbSelect").addEventListener("change", () => {
         recalcAcdbPrice();
-        const totals = calcTotals();
+        calcTotals();
       });
 
       document.getElementById("dcdbSelect").addEventListener("change", () => {
         recalcDcdbPrice();
-        const totals = calcTotals();
+        calcTotals();
       });
 
-      ["acdbQty","dcdbQty","meterQty","meterPrice","acCableQty","acCablePrice",
-       "earthCableQty","earthCablePrice","installRate","structureRate",
-       "earthingSetQty","earthingSetPrice"].forEach(id => {
+      [
+        "acdbQty","dcdbQty","meterQty","meterPrice","acCableQty","acCablePrice",
+        "earthCableQty","earthCablePrice","installRate","structureRate",
+        "earthingSetQty","earthingSetPrice"
+      ].forEach(id => {
         document.getElementById(id).addEventListener("input", () => {
           if (id === "installRate" || id === "structureRate") {
             recalcInstallAndStructure();
           }
-          const totals = calcTotals();
+          calcTotals();
         });
       });
 
