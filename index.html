@@ -1,0 +1,1425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Solar Quote Generator</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #1e293b;
+      --card-soft: #111827;
+      --accent: #22c55e;
+      --accent-soft: rgba(34,197,94,0.2);
+      --text: #e5e7eb;
+      --muted: #9ca3af;
+      --danger: #f87171;
+    }
+
+    * {
+      box-sizing: border-box;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    body {
+      margin: 0;
+      background: radial-gradient(circle at top, #111827 0, #020617 55%);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      align-items: stretch;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1200px;
+      background: linear-gradient(135deg, var(--card-soft), var(--card));
+      border-radius: 18px;
+      padding: 24px;
+      box-shadow: 0 30px 70px rgba(15,23,42,0.8);
+      border: 1px solid rgba(148,163,184,0.25);
+    }
+
+    h1 {
+      margin-top: 0;
+      font-size: 28px;
+      letter-spacing: 0.02em;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    h1 span.logo-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      background: var(--accent);
+      box-shadow: 0 0 12px rgba(34,197,94,0.7);
+    }
+
+    .subtitle {
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 16px;
+      margin-top: 18px;
+    }
+
+    .card {
+      background: rgba(15,23,42,0.8);
+      border-radius: 14px;
+      padding: 16px 16px 18px;
+      border: 1px solid rgba(148,163,184,0.2);
+      box-shadow: 0 10px 30px rgba(15,23,42,0.8);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 10px;
+    }
+
+    .card-title {
+      font-size: 15px;
+      font-weight: 600;
+    }
+
+    .card-tag {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 2px 6px;
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,0.4);
+      color: var(--muted);
+    }
+
+    label {
+      display: block;
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 7px 9px;
+      border-radius: 8px;
+      border: 1px solid rgba(148,163,184,0.45);
+      background: rgba(15,23,42,0.9);
+      color: var(--text);
+      font-size: 13px;
+      outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
+    }
+
+    input:focus, select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px var(--accent-soft);
+      background: rgba(15,23,42,1);
+    }
+
+    input[readonly] {
+      background: rgba(15,23,42,0.7);
+      color: var(--muted);
+    }
+
+    .inline-fields {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0,1fr));
+      gap: 10px;
+    }
+
+    .inline-fields-2 {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0,1fr));
+      gap: 10px;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: rgba(15,23,42,0.8);
+      border: 1px solid rgba(148,163,184,0.4);
+      color: var(--muted);
+    }
+
+    .pill span {
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    .summary-bar {
+      margin-top: 18px;
+      padding: 12px 14px;
+      border-radius: 12px;
+      background: rgba(15,23,42,0.95);
+      border: 1px dashed rgba(148,163,184,0.5);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      font-size: 13px;
+    }
+
+    .summary-bar strong {
+      color: var(--accent);
+      font-size: 15px;
+    }
+
+    .summary-items {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .btn-row {
+      margin-top: 16px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    button {
+      border-radius: 999px;
+      border: none;
+      padding: 8px 14px;
+      font-size: 13px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 500;
+      transition: transform 0.12s, box-shadow 0.12s, background 0.12s, opacity 0.12s;
+    }
+
+    button.primary {
+      background: var(--accent);
+      color: #022c22;
+      box-shadow: 0 10px 25px rgba(34,197,94,0.35);
+    }
+
+    button.secondary {
+      background: rgba(15,23,42,0.9);
+      color: var(--text);
+      border: 1px solid rgba(148,163,184,0.6);
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 12px 28px rgba(15,23,42,0.85);
+      opacity: 0.95;
+    }
+
+    button:active {
+      transform: translateY(0);
+      box-shadow: none;
+      opacity: 0.9;
+    }
+
+    .danger-text {
+      color: var(--danger);
+      font-size: 12px;
+      margin-top: 4px;
+    }
+
+    .note {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 6px;
+    }
+
+    .badge-ok {
+      color: #4ade80;
+      font-size: 11px;
+    }
+
+    .badge-warn {
+      color: #facc15;
+      font-size: 11px;
+    }
+
+    @media (max-width: 900px) {
+      body {
+        padding: 12px;
+      }
+      .grid {
+        grid-template-columns: repeat(1, minmax(0,1fr));
+      }
+    }
+
+    /* Quotation styles (used in popup) */
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>
+      <span class="logo-dot"></span>
+      Solar Quote Generator
+    </h1>
+    <div class="subtitle">
+      Enter plant details, choose components and generate a detailed or summary quotation instantly.
+    </div>
+
+    <!-- Top controls -->
+    <div class="grid" style="margin-top: 22px;">
+      <div class="card" style="grid-column: span 4;">
+        <div class="card-header">
+          <div class="card-title">1. Project Size</div>
+          <div class="card-tag">kW input</div>
+        </div>
+        <label for="plantKw">Plant capacity (kW)</label>
+        <input type="number" id="plantKw" min="0" step="0.1" placeholder="e.g. 3, 5, 10" />
+        <div class="note">
+          All auto-calculations (inverter options, panels, installation & structure) use this value.
+        </div>
+      </div>
+
+      <div class="card" style="grid-column: span 4;">
+        <div class="card-header">
+          <div class="card-title">2. Margin</div>
+          <div class="card-tag">Dealer + %</div>
+        </div>
+        <label for="marginPercent">Margin over dealer price (%)</label>
+        <input type="number" id="marginPercent" min="0" max="200" step="1" value="20" />
+        <div class="note">
+          Applied to items with a fixed dealer price list (inverters, ACDB, DCDB, etc.).
+        </div>
+      </div>
+
+      <div class="card" style="grid-column: span 4;">
+        <div class="card-header">
+          <div class="card-title">Project Info</div>
+          <div class="card-tag">Optional</div>
+        </div>
+        <label for="projectName">Project / Customer name</label>
+        <input type="text" id="projectName" placeholder="e.g. Mr. Sharma - 5kW Rooftop" />
+        <div class="inline-fields-2" style="margin-top: 8px;">
+          <div>
+            <label for="projectLocation">Location</label>
+            <input type="text" id="projectLocation" placeholder="e.g. Bengaluru, India" />
+          </div>
+          <div>
+            <label for="projectDate">Quotation date</label>
+            <input type="date" id="projectDate" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Components -->
+    <div class="grid">
+      <!-- Inverter -->
+      <div class="card" style="grid-column: span 4;">
+        <div class="card-header">
+          <div class="card-title">3. Inverter</div>
+          <div class="card-tag">On-grid</div>
+        </div>
+        <label for="inverterSelect">Inverter model (capacity ≥ plant kW)</label>
+        <select id="inverterSelect">
+          <option value="">Select inverter</option>
+        </select>
+        <div class="inline-fields-2" style="margin-top: 8px;">
+          <div>
+            <label>Dealer price (₹)</label>
+            <input type="text" id="inverterDealer" readonly />
+          </div>
+          <div>
+            <label>Billing price with margin (₹)</label>
+            <input type="text" id="inverterSell" readonly />
+          </div>
+        </div>
+      </div>
+
+      <!-- Panels -->
+      <div class="card" style="grid-column: span 4;">
+        <div class="card-header">
+          <div class="card-title">4. Solar Panels</div>
+          <div class="card-tag">DC side</div>
+        </div>
+        <label for="panelSelect">Panel model</label>
+        <select id="panelSelect">
+          <option value="">Select panel</option>
+        </select>
+
+        <div class="inline-fields">
+          <div>
+            <label>Panel wattage (Wp)</label>
+            <input type="text" id="panelWatt" readonly />
+          </div>
+          <div>
+            <label>No. of panels (auto)</label>
+            <input type="text" id="panelQty" readonly />
+          </div>
+          <div>
+            <label>Total DC capacity (kWp)</label>
+            <input type="text" id="panelCapacity" readonly />
+          </div>
+        </div>
+
+        <div id="panelCapacityNote" class="note"></div>
+      </div>
+
+      <!-- Meter -->
+      <div class="card" style="grid-column: span 4;">
+        <div class="card-header">
+          <div class="card-title">5. Bi-directional Meter</div>
+          <div class="card-tag">DISCOM</div>
+        </div>
+        <label for="meterType">Meter type</label>
+        <select id="meterType">
+          <option value="">Select</option>
+          <option value="Single Phase">Single phase</option>
+          <option value="Three Phase">Three phase</option>
+        </select>
+        <div class="inline-fields-2" style="margin-top: 8px;">
+          <div>
+            <label>Quantity</label>
+            <input type="number" id="meterQty" min="0" step="1" value="1" />
+          </div>
+          <div>
+            <label>Price per unit (₹)</label>
+            <input type="number" id="meterPrice" min="0" step="1" placeholder="Enter price" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid">
+      <!-- ACDB -->
+      <div class="card" style="grid-column: span 4;">
+        <div class="card-header">
+          <div class="card-title">6. ACDB</div>
+          <div class="card-tag">Protection</div>
+        </div>
+        <label for="acdbSelect">ACDB model</label>
+        <select id="acdbSelect">
+          <option value="">Select ACDB</option>
+        </select>
+        <div class="inline-fields-2" style="margin-top: 8px;">
+          <div>
+            <label>Quantity</label>
+            <input type="number" id="acdbQty" value="1" min="0" step="1" />
+          </div>
+          <div>
+            <label>Billing price per unit (₹)</label>
+            <input type="text" id="acdbSell" readonly />
+          </div>
+        </div>
+      </div>
+
+      <!-- DCDB -->
+      <div class="card" style="grid-column: span 4;">
+        <div class="card-header">
+          <div class="card-title">7. DCDB</div>
+          <div class="card-tag">Protection</div>
+        </div>
+        <label for="dcdbSelect">DCDB model</label>
+        <select id="dcdbSelect">
+          <option value="">Select DCDB</option>
+        </select>
+        <div class="inline-fields-2" style="margin-top: 8px;">
+          <div>
+            <label>Quantity</label>
+            <input type="number" id="dcdbQty" value="1" min="0" step="1" />
+          </div>
+          <div>
+            <label>Billing price per unit (₹)</label>
+            <input type="text" id="dcdbSell" readonly />
+          </div>
+        </div>
+      </div>
+
+      <!-- AC Cable -->
+      <div class="card" style="grid-column: span 4;">
+        <div class="card-header">
+          <div class="card-title">8. AC Cable</div>
+          <div class="card-tag">Manual</div>
+        </div>
+        <div class="inline-fields">
+          <div>
+            <label>Gauge / spec</label>
+            <input type="text" id="acCableGauge" placeholder="e.g. 4 core 10 sqmm" />
+          </div>
+          <div>
+            <label>Quantity (mtr)</label>
+            <input type="number" id="acCableQty" min="0" step="1" />
+          </div>
+          <div>
+            <label>Rate per unit (₹)</label>
+            <input type="number" id="acCablePrice" min="0" step="1" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid">
+      <!-- Earthing cable -->
+      <div class="card" style="grid-column: span 4;">
+        <div class="card-header">
+          <div class="card-title">9. Earthing Cable</div>
+          <div class="card-tag">Manual</div>
+        </div>
+        <div class="inline-fields">
+          <div>
+            <label>Gauge / spec</label>
+            <input type="text" id="earthCableGauge" placeholder="e.g. 16 sqmm" />
+          </div>
+          <div>
+            <label>Quantity (mtr)</label>
+            <input type="number" id="earthCableQty" min="0" step="1" />
+          </div>
+          <div>
+            <label>Rate per unit (₹)</label>
+            <input type="number" id="earthCablePrice" min="0" step="1" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Installation -->
+      <div class="card" style="grid-column: span 4;">
+        <div class="card-header">
+          <div class="card-title">10. Installation</div>
+          <div class="card-tag">Auto</div>
+        </div>
+        <div class="inline-fields-2">
+          <div>
+            <label>Rate (₹/kW)</label>
+            <input type="number" id="installRate" value="5000" />
+          </div>
+          <div>
+            <label>Installation total (₹)</label>
+            <input type="text" id="installTotal" readonly />
+          </div>
+        </div>
+        <div class="note">
+          Calculated as <strong>kW × rate</strong>. Default 5,000 ₹/kW.
+        </div>
+      </div>
+
+      <!-- Structure -->
+      <div class="card" style="grid-column: span 4;">
+        <div class="card-header">
+          <div class="card-title">11. Structure</div>
+          <div class="card-tag">Auto</div>
+        </div>
+        <div class="inline-fields-2">
+          <div>
+            <label>Rate (₹/kW)</label>
+            <input type="number" id="structureRate" value="8000" />
+          </div>
+          <div>
+            <label>Structure total (₹)</label>
+            <input type="text" id="structureTotal" readonly />
+          </div>
+        </div>
+        <div class="note">
+          Calculated as <strong>kW × rate</strong>. Default 8,000 ₹/kW.
+        </div>
+      </div>
+    </div>
+
+    <div class="grid">
+      <!-- Earthing set -->
+      <div class="card" style="grid-column: span 4;">
+        <div class="card-header">
+          <div class="card-title">12. Earthing Set</div>
+          <div class="card-tag">Manual</div>
+        </div>
+        <div class="inline-fields-2">
+          <div>
+            <label>Quantity</label>
+            <input type="number" id="earthingSetQty" min="0" step="1" value="3" />
+          </div>
+          <div>
+            <label>Price per set (₹)</label>
+            <input type="number" id="earthingSetPrice" min="0" step="1" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Summary + buttons -->
+    <div class="summary-bar">
+      <div>
+        Project total (incl. margin items): <strong id="summaryTotal">₹0</strong>
+      </div>
+      <div class="summary-items">
+        <span id="summaryPlant">Plant: –</span>
+        <span id="summaryPanels">Panels: –</span>
+        <span id="summaryInverter">Inverter: –</span>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button type="button" class="primary" id="btnDetailed">
+        💼 Generate detailed quotation
+      </button>
+      <button type="button" class="secondary" id="btnSummary">
+        📄 Generate summary quotation
+      </button>
+    </div>
+  </div>
+
+  <script>
+    // ---------- DATA SETUP ----------
+
+    const inverters = [
+      { model: "NXI 120(2KW) (EXC.DONGLE)", capacityKw: 2, dealerPrice: 16882 },
+      { model: "NXI 130(3KW) (EXC.DONGLE)", capacityKw: 3, dealerPrice: 17915 },
+      { model: "NXI 130(3KW) (INCL.DONGLE)", capacityKw: 3, dealerPrice: 18022 },
+      { model: "NXI T130(3KW) + DONGLE", capacityKw: 3, dealerPrice: 18022 },
+      { model: "NXI 140(4KW) (EXC.DONGLE)", capacityKw: 4, dealerPrice: 28509 },
+      { model: "NXI 150(5KW) (EXC.DONGLE)", capacityKw: 5, dealerPrice: 30508 },
+      { model: "NXI 305(5KW) (EXC.DONGLE)", capacityKw: 5, dealerPrice: 45696 },
+      { model: "NXI 306(6KW) (EXC.DONGLE)", capacityKw: 6, dealerPrice: 51206 },
+      { model: "NXI 308(8KW) (EXC.DONGLE)", capacityKw: 8, dealerPrice: 57641 },
+      { model: "NXI 310(10KW) (EXC.DONGLE)", capacityKw: 10, dealerPrice: 59110 },
+      { model: "NXI 312(12KW) (EXC.DONGLE)", capacityKw: 12, dealerPrice: 63560 },
+      { model: "NXI 315(15KW) (EXC.DONGLE)", capacityKw: 15, dealerPrice: 66339 },
+      { model: "NXI 320(20KW) (EXC.DONGLE)", capacityKw: 20, dealerPrice: 79429 },
+      { model: "NXI 325(25KW) (EXC.DONGLE)", capacityKw: 25, dealerPrice: 97180 },
+      { model: "NXI 330(30KW) (EXC.DONGLE)", capacityKw: 30, dealerPrice: 110076 },
+      { model: "NXI 350(50KW) (EXC.DONGLE)", capacityKw: 50, dealerPrice: 150912 },
+      { model: "NXI 360(60KW) (EXC.DONGLE)", capacityKw: 60, dealerPrice: 161198 },
+      { model: "NXI 380(80KW) (EXC.DONGLE)", capacityKw: 80, dealerPrice: 251588 },
+      { model: "NXI 3100(100KW) (EXC.DONGLE)", capacityKw: 100, dealerPrice: 268801 },
+      { model: "NXI W3125(125KW) (INCL.DONGLE)", capacityKw: 125, dealerPrice: 317042 },
+      { model: "NXI W3150(150KW) (INCL.DONGLE)", capacityKw: 150, dealerPrice: 344553 },
+      { model: "NXI A3250-HV(250KW)", capacityKw: 250, dealerPrice: 417806 },
+      { model: "NXI A3250-HV(350KW)", capacityKw: 350, dealerPrice: 555492 }
+    ];
+
+    // Mock solar panels based on common wattages in India (approx. 440–550 Wp)
+    const panels = [
+      { name: "Mono PERC 440Wp (Half-Cut)", watt: 440 },
+      { name: "Mono PERC 500Wp", watt: 500 },
+      { name: "Mono PERC 540Wp", watt: 540 },
+      { name: "Mono PERC 550Wp (Bifacial)", watt: 550 }
+    ];
+
+    // ACDB & DCDB dealer price list (₹ inc tax)
+    const acdbItems = [
+      { sku: "TSAD0AC32PH1", desc: "ACDB Single Phase 32 Amp (0-5 kW)", dealerPrice: 1899.80 },
+      { sku: "TSAD0AC63PH1", desc: "ACDB Single Phase 63 Amp (7 kW)", dealerPrice: 2312.80 },
+      { sku: "TSAD0AC40PH1", desc: "ACDB Single Phase 40 Amp (9 kW)", dealerPrice: 2277.40 },
+      { sku: "TSAD0AC80PH1", desc: "ACDB Single Phase 80 Amp (11 kW)", dealerPrice: 4708.20 },
+      { sku: "TSADAC100PH1", desc: "ACDB Single Phase 100 Amp", dealerPrice: 4920.60 },
+      { sku: "TSAD0AC32PH3", desc: "ACDB Three Phase 32 Amp", dealerPrice: 4177.20 }
+    ];
+
+    const dcdbItems = [
+      { sku: "TSADDC600V11", desc: "DCDB 1 In 1 Out With MCB", dealerPrice: 1939.92 },
+      { sku: "TSADDC600V22", desc: "DCDB 2 In 2 Out With Fuse", dealerPrice: 2808.40 },
+      { sku: "TSADDC600V21", desc: "DCDB 2 In 1 Out With MCB", dealerPrice: 2997.20 },
+      { sku: "TSADDC600V31", desc: "DCDB 3 In 1 Out With MCB", dealerPrice: 3835.00 },
+      { sku: "TSADDC600V41", desc: "DCDB 4 In 1 Out With MCB", dealerPrice: 4224.40 },
+      { sku: "TSADDC600V11F", desc: "DCDB 1 In 1 Out With Fuse (A)", dealerPrice: 1711.00 },
+      { sku: "TSADC600V21F", desc: "DCDB 2 In 1 Out With Fuse", dealerPrice: 2383.60 },
+      { sku: "TSADC600V31F", desc: "DCDB 3 In 1 Out With Fuse", dealerPrice: 2725.80 },
+      { sku: "TSADC600V41F", desc: "DCDB 4 In 1 Out With Fuse", dealerPrice: 3103.40 }
+    ];
+
+    // ---------- HELPERS ----------
+
+    const formatMoney = (value) => {
+      if (isNaN(value) || !isFinite(value)) return "0";
+      return value.toLocaleString("en-IN", {
+        style: "currency",
+        currency: "INR",
+        maximumFractionDigits: 2
+      });
+    };
+
+    const getMarginFactor = () => {
+      const marginInput = document.getElementById("marginPercent");
+      const m = parseFloat(marginInput.value || "0");
+      if (isNaN(m)) return 1;
+      return 1 + m / 100;
+    };
+
+    const getPlantKw = () => {
+      const plantKwInput = document.getElementById("plantKw");
+      const kW = parseFloat(plantKwInput.value || "0");
+      return isNaN(kW) ? 0 : kW;
+    };
+
+    const recalcInverterOptions = () => {
+      const plantKw = getPlantKw();
+      const inverterSelect = document.getElementById("inverterSelect");
+      const currentValue = inverterSelect.value;
+      inverterSelect.innerHTML = '<option value="">Select inverter</option>';
+
+      const eligible = inverters.filter(i => plantKw === 0 || i.capacityKw >= plantKw);
+      eligible.forEach((inv, index) => {
+        const opt = document.createElement("option");
+        opt.value = inv.model;
+        opt.textContent = `${inv.model} (${inv.capacityKw} kW)`;
+        inverterSelect.appendChild(opt);
+      });
+
+      // Try to keep previous selection if still valid
+      const stillExists = Array.from(inverterSelect.options).some(o => o.value === currentValue);
+      if (stillExists) inverterSelect.value = currentValue;
+      recalcInverterPrice();
+    };
+
+    const recalcInverterPrice = () => {
+      const inverterSelect = document.getElementById("inverterSelect");
+      const inverterDealer = document.getElementById("inverterDealer");
+      const inverterSell = document.getElementById("inverterSell");
+      const selected = inverters.find(i => i.model === inverterSelect.value);
+      const marginFactor = getMarginFactor();
+
+      if (!selected) {
+        inverterDealer.value = "";
+        inverterSell.value = "";
+        return;
+      }
+
+      inverterDealer.value = Math.round(selected.dealerPrice).toLocaleString("en-IN");
+      const sellPrice = selected.dealerPrice * marginFactor;
+      inverterSell.value = Math.round(sellPrice).toLocaleString("en-IN");
+    };
+
+    const initPanelOptions = () => {
+      const panelSelect = document.getElementById("panelSelect");
+      panels.forEach(p => {
+        const opt = document.createElement("option");
+        opt.value = p.name;
+        opt.textContent = `${p.name} (${p.watt} Wp)`;
+        panelSelect.appendChild(opt);
+      });
+    };
+
+    const recalcPanels = () => {
+      const panelSelect = document.getElementById("panelSelect");
+      const panelWattEl = document.getElementById("panelWatt");
+      const panelQtyEl = document.getElementById("panelQty");
+      const panelCapEl = document.getElementById("panelCapacity");
+      const noteEl = document.getElementById("panelCapacityNote");
+
+      const selected = panels.find(p => p.name === panelSelect.value);
+      const plantKw = getPlantKw();
+      if (!selected || plantKw <= 0) {
+        panelWattEl.value = "";
+        panelQtyEl.value = "";
+        panelCapEl.value = "";
+        noteEl.innerHTML = "";
+        return;
+      }
+
+      panelWattEl.value = selected.watt;
+
+      const requiredWatt = plantKw * 1000;
+      const qty = Math.ceil(requiredWatt / selected.watt);
+      const totalWatt = qty * selected.watt;
+      const totalKw = totalWatt / 1000;
+
+      panelQtyEl.value = qty;
+      panelCapEl.value = totalKw.toFixed(2);
+
+      const maxKw = plantKw * 1.1;
+      if (totalKw <= maxKw) {
+        noteEl.innerHTML = `<span class="badge-ok">✔ Within 10% limit.</span> Panel DC capacity = ${totalKw.toFixed(2)} kWp (max allowed ${maxKw.toFixed(2)} kWp).`;
+      } else {
+        noteEl.innerHTML = `<span class="badge-warn">⚠ Above 10% limit.</span> Panel DC capacity = ${totalKw.toFixed(2)} kWp (max allowed ${maxKw.toFixed(2)} kWp).`;
+      }
+    };
+
+    const initAcdbDcdbOptions = () => {
+      const acdbSelect = document.getElementById("acdbSelect");
+      const dcdbSelect = document.getElementById("dcdbSelect");
+
+      acdbItems.forEach(item => {
+        const opt = document.createElement("option");
+        opt.value = item.sku;
+        opt.textContent = `${item.desc} (${item.sku})`;
+        acdbSelect.appendChild(opt);
+      });
+
+      dcdbItems.forEach(item => {
+        const opt = document.createElement("option");
+        opt.value = item.sku;
+        opt.textContent = `${item.desc} (${item.sku})`;
+        dcdbSelect.appendChild(opt);
+      });
+    };
+
+    const recalcAcdbPrice = () => {
+      const acdbSelect = document.getElementById("acdbSelect");
+      const acdbSell = document.getElementById("acdbSell");
+      const marginFactor = getMarginFactor();
+      const selected = acdbItems.find(i => i.sku === acdbSelect.value);
+      if (!selected) {
+        acdbSell.value = "";
+        return;
+      }
+      const sell = selected.dealerPrice * marginFactor;
+      acdbSell.value = Math.round(sell).toLocaleString("en-IN");
+    };
+
+    const recalcDcdbPrice = () => {
+      const dcdbSelect = document.getElementById("dcdbSelect");
+      const dcdbSell = document.getElementById("dcdbSell");
+      const marginFactor = getMarginFactor();
+      const selected = dcdbItems.find(i => i.sku === dcdbSelect.value);
+      if (!selected) {
+        dcdbSell.value = "";
+        return;
+      }
+      const sell = selected.dealerPrice * marginFactor;
+      dcdbSell.value = Math.round(sell).toLocaleString("en-IN");
+    };
+
+    const recalcInstallAndStructure = () => {
+      const plantKw = getPlantKw();
+      const installRate = parseFloat(document.getElementById("installRate").value || "0");
+      const structureRate = parseFloat(document.getElementById("structureRate").value || "0");
+
+      document.getElementById("installTotal").value =
+        Math.round(plantKw * installRate).toLocaleString("en-IN");
+      document.getElementById("structureTotal").value =
+        Math.round(plantKw * structureRate).toLocaleString("en-IN");
+    };
+
+    const parseIndianNumber = (s) => {
+      if (!s) return 0;
+      const clean = String(s).replace(/,/g, "").trim();
+      const val = parseFloat(clean);
+      return isNaN(val) ? 0 : val;
+    };
+
+    const calcTotals = () => {
+      const plantKw = getPlantKw();
+      const marginFactor = getMarginFactor();
+
+      // Inverter
+      const invSel = document.getElementById("inverterSelect");
+      const selectedInv = inverters.find(i => i.model === invSel.value);
+      const inverterQty = selectedInv ? 1 : 0;
+      const inverterLine = selectedInv ? selectedInv.dealerPrice * marginFactor * inverterQty : 0;
+
+      // ACDB
+      const acdbSel = document.getElementById("acdbSelect");
+      const acdbQty = parseFloat(document.getElementById("acdbQty").value || "0");
+      const acdbItem = acdbItems.find(i => i.sku === acdbSel.value);
+      const acdbLine = acdbItem ? acdbItem.dealerPrice * marginFactor * acdbQty : 0;
+
+      // DCDB
+      const dcdbSel = document.getElementById("dcdbSelect");
+      const dcdbQty = parseFloat(document.getElementById("dcdbQty").value || "0");
+      const dcdbItem = dcdbItems.find(i => i.sku === dcdbSel.value);
+      const dcdbLine = dcdbItem ? dcdbItem.dealerPrice * marginFactor * dcdbQty : 0;
+
+      // Meter
+      const meterQty = parseFloat(document.getElementById("meterQty").value || "0");
+      const meterPrice = parseFloat(document.getElementById("meterPrice").value || "0");
+      const meterLine = meterQty * meterPrice;
+
+      // AC cable
+      const acCableQty = parseFloat(document.getElementById("acCableQty").value || "0");
+      const acCablePrice = parseFloat(document.getElementById("acCablePrice").value || "0");
+      const acCableLine = acCableQty * acCablePrice;
+
+      // Earthing cable
+      const earthCableQty = parseFloat(document.getElementById("earthCableQty").value || "0");
+      const earthCablePrice = parseFloat(document.getElementById("earthCablePrice").value || "0");
+      const earthCableLine = earthCableQty * earthCablePrice;
+
+      // Installation & structure (already final)
+      const installLine = parseIndianNumber(document.getElementById("installTotal").value);
+      const structureLine = parseIndianNumber(document.getElementById("structureTotal").value);
+
+      // Earthing set
+      const earthingSetQty = parseFloat(document.getElementById("earthingSetQty").value || "0");
+      const earthingSetPrice = parseFloat(document.getElementById("earthingSetPrice").value || "0");
+      const earthingSetLine = earthingSetQty * earthingSetPrice;
+
+      const grandTotal = inverterLine + acdbLine + dcdbLine + meterLine +
+        acCableLine + earthCableLine + installLine + structureLine + earthingSetLine;
+
+      document.getElementById("summaryTotal").textContent = formatMoney(grandTotal);
+
+      // Summary texts
+      const panelSelect = document.getElementById("panelSelect");
+      const panelQty = document.getElementById("panelQty").value || "";
+      document.getElementById("summaryPlant").textContent =
+        plantKw > 0 ? `Plant: ${plantKw} kW` : "Plant: –";
+      document.getElementById("summaryPanels").textContent =
+        panelSelect.value ? `Panels: ${panelQty} × ${panelSelect.value}` : "Panels: –";
+      document.getElementById("summaryInverter").textContent =
+        selectedInv ? `Inverter: ${selectedInv.model}` : "Inverter: –";
+
+      return {
+        grandTotal,
+        inverterLine,
+        acdbLine,
+        dcdbLine,
+        meterLine,
+        acCableLine,
+        earthCableLine,
+        installLine,
+        structureLine,
+        earthingSetLine
+      };
+    };
+
+    const validateCore = () => {
+      const plantKw = getPlantKw();
+      const margin = parseFloat(document.getElementById("marginPercent").value || "0");
+      if (!plantKw || plantKw <= 0) {
+        alert("Please enter a valid plant capacity in kW.");
+        return false;
+      }
+      if (margin < 0) {
+        alert("Margin cannot be negative.");
+        return false;
+      }
+      return true;
+    };
+
+    // ---------- QUOTATION TEMPLATES ----------
+
+    const buildDetailedQuotationHtml = (totals) => {
+      const plantKw = getPlantKw();
+      const projectName = document.getElementById("projectName").value || "Solar PV System";
+      const projectLocation = document.getElementById("projectLocation").value || "";
+      const projectDate = document.getElementById("projectDate").value || "";
+      const margin = parseFloat(document.getElementById("marginPercent").value || "0");
+
+      const inverterSel = document.getElementById("inverterSelect");
+      const inv = inverters.find(i => i.model === inverterSel.value);
+
+      const panelSel = document.getElementById("panelSelect");
+      const panel = panels.find(p => p.name === panelSel.value);
+      const panelQty = parseFloat(document.getElementById("panelQty").value || "0");
+      const panelCapKw = parseFloat(document.getElementById("panelCapacity").value || "0");
+
+      const acdbSel = document.getElementById("acdbSelect");
+      const acdbItem = acdbItems.find(i => i.sku === acdbSel.value);
+      const acdbQty = parseFloat(document.getElementById("acdbQty").value || "0");
+
+      const dcdbSel = document.getElementById("dcdbSelect");
+      const dcdbItem = dcdbItems.find(i => i.sku === dcdbSel.value);
+      const dcdbQty = parseFloat(document.getElementById("dcdbQty").value || "0");
+
+      const meterType = document.getElementById("meterType").value || "";
+      const meterQty = parseFloat(document.getElementById("meterQty").value || "0");
+      const meterPrice = parseFloat(document.getElementById("meterPrice").value || "0");
+
+      const acCableGauge = document.getElementById("acCableGauge").value || "";
+      const acCableQty = parseFloat(document.getElementById("acCableQty").value || "0");
+      const acCablePrice = parseFloat(document.getElementById("acCablePrice").value || "0");
+
+      const earthCableGauge = document.getElementById("earthCableGauge").value || "";
+      const earthCableQty = parseFloat(document.getElementById("earthCableQty").value || "0");
+      const earthCablePrice = parseFloat(document.getElementById("earthCablePrice").value || "0");
+
+      const installRate = parseFloat(document.getElementById("installRate").value || "0");
+      const structureRate = parseFloat(document.getElementById("structureRate").value || "0");
+
+      const earthingSetQty = parseFloat(document.getElementById("earthingSetQty").value || "0");
+      const earthingSetPrice = parseFloat(document.getElementById("earthingSetPrice").value || "0");
+
+      const marginFactor = getMarginFactor();
+
+      const rows = [];
+
+      if (panel && panelQty > 0) {
+        rows.push({
+          sr: 1,
+          item: "Solar PV Modules",
+          desc: `${panelQty} × ${panel.name} (${panel.watt} Wp) | DC capacity ≈ ${panelCapKw.toFixed(2)} kWp`,
+          qty: panelQty,
+          unit: "Nos",
+          unitRate: formatMoney(0), // you can plug panel cost later
+          amount: formatMoney(0)
+        });
+      }
+
+      if (inv) {
+        const invSell = inv.dealerPrice * marginFactor;
+        rows.push({
+          sr: rows.length + 1,
+          item: "Solar Inverter",
+          desc: `${inv.model} (${inv.capacityKw} kW)`,
+          qty: 1,
+          unit: "Nos",
+          unitRate: formatMoney(invSell),
+          amount: formatMoney(totals.inverterLine)
+        });
+      }
+
+      if (acdbItem && acdbQty > 0) {
+        const sell = acdbItem.dealerPrice * marginFactor;
+        rows.push({
+          sr: rows.length + 1,
+          item: "ACDB",
+          desc: `${acdbItem.desc} (${acdbItem.sku})`,
+          qty: acdbQty,
+          unit: "Nos",
+          unitRate: formatMoney(sell),
+          amount: formatMoney(totals.acdbLine)
+        });
+      }
+
+      if (dcdbItem && dcdbQty > 0) {
+        const sell = dcdbItem.dealerPrice * marginFactor;
+        rows.push({
+          sr: rows.length + 1,
+          item: "DCDB",
+          desc: `${dcdbItem.desc} (${dcdbItem.sku})`,
+          qty: dcdbQty,
+          unit: "Nos",
+          unitRate: formatMoney(sell),
+          amount: formatMoney(totals.dcdbLine)
+        });
+      }
+
+      if (meterType && meterQty > 0) {
+        rows.push({
+          sr: rows.length + 1,
+          item: "Bi-directional Energy Meter",
+          desc: meterType,
+          qty: meterQty,
+          unit: "Nos",
+          unitRate: formatMoney(meterPrice),
+          amount: formatMoney(totals.meterLine)
+        });
+      }
+
+      if (acCableQty > 0) {
+        rows.push({
+          sr: rows.length + 1,
+          item: "AC Cable",
+          desc: acCableGauge || "AC Cable",
+          qty: acCableQty,
+          unit: "Mtr",
+          unitRate: formatMoney(acCablePrice),
+          amount: formatMoney(totals.acCableLine)
+        });
+      }
+
+      if (earthCableQty > 0) {
+        rows.push({
+          sr: rows.length + 1,
+          item: "Earthing Cable",
+          desc: earthCableGauge || "Earthing Cable",
+          qty: earthCableQty,
+          unit: "Mtr",
+          unitRate: formatMoney(earthCablePrice),
+          amount: formatMoney(totals.earthCableLine)
+        });
+      }
+
+      if (plantKw > 0 && installRate > 0) {
+        rows.push({
+          sr: rows.length + 1,
+          item: "Installation & Commissioning",
+          desc: `Complete installation @ ${formatMoney(installRate)} per kW`,
+          qty: plantKw.toFixed(2),
+          unit: "kW",
+          unitRate: formatMoney(installRate),
+          amount: formatMoney(totals.installLine)
+        });
+      }
+
+      if (plantKw > 0 && structureRate > 0) {
+        rows.push({
+          sr: rows.length + 1,
+          item: "Module Mounting Structure",
+          desc: `Hot dipped galvanized structure @ ${formatMoney(structureRate)} per kW`,
+          qty: plantKw.toFixed(2),
+          unit: "kW",
+          unitRate: formatMoney(structureRate),
+          amount: formatMoney(totals.structureLine)
+        });
+      }
+
+      if (earthingSetQty > 0) {
+        rows.push({
+          sr: rows.length + 1,
+          item: "Earthing Set",
+          desc: "Chemical earthing / GI / copper bonded as per design",
+          qty: earthingSetQty,
+          unit: "Set",
+          unitRate: formatMoney(earthingSetPrice),
+          amount: formatMoney(totals.earthingSetLine)
+        });
+      }
+
+      const rowsHtml = rows.map(r => `
+        <tr>
+          <td>${r.sr}</td>
+          <td>${r.item}</td>
+          <td>${r.desc}</td>
+          <td style="text-align:right;">${r.qty}</td>
+          <td>${r.unit}</td>
+          <td style="text-align:right;">${r.unitRate}</td>
+          <td style="text-align:right;">${r.amount}</td>
+        </tr>
+      `).join("");
+
+      return `
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8" />
+<title>Quotation - ${projectName}</title>
+<style>
+  body {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: #f3f4f6;
+    margin: 0;
+    padding: 24px;
+  }
+  .quote {
+    max-width: 900px;
+    margin: 0 auto;
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 24px 28px;
+    box-shadow: 0 10px 40px rgba(15,23,42,0.18);
+    color: #0f172a;
+  }
+  h1 {
+    margin: 0 0 4px;
+    font-size: 24px;
+  }
+  .meta {
+    font-size: 13px;
+    color: #6b7280;
+    margin-bottom: 18px;
+  }
+  .meta span {
+    display: inline-block;
+    margin-right: 16px;
+  }
+  .badge {
+    display: inline-block;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    padding: 3px 8px;
+    border-radius: 999px;
+    border: 1px solid #22c55e;
+    color: #166534;
+    background: #dcfce7;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 18px;
+    font-size: 13px;
+  }
+  th, td {
+    border: 1px solid #e5e7eb;
+    padding: 6px 8px;
+    vertical-align: top;
+  }
+  th {
+    background: #f9fafb;
+    text-align: left;
+  }
+  tfoot td {
+    font-weight: 600;
+    border-top: 2px solid #0f172a;
+  }
+  .totals {
+    margin-top: 16px;
+    text-align: right;
+  }
+  .totals strong {
+    font-size: 18px;
+    color: #16a34a;
+  }
+  .footnote {
+    margin-top: 16px;
+    font-size: 11px;
+    color: #6b7280;
+  }
+</style>
+</head>
+<body>
+  <div class="quote">
+    <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+      <div>
+        <h1>Quotation – ${projectName}</h1>
+        <div class="meta">
+          <span><strong>Project size:</strong> ${plantKw.toFixed(2)} kW</span>
+          ${panel ? `<span><strong>DC Capacity:</strong> ${panelCapKw.toFixed(2)} kWp</span>` : ""}
+        </div>
+      </div>
+      <div style="text-align:right;">
+        <div class="badge">Detailed quotation</div>
+        <div class="meta" style="margin-top:6px;">
+          ${projectLocation ? `<div><strong>Location:</strong> ${projectLocation}</div>` : ""}
+          ${projectDate ? `<div><strong>Date:</strong> ${projectDate}</div>` : ""}
+          <div><strong>Margin:</strong> ${margin.toFixed(1)} % over dealer</div>
+        </div>
+      </div>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Item</th>
+          <th>Description</th>
+          <th style="text-align:right;">Qty</th>
+          <th>Unit</th>
+          <th style="text-align:right;">Rate (₹)</th>
+          <th style="text-align:right;">Amount (₹)</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${rowsHtml}
+      </tbody>
+      <tfoot>
+        <tr>
+          <td colspan="6" style="text-align:right;">Total</td>
+          <td style="text-align:right;">${formatMoney(totals.grandTotal)}</td>
+        </tr>
+      </tfoot>
+    </table>
+
+    <div class="totals">
+      Total contract value (excl. taxes, if applicable): <strong>${formatMoney(totals.grandTotal)}</strong>
+    </div>
+
+    <div class="footnote">
+      <strong>Notes:</strong>
+      <ul>
+        <li>Prices are indicative and subject to change based on actual site conditions, DISCOM requirements and final design.</li>
+        <li>Any civil work, additional cabling, trenching, net-meter charges or approvals are excluded unless specifically mentioned.</li>
+        <li>Taxes and duties (if applicable) are extra at actuals.</li>
+      </ul>
+    </div>
+  </div>
+</body>
+</html>
+      `;
+    };
+
+    const buildSummaryQuotationHtml = (totals) => {
+      const plantKw = getPlantKw();
+      const projectName = document.getElementById("projectName").value || "Solar PV System";
+      const projectLocation = document.getElementById("projectLocation").value || "";
+      const projectDate = document.getElementById("projectDate").value || "";
+
+      const panelSel = document.getElementById("panelSelect");
+      const panel = panels.find(p => p.name === panelSel.value);
+      const panelQty = parseFloat(document.getElementById("panelQty").value || "0");
+      const panelCapKw = parseFloat(document.getElementById("panelCapacity").value || "0");
+
+      const inverterSel = document.getElementById("inverterSelect");
+      const inv = inverters.find(i => i.model === inverterSel.value);
+
+      return `
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8" />
+<title>Summary Quotation - ${projectName}</title>
+<style>
+  body {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: #f9fafb;
+    margin: 0;
+    padding: 24px;
+  }
+  .quote {
+    max-width: 700px;
+    margin: 0 auto;
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 24px 28px;
+    box-shadow: 0 10px 36px rgba(15,23,42,0.15);
+    color: #0f172a;
+  }
+  h1 {
+    margin: 0 0 4px;
+    font-size: 24px;
+  }
+  .meta {
+    font-size: 13px;
+    color: #6b7280;
+    margin-bottom: 18px;
+  }
+  .badge {
+    display: inline-block;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    padding: 3px 8px;
+    border-radius: 999px;
+    border: 1px solid #0ea5e9;
+    color: #0369a1;
+    background: #e0f2fe;
+  }
+  .section-title {
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: #6b7280;
+    margin-bottom: 4px;
+  }
+  .line {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 0;
+    border-bottom: 1px dashed #e5e7eb;
+    font-size: 13px;
+  }
+  .line span:last-child {
+    font-weight: 500;
+  }
+  .total {
+    margin-top: 16px;
+    padding-top: 10px;
+    border-top: 2px solid #0f172a;
+    text-align: right;
+  }
+  .total strong {
+    font-size: 20px;
+    color: #16a34a;
+  }
+  .footnote {
+    margin-top: 14px;
+    font-size: 11px;
+    color: #6b7280;
+  }
+</style>
+</head>
+<body>
+  <div class="quote">
+    <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+      <div>
+        <h1>Summary – ${projectName}</h1>
+        <div class="meta">
+          <div><strong>Project size:</strong> ${plantKw.toFixed(2)} kW</div>
+          ${panel ? `<div><strong>Panels:</strong> ${panelQty} × ${panel.name} (${panelCapKw.toFixed(2)} kWp DC)</div>` : ""}
+          ${inv ? `<div><strong>Inverter:</strong> ${inv.model} (${inv.capacityKw} kW)</div>` : ""}
+        </div>
+      </div>
+      <div style="text-align:right;">
+        <div class="badge">Summary quotation</div>
+        <div class="meta" style="margin-top:6px;">
+          ${projectLocation ? `<div><strong>Location:</strong> ${projectLocation}</div>` : ""}
+          ${projectDate ? `<div><strong>Date:</strong> ${projectDate}</div>` : ""}
+        </div>
+      </div>
+    </div>
+
+    <div class="section-title">Scope overview</div>
+    <div class="line"><span>Design, supply & installation of grid-tied solar PV system</span><span>${plantKw.toFixed(2)} kW</span></div>
+    <div class="line"><span>Balance of system (ACDB, DCDB, cabling, earthing, structure etc.)</span><span>As per design</span></div>
+
+    <div class="total">
+      Total project value (approx): <strong>${formatMoney(totals.grandTotal)}</strong>
+    </div>
+
+    <div class="footnote">
+      This is a summary quotation. Detailed component-wise breakup with individual prices is available in the detailed quotation.
+    </div>
+  </div>
+</body>
+</html>
+      `;
+    };
+
+    const openInNewWindow = (htmlString) => {
+      const w = window.open("", "_blank");
+      w.document.open();
+      w.document.write(htmlString);
+      w.document.close();
+    };
+
+    // ---------- EVENT BINDINGS ----------
+
+    window.addEventListener("DOMContentLoaded", () => {
+      // Init selects
+      recalcInverterOptions();
+      initPanelOptions();
+      initAcdbDcdbOptions();
+      recalcInstallAndStructure();
+      calcTotals();
+
+      document.getElementById("plantKw").addEventListener("input", () => {
+        recalcInverterOptions();
+        recalcPanels();
+        recalcInstallAndStructure();
+        const totals = calcTotals();
+      });
+
+      document.getElementById("marginPercent").addEventListener("input", () => {
+        recalcInverterPrice();
+        recalcAcdbPrice();
+        recalcDcdbPrice();
+        const totals = calcTotals();
+      });
+
+      document.getElementById("inverterSelect").addEventListener("change", () => {
+        recalcInverterPrice();
+        const totals = calcTotals();
+      });
+
+      document.getElementById("panelSelect").addEventListener("change", () => {
+        recalcPanels();
+        const totals = calcTotals();
+      });
+
+      document.getElementById("acdbSelect").addEventListener("change", () => {
+        recalcAcdbPrice();
+        const totals = calcTotals();
+      });
+
+      document.getElementById("dcdbSelect").addEventListener("change", () => {
+        recalcDcdbPrice();
+        const totals = calcTotals();
+      });
+
+      ["acdbQty","dcdbQty","meterQty","meterPrice","acCableQty","acCablePrice",
+       "earthCableQty","earthCablePrice","installRate","structureRate",
+       "earthingSetQty","earthingSetPrice"].forEach(id => {
+        document.getElementById(id).addEventListener("input", () => {
+          if (id === "installRate" || id === "structureRate") {
+            recalcInstallAndStructure();
+          }
+          const totals = calcTotals();
+        });
+      });
+
+      document.getElementById("btnDetailed").addEventListener("click", () => {
+        if (!validateCore()) return;
+        const totals = calcTotals();
+        const html = buildDetailedQuotationHtml(totals);
+        openInNewWindow(html);
+      });
+
+      document.getElementById("btnSummary").addEventListener("click", () => {
+        if (!validateCore()) return;
+        const totals = calcTotals();
+        const html = buildSummaryQuotationHtml(totals);
+        openInNewWindow(html);
+      });
+    });
+  </script>
+</body>
+</html>
