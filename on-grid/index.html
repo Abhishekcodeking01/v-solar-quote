@@ -5,6 +5,20 @@
   <title>On-Grid Quotation – V-Sustain Solar Solutions</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="stylesheet" href="style.css" />
+  <style>
+    /* small helper for inline fields if not already in style.css */
+    .inline-fields {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 10px;
+    }
+    .toggle.small {
+      font-size: 12px;
+    }
+    .manual-price-input {
+      margin-top: 6px;
+    }
+  </style>
 </head>
 <body>
   <div class="page">
@@ -18,7 +32,10 @@
       <h2>Global Margin</h2>
       <label>Common Margin (%)</label>
       <input type="number" id="globalMargin" value="20" />
-      <p class="note">Per-product custom margin is also available in each card.</p>
+      <p class="note">
+        Each product card can use this common margin or a custom margin.
+        Manual price override works on top of the dealer price.
+      </p>
     </section>
 
     <!-- SYSTEM CAPACITY -->
@@ -50,12 +67,9 @@
       <label>Select Inverter Model</label>
       <select id="inverterSelect"></select>
 
-      <label>Custom Margin (%)</label>
-      <input type="number" class="custom-margin" data-target="inverter" />
-
       <div class="inline-fields">
         <div>
-          <label>Dealer Price</label>
+          <label>Dealer Price (Auto)</label>
           <input type="text" id="inverterDealer" readonly />
         </div>
         <div>
@@ -72,6 +86,25 @@
         <div>
           <label>Estimated Total (incl. GST)</label>
           <input type="text" id="inverterTotal" readonly />
+        </div>
+      </div>
+
+      <div class="inline-fields">
+        <div>
+          <label>Custom Margin (%)</label>
+          <input type="number" class="custom-margin" data-target="inverter" />
+        </div>
+        <div>
+          <label class="toggle small">
+            <input type="checkbox" class="manual-price-toggle" data-target="inverter" />
+            <span></span> Manual Price Override
+          </label>
+          <input
+            type="number"
+            class="manual-price-input"
+            data-target="inverter"
+            placeholder="Override Dealer Price"
+          />
         </div>
       </div>
     </section>
@@ -95,7 +128,7 @@
 
       <div class="inline-fields">
         <div>
-          <label>Dealer Price / Panel</label>
+          <label>Dealer Price / Panel (Auto)</label>
           <input type="text" id="panelDealer" readonly />
         </div>
         <div>
@@ -122,11 +155,27 @@
         </div>
       </div>
 
-      <label>Custom Margin (%)</label>
-      <input type="number" class="custom-margin" data-target="panels" />
+      <div class="inline-fields">
+        <div>
+          <label>Custom Margin (%)</label>
+          <input type="number" class="custom-margin" data-target="panels" />
+        </div>
+        <div>
+          <label class="toggle small">
+            <input type="checkbox" class="manual-price-toggle" data-target="panels" />
+            <span></span> Manual Price Override
+          </label>
+          <input
+            type="number"
+            class="manual-price-input"
+            data-target="panels"
+            placeholder="Override Dealer Price / Panel"
+          />
+        </div>
+      </div>
     </section>
 
-    <!-- METER -->
+    <!-- METER (no price, just type selection for now) -->
     <section class="card">
       <div class="card-header">
         <h2>4. Bi-Directional Meter</h2>
@@ -158,8 +207,35 @@
       <label>Select ACDB</label>
       <select id="acdbSelect"></select>
 
-      <label>Custom Margin (%)</label>
-      <input type="number" class="custom-margin" data-target="acdb" />
+      <div class="inline-fields">
+        <div>
+          <label>Dealer Price (Auto)</label>
+          <input type="text" id="acdbDealer" readonly />
+        </div>
+        <div>
+          <label>Effective Rate (after Margin)</label>
+          <input type="text" id="acdbRate" readonly />
+        </div>
+      </div>
+
+      <div class="inline-fields">
+        <div>
+          <label>Custom Margin (%)</label>
+          <input type="number" class="custom-margin" data-target="acdb" />
+        </div>
+        <div>
+          <label class="toggle small">
+            <input type="checkbox" class="manual-price-toggle" data-target="acdb" />
+            <span></span> Manual Price Override
+          </label>
+          <input
+            type="number"
+            class="manual-price-input"
+            data-target="acdb"
+            placeholder="Override Dealer Price"
+          />
+        </div>
+      </div>
     </section>
 
     <!-- DCDB -->
@@ -179,8 +255,35 @@
       <label>Select DCDB</label>
       <select id="dcdbSelect"></select>
 
-      <label>Custom Margin (%)</label>
-      <input type="number" class="custom-margin" data-target="dcdb" />
+      <div class="inline-fields">
+        <div>
+          <label>Dealer Price (Auto)</label>
+          <input type="text" id="dcdbDealer" readonly />
+        </div>
+        <div>
+          <label>Effective Rate (after Margin)</label>
+          <input type="text" id="dcdbRate" readonly />
+        </div>
+      </div>
+
+      <div class="inline-fields">
+        <div>
+          <label>Custom Margin (%)</label>
+          <input type="number" class="custom-margin" data-target="dcdb" />
+        </div>
+        <div>
+          <label class="toggle small">
+            <input type="checkbox" class="manual-price-toggle" data-target="dcdb" />
+            <span></span> Manual Price Override
+          </label>
+          <input
+            type="number"
+            class="manual-price-input"
+            data-target="dcdb"
+            placeholder="Override Dealer Price"
+          />
+        </div>
+      </div>
     </section>
 
     <!-- AC CABLE -->
@@ -203,7 +306,7 @@
       <label>Quantity (m)</label>
       <input type="number" id="acQty" />
 
-      <label>Price / meter</label>
+      <label>Price / meter (Base)</label>
       <input type="number" id="acPrice" />
 
       <label>Custom Margin (%)</label>
@@ -230,7 +333,7 @@
       <label>Quantity (m)</label>
       <input type="number" id="earthQty" />
 
-      <label>Price / meter</label>
+      <label>Price / meter (Base)</label>
       <input type="number" id="earthPrice" />
 
       <label>Custom Margin (%)</label>
@@ -246,8 +349,10 @@
           <span></span> Enable
         </label>
       </div>
-      <label>Auto: kW × 5000</label>
-      <input type="number" id="installationCost" readonly />
+
+      <p class="note">Auto: kW × 5000 (you can manually adjust the total amount below).</p>
+      <label>Total Installation Amount (Editable)</label>
+      <input type="number" id="installationCost" />
     </section>
 
     <!-- STRUCTURE -->
@@ -259,8 +364,9 @@
           <span></span> Enable
         </label>
       </div>
-      <label>Auto: kW × 8000</label>
-      <input type="number" id="structureCost" readonly />
+      <p class="note">Auto: kW × 8000 (you can manually adjust the total amount below).</p>
+      <label>Total Structure Amount (Editable)</label>
+      <input type="number" id="structureCost" />
     </section>
 
     <!-- LIGHTNING ARRESTOR -->
@@ -280,7 +386,7 @@
       <label>Quantity</label>
       <input type="number" id="lightQty" />
 
-      <label>Price</label>
+      <label>Price (Base)</label>
       <input type="number" id="lightPrice" />
 
       <label>Custom Margin (%)</label>
@@ -300,7 +406,7 @@
       <button id="generateSummary" class="alt">Generate Summary Quotation</button>
     </section>
 
-    <!-- (Not used now; quotes open in new window) -->
+    <!-- Not used (we now open new window) -->
     <section id="quotationOutput" style="display:none;"></section>
   </div>
 
