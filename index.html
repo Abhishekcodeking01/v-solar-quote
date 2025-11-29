@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>V-Sustain Solar Solutions – Quotation Suite</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="page">
+    <header class="header">
+      <div class="brand">
+        <div class="logo-circle"></div>
+        <div>
+          <h1>V-Sustain Solar Solutions</h1>
+          <p class="tagline">Authorized Luminous Partner • Solar Quotation Suite</p>
+        </div>
+      </div>
+      <div class="header-contact">
+        <div>📧 vsustainsolarsolutions@gmail.com</div>
+        <div>📞 +91 99-000-00476</div>
+        <div>📍 Bengaluru, Karnataka</div>
+      </div>
+    </header>
+
+    <main class="main">
+      <section class="intro">
+        <h2>Choose Quotation Type</h2>
+        <p>
+          Generate professional GST-compliant quotations for on-grid, off-grid and hybrid solar systems.
+          Select the type of system you want to configure.
+        </p>
+      </section>
+
+      <section class="cards">
+        <!-- On-grid card -->
+        <a href="on-grid/index.html" class="card">
+          <div class="card-icon">🏙️</div>
+          <h3>On-Grid Solar System</h3>
+          <p>
+            Grid-tied rooftop system with net-metering.
+            Use when the system is primarily connected to the utility grid.
+          </p>
+          <ul class="card-points">
+            <li>On-grid inverters</li>
+            <li>Solar panels</li>
+            <li>ACDB / DCDB, cabling & BOS</li>
+            <li>GST 5% / 18% logic</li>
+          </ul>
+          <span class="card-cta">Open On-Grid Quotation →</span>
+        </a>
+
+        <!-- Off-grid card -->
+        <a href="off-grid/index.html" class="card">
+          <div class="card-icon">🔋</div>
+          <h3>Off-Grid Solar System</h3>
+          <p>
+            Battery-backed standalone system for backup and remote locations.
+            Includes inverter + battery + solar panel tax logic.
+          </p>
+          <ul class="card-points">
+            <li>Off-grid inverters</li>
+            <li>Solar batteries & panels</li>
+            <li>Special 5% GST combo logic</li>
+            <li>ACDB / DCDB & accessories</li>
+          </ul>
+          <span class="card-cta">Open Off-Grid Quotation →</span>
+        </a>
+
+        <!-- Hybrid card -->
+        <a href="hybrid/index.html" class="card">
+          <div class="card-icon">⚡</div>
+          <h3>Hybrid Solar System (Draft)</h3>
+          <p>
+            Draft hybrid configuration combining on-grid and battery-backed components.
+            Includes all off-grid components for now.
+          </p>
+          <ul class="card-points">
+            <li>Hybrid / off-grid style logic</li>
+            <li>Inverter + battery + panels</li>
+            <li>GST rules same as off-grid</li>
+            <li>Ready for future customization</li>
+          </ul>
+          <span class="card-cta">Open Hybrid Quotation →</span>
+        </a>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div>© <span id="year"></span> V-Sustain Solar Solutions. All rights reserved.</div>
+      <div class="footer-sub">
+        Built for fast, accurate & branded solar quotations.
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    // Set current year in footer
+    document.getElementById("year").textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
