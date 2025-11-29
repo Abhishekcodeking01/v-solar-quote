@@ -1,7 +1,7 @@
 /****************************************************
  * V-SUSTAIN SOLAR SOLUTIONS – ON GRID BILLING ENGINE
- * Revised to show all key values in cards and open
- * detailed/summary quotes in a new printable window.
+ * Shows all values inside cards, supports manual price
+ * override & opens quotations in a new tab with Print button.
  ****************************************************/
 
 /*----------------------------------------------
@@ -62,10 +62,10 @@ const dcdbList = [
 ];
 
 /*----------------------------------------------
-  2. SMALL HELPERS
+  2. HELPERS
 -----------------------------------------------*/
-const n = v => isNaN(parseFloat(v)) ? 0 : parseFloat(v);
-const fmt = v => "₹" + (n(v).toLocaleString("en-IN", { maximumFractionDigits: 2 }));
+const n = v => (isNaN(parseFloat(v)) ? 0 : parseFloat(v));
+const fmt = v => "₹" + n(v).toLocaleString("en-IN", { maximumFractionDigits: 2 });
 
 function isSectionEnabled(id) {
   const chk = document.querySelector("input[type='checkbox'][data-target='" + id + "']");
@@ -77,16 +77,31 @@ function getGlobalMargin() {
 }
 
 /**
- * Apply margin with priority:
- * 1) if margin-toggle ON → use global margin
- * 2) else if custom margin entered → use custom
- * 3) else no margin
+ * Manual price override engine:
+ * If manual-price-toggle[data-target=sectionId] is ON and input has value,
+ * use that as base price. Otherwise use dealer price.
+ */
+function getBasePrice(sectionId, dealerPrice) {
+  const toggle = document.querySelector(".manual-price-toggle[data-target='" + sectionId + "']");
+  const inp = document.querySelector(".manual-price-input[data-target='" + sectionId + "']");
+  if (toggle && toggle.checked && inp) {
+    const val = n(inp.value);
+    if (val > 0) return val;
+  }
+  return dealerPrice;
+}
+
+/**
+ * Margin engine:
+ * 1) If margin-toggle ON → use global margin
+ * 2) Else if custom margin provided → use custom
+ * 3) Else → no margin
  */
 function applyMargin(base, sectionId) {
   const global = getGlobalMargin();
   const toggle = document.querySelector(".margin-toggle[data-target='" + sectionId + "']");
-  const customInput = document.querySelector(".custom-margin[data-target='" + sectionId + "']");
-  const custom = customInput ? n(customInput.value) : 0;
+  const customInp = document.querySelector(".custom-margin[data-target='" + sectionId + "']");
+  const custom = customInp ? n(customInp.value) : 0;
 
   if (toggle && toggle.checked) {
     return base + (base * global / 100);
@@ -108,7 +123,7 @@ function getGstPercent(sectionId) {
 }
 
 /*----------------------------------------------
-  3. INITIALIZE DROPDOWNS & EVENTS
+  3. INIT
 -----------------------------------------------*/
 window.addEventListener("DOMContentLoaded", () => {
   loadInverters();
@@ -123,19 +138,42 @@ window.addEventListener("DOMContentLoaded", () => {
   });
 
   document.getElementById("inverterSelect").addEventListener("change", recalcInverterCard);
+  document.getElementById("acdbSelect").addEventListener("change", recalcAcdbCard);
+  document.getElementById("dcdbSelect").addEventListener("change", recalcDcdbCard);
+
   document.getElementById("globalMargin").addEventListener("input", () => {
     recalcInverterCard();
     recalcPanelsCard();
+    recalcAcdbCard();
+    recalcDcdbCard();
   });
 
   document.querySelectorAll(".custom-margin").forEach(inp => {
     inp.addEventListener("input", () => {
       recalcInverterCard();
       recalcPanelsCard();
+      recalcAcdbCard();
+      recalcDcdbCard();
     });
   });
 
-  // enable / disable cards
+  // manual price override change
+  document.querySelectorAll(".manual-price-toggle, .manual-price-input").forEach(el => {
+    el.addEventListener("change", () => {
+      recalcInverterCard();
+      recalcPanelsCard();
+      recalcAcdbCard();
+      recalcDcdbCard();
+    });
+    el.addEventListener("input", () => {
+      recalcInverterCard();
+      recalcPanelsCard();
+      recalcAcdbCard();
+      recalcDcdbCard();
+    });
+  });
+
+  // enable/disable cards
   document.querySelectorAll("input[type='checkbox'][data-target]").forEach(chk => {
     chk.addEventListener("change", function () {
       const card = this.closest(".card");
@@ -148,7 +186,7 @@ window.addEventListener("DOMContentLoaded", () => {
   // custom products
   document.getElementById("addCustomProduct").addEventListener("click", addCustomProductRow);
 
-  // buttons
+  // quote buttons
   document.getElementById("generateDetailed").addEventListener("click", () => {
     const totals = calcTotals();
     const html = buildDetailedQuotationHtml(totals);
@@ -164,17 +202,21 @@ window.addEventListener("DOMContentLoaded", () => {
   // initial
   recalcInverterCard();
   recalcPanelsCard();
+  recalcAcdbCard();
+  recalcDcdbCard();
   recalcInstallStructure();
 });
 
-/*--- Loaders ---*/
+/*----------------------------------------------
+  4. LOADERS
+-----------------------------------------------*/
 function loadInverters() {
   const sel = document.getElementById("inverterSelect");
   inverterList.forEach(inv => {
     const opt = document.createElement("option");
     opt.value = inv.model;
     opt.dataset.price = inv.price;
-    opt.textContent = inv.model + " – " + fmt(inv.price);
+    opt.textContent = `${inv.model} – ${fmt(inv.price)}`;
     sel.appendChild(opt);
   });
 }
@@ -186,7 +228,7 @@ function loadPanels() {
     opt.value = p.model;
     opt.dataset.price = p.price;
     opt.dataset.watt = p.watt;
-    opt.textContent = p.model + " – " + p.watt + "W – " + fmt(p.price);
+    opt.textContent = `${p.model} – ${p.watt}W – ${fmt(p.price)}`;
     sel.appendChild(opt);
   });
 }
@@ -197,7 +239,7 @@ function loadACDB() {
     const opt = document.createElement("option");
     opt.value = a.sku;
     opt.dataset.price = a.price;
-    opt.textContent = a.desc + " (" + a.sku + ") – " + fmt(a.price);
+    opt.textContent = `${a.desc} (${a.sku}) – ${fmt(a.price)}`;
     sel.appendChild(opt);
   });
 }
@@ -208,13 +250,13 @@ function loadDCDB() {
     const opt = document.createElement("option");
     opt.value = a.sku;
     opt.dataset.price = a.price;
-    opt.textContent = a.desc + " (" + a.sku + ") – " + fmt(a.price);
+    opt.textContent = `${a.desc} (${a.sku}) – ${fmt(a.price)}`;
     sel.appendChild(opt);
   });
 }
 
 /*----------------------------------------------
-  4. CARD CALCULATIONS
+  5. CARD CALCULATIONS
 -----------------------------------------------*/
 function recalcInverterCard() {
   if (!isSectionEnabled("inverter")) return;
@@ -224,7 +266,8 @@ function recalcInverterCard() {
   if (!opt) return;
 
   const dealer = n(opt.dataset.price);
-  const finalRate = applyMargin(dealer, "inverter");
+  const base = getBasePrice("inverter", dealer);
+  const finalRate = applyMargin(base, "inverter");
   const gst = getGstPercent("inverter");
   const qty = 1;
 
@@ -232,15 +275,10 @@ function recalcInverterCard() {
   const gstAmt = amount * gst / 100;
   const total = amount + gstAmt;
 
-  const dealerInput = document.getElementById("inverterDealer");
-  const rateInput = document.getElementById("inverterRate");
-  const gstInput = document.getElementById("inverterGst");
-  const totalInput = document.getElementById("inverterTotal");
-
-  if (dealerInput) dealerInput.value = fmt(dealer);
-  if (rateInput) rateInput.value = fmt(finalRate);
-  if (gstInput) gstInput.value = gst + "%";
-  if (totalInput) totalInput.value = fmt(total);
+  document.getElementById("inverterDealer").value = fmt(dealer);
+  document.getElementById("inverterRate").value = fmt(finalRate);
+  document.getElementById("inverterGst").value = gst + "%";
+  document.getElementById("inverterTotal").value = fmt(total);
 }
 
 function recalcPanelsCard() {
@@ -253,7 +291,8 @@ function recalcPanelsCard() {
 
   const watt = n(opt.dataset.watt);
   const dealer = n(opt.dataset.price);
-  const perRate = applyMargin(dealer, "panels");
+  const base = getBasePrice("panels", dealer);
+  const perRate = applyMargin(base, "panels");
 
   const totalWatt = kw * 1000;
   const qty = Math.ceil(totalWatt / watt);
@@ -265,30 +304,50 @@ function recalcPanelsCard() {
   const total = amount + gstAmt;
 
   document.getElementById("panelQty").value = qty;
-  const capField = document.getElementById("panelCapacityKw");
-  if (capField) capField.value = dcCapacityKw.toFixed(2) + " kW";
+  document.getElementById("panelCapacityKw").value = dcCapacityKw.toFixed(2) + " kW";
+  document.getElementById("panelDealer").value = fmt(dealer);
+  document.getElementById("panelRate").value = fmt(perRate);
+  document.getElementById("panelGst").value = gst + "%";
+  document.getElementById("panelTotal").value = fmt(total);
+}
 
-  const dealerInput = document.getElementById("panelDealer");
-  const rateInput = document.getElementById("panelRate");
-  const totalInput = document.getElementById("panelTotal");
-  const gstInput = document.getElementById("panelGst");
+function recalcAcdbCard() {
+  if (!isSectionEnabled("acdb")) return;
+  const sel = document.getElementById("acdbSelect");
+  const opt = sel.selectedOptions[0];
+  if (!opt) return;
+  const dealer = n(opt.dataset.price);
+  const base = getBasePrice("acdb", dealer);
+  const rate = applyMargin(base, "acdb");
+  document.getElementById("acdbDealer").value = fmt(dealer);
+  document.getElementById("acdbRate").value = fmt(rate);
+}
 
-  if (dealerInput) dealerInput.value = fmt(dealer);
-  if (rateInput) rateInput.value = fmt(perRate);
-  if (gstInput) gstInput.value = gst + "%";
-  if (totalInput) totalInput.value = fmt(total);
+function recalcDcdbCard() {
+  if (!isSectionEnabled("dcdb")) return;
+  const sel = document.getElementById("dcdbSelect");
+  const opt = sel.selectedOptions[0];
+  if (!opt) return;
+  const dealer = n(opt.dataset.price);
+  const base = getBasePrice("dcdb", dealer);
+  const rate = applyMargin(base, "dcdb");
+  document.getElementById("dcdbDealer").value = fmt(dealer);
+  document.getElementById("dcdbRate").value = fmt(rate);
 }
 
 function recalcInstallStructure() {
   const kw = n(document.getElementById("systemKW").value);
   const installField = document.getElementById("installationCost");
   const structField = document.getElementById("structureCost");
-  if (installField) installField.value = kw ? (kw * 5000) : "";
-  if (structField) structField.value = kw ? (kw * 8000) : "";
+
+  if (kw > 0) {
+    if (!installField.value) installField.value = kw * 5000;
+    if (!structField.value) structField.value = kw * 8000;
+  }
 }
 
 /*----------------------------------------------
-  5. CUSTOM PRODUCTS
+  6. CUSTOM PRODUCTS
 -----------------------------------------------*/
 function addCustomProductRow() {
   const box = document.getElementById("customProducts");
@@ -308,7 +367,7 @@ function addCustomProductRow() {
 }
 
 /*----------------------------------------------
-  6. BUILD LINE ITEMS FOR QUOTE
+  7. BUILD LINE ITEMS
 -----------------------------------------------*/
 function buildLineItems() {
   const items = [];
@@ -319,7 +378,8 @@ function buildLineItems() {
     const opt = sel.selectedOptions[0];
     if (opt) {
       const dealer = n(opt.dataset.price);
-      const rate = applyMargin(dealer, "inverter");
+      const base = getBasePrice("inverter", dealer);
+      const rate = applyMargin(base, "inverter");
       const gst = getGstPercent("inverter");
       items.push({
         type: "inverter",
@@ -340,7 +400,8 @@ function buildLineItems() {
     const qty = n(document.getElementById("panelQty").value);
     if (opt && qty > 0) {
       const dealer = n(opt.dataset.price);
-      const rate = applyMargin(dealer, "panels");
+      const base = getBasePrice("panels", dealer);
+      const rate = applyMargin(base, "panels");
       const gst = getGstPercent("panels");
       items.push({
         type: "panels",
@@ -360,7 +421,8 @@ function buildLineItems() {
     const opt = sel.selectedOptions[0];
     if (opt) {
       const dealer = n(opt.dataset.price);
-      const rate = applyMargin(dealer, "acdb");
+      const base = getBasePrice("acdb", dealer);
+      const rate = applyMargin(base, "acdb");
       items.push({
         type: "acdb",
         item: "ACDB",
@@ -379,7 +441,8 @@ function buildLineItems() {
     const opt = sel.selectedOptions[0];
     if (opt) {
       const dealer = n(opt.dataset.price);
-      const rate = applyMargin(dealer, "dcdb");
+      const base = getBasePrice("dcdb", dealer);
+      const rate = applyMargin(base, "dcdb");
       items.push({
         type: "dcdb",
         item: "DCDB",
@@ -430,15 +493,16 @@ function buildLineItems() {
     }
   }
 
-  // installation (no margin, service)
+  // installation (use editable total)
   if (isSectionEnabled("installation")) {
     const kw = n(document.getElementById("systemKW").value);
-    if (kw > 0) {
-      const rate = 5000;
+    const total = n(document.getElementById("installationCost").value);
+    if (kw > 0 && total > 0) {
+      const rate = total / kw;
       items.push({
         type: "installation",
         item: "Installation & Commissioning",
-        desc: "Installation @ ₹5000/kW",
+        desc: "Installation services",
         qty: kw,
         unit: "kW",
         baseRate: rate,
@@ -447,15 +511,16 @@ function buildLineItems() {
     }
   }
 
-  // structure
+  // structure (use editable total)
   if (isSectionEnabled("structure")) {
     const kw = n(document.getElementById("systemKW").value);
-    if (kw > 0) {
-      const rate = 8000;
+    const total = n(document.getElementById("structureCost").value);
+    if (kw > 0 && total > 0) {
+      const rate = total / kw;
       items.push({
         type: "structure",
         item: "Module Mounting Structure",
-        desc: "Structure @ ₹8000/kW",
+        desc: "Structure for PV modules",
         qty: kw,
         unit: "kW",
         baseRate: rate,
@@ -464,7 +529,7 @@ function buildLineItems() {
     }
   }
 
-  // lightning arrestor
+  // lightning
   if (isSectionEnabled("lightning")) {
     const qty = n(document.getElementById("lightQty").value);
     const price = n(document.getElementById("lightPrice").value);
@@ -513,7 +578,7 @@ function buildLineItems() {
 }
 
 /*----------------------------------------------
-  7. TOTALS
+  8. TOTALS
 -----------------------------------------------*/
 function calcTotals() {
   const items = buildLineItems();
@@ -532,19 +597,19 @@ function calcTotals() {
 }
 
 /*----------------------------------------------
-  8. QUOTATION HTML (DETAILED & SUMMARY)
+  9. QUOTATION HTML (DETAILED & SUMMARY)
 -----------------------------------------------*/
 function buildDetailedQuotationHtml(totals) {
   const plantKw = n(document.getElementById("systemKW").value);
   const margin = getGlobalMargin();
 
-  // subsidy text for on-grid
+  // subsidy
   let subsidyText = "";
   if (plantKw > 0) {
     if (plantKw <= 2) {
-      subsidyText = "For on-grid residential projects up to 2 kW, government subsidy of ₹60,000 (as per current scheme) may be applicable.";
+      subsidyText = "For on-grid residential projects up to 2 kW, government subsidy of ₹60,000 may be applicable (as per current scheme).";
     } else if (plantKw >= 3 && plantKw <= 10) {
-      subsidyText = "For on-grid residential projects from 3 kW to 10 kW, government subsidy of ₹78,000 (as per current scheme) may be applicable.";
+      subsidyText = "For on-grid residential projects from 3 kW to 10 kW, government subsidy of ₹78,000 may be applicable (as per current scheme).";
     } else {
       subsidyText = "Government subsidy currently applies up to 10 kW. Please confirm scheme details at the time of ordering.";
     }
@@ -607,14 +672,17 @@ function buildDetailedQuotationHtml(totals) {
     .fine-print { font-size:11px; color:#6b7280; margin-top:4px; }
     .subsidy-box { margin-top:12px; padding:10px; border-radius:8px; background:#ecfdf5; border:1px solid #bbf7d0; font-size:12px; }
     .footer { margin-top:16px; font-size:11px; text-align:center; color:#6b7280; }
+    .print-btn { margin-bottom:10px; padding:6px 12px; border-radius:8px; border:none; background:#1d4ed8; color:#fff; cursor:pointer; font-size:13px; float:right; }
     @media print {
       body { background:#fff; padding:0; }
       .quotation-wrapper { box-shadow:none; border-radius:0; }
+      .print-btn { display:none; }
     }
   </style>
 </head>
 <body>
   <div class="quotation-wrapper">
+    <button class="print-btn" onclick="window.print()">Print / Save as PDF</button>
     <header>
       <div class="brand-left">
         <div class="logo-placeholder"></div>
@@ -632,7 +700,7 @@ function buildDetailedQuotationHtml(totals) {
 
     <h2>Quotation Details</h2>
     <p>System Capacity: <strong>${plantKw} kW</strong></p>
-    <p>Margin Applied: <strong>${margin}%</strong></p>
+    <p>Global Margin Applied: <strong>${margin}%</strong></p>
 
     <table>
       <thead>
@@ -655,10 +723,10 @@ function buildDetailedQuotationHtml(totals) {
       <tfoot>
         <tr>
           <td colspan="6"></td>
-          <td><strong>${fmt(totals.subtotal)}</strong></td>
+          <td>${fmt(totals.subtotal)}</td>
           <td></td>
-          <td><strong>${fmt(totals.totalGst)}</strong></td>
-          <td><strong>${fmt(totals.grandTotal)}</strong></td>
+          <td>${fmt(totals.totalGst)}</td>
+          <td>${fmt(totals.grandTotal)}</td>
         </tr>
       </tfoot>
     </table>
@@ -763,9 +831,6 @@ function buildDetailedQuotationHtml(totals) {
       <p>This is a computer generated quotation. No signature is required.</p>
     </div>
   </div>
-  <script>
-    window.print();
-  </script>
 </body>
 </html>
   `;
@@ -801,11 +866,13 @@ function buildSummaryQuotationHtml(totals) {
     th, td { border:1px solid #e2e8f0; padding:6px 6px; vertical-align:top; }
     th { background:#f8fafc; text-align:left; }
     .footer { margin-top:16px; font-size:11px; text-align:center; color:#6b7280; }
-    @media print { body { background:#fff; padding:0; } .quotation-wrapper { box-shadow:none; border-radius:0; } }
+    .print-btn { margin-bottom:10px; padding:6px 12px; border-radius:8px; border:none; background:#1d4ed8; color:#fff; cursor:pointer; float:right; }
+    @media print { body { background:#fff; padding:0; } .quotation-wrapper { box-shadow:none; border-radius:0; } .print-btn { display:none; } }
   </style>
 </head>
 <body>
   <div class="quotation-wrapper">
+    <button class="print-btn" onclick="window.print()">Print / Save as PDF</button>
     <header>
       <div style="display:flex;gap:10px;align-items:center;">
         <div class="logo-placeholder"></div>
@@ -841,7 +908,6 @@ function buildSummaryQuotationHtml(totals) {
       <p>Authorized Luminous Partner</p>
     </div>
   </div>
-  <script>window.print();</script>
 </body>
 </html>
   `;
@@ -849,7 +915,7 @@ function buildSummaryQuotationHtml(totals) {
 }
 
 /*----------------------------------------------
-  9. OPEN IN NEW WINDOW
+  10. OPEN IN NEW WINDOW (NO AUTO PRINT)
 -----------------------------------------------*/
 function openInNewWindow(html) {
   const w = window.open("", "_blank");
