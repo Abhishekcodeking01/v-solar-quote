@@ -1,11 +1,9 @@
 /****************************************************
  * V-SUSTAIN SOLAR SOLUTIONS – ON GRID BILLING ENGINE
- * Shows all values inside cards, supports manual price
- * override & opens quotations in a new tab with Print button.
  ****************************************************/
 
 /*----------------------------------------------
-  1. DATASETS (Inverters, Panels, ACDB, DCDB)
+  1. DATASETS
 -----------------------------------------------*/
 const inverterList = [
   { model: "NXI 120(2KW) (EXC.DONGLE)", price: 16882 },
@@ -61,6 +59,12 @@ const dcdbList = [
   { sku: "TSADC600V41F", desc: "DCDB 4 In 1 Out With Fuse", price: 3103.40 }
 ];
 
+// Random meter prices as requested
+const meterOptions = [
+  { code: "single", label: "Single Phase", price: 4500 },
+  { code: "three", label: "Three Phase", price: 7500 }
+];
+
 /*----------------------------------------------
   2. HELPERS
 -----------------------------------------------*/
@@ -76,11 +80,6 @@ function getGlobalMargin() {
   return n(document.getElementById("globalMargin").value);
 }
 
-/**
- * Manual price override engine:
- * If manual-price-toggle[data-target=sectionId] is ON and input has value,
- * use that as base price. Otherwise use dealer price.
- */
 function getBasePrice(sectionId, dealerPrice) {
   const toggle = document.querySelector(".manual-price-toggle[data-target='" + sectionId + "']");
   const inp = document.querySelector(".manual-price-input[data-target='" + sectionId + "']");
@@ -91,12 +90,6 @@ function getBasePrice(sectionId, dealerPrice) {
   return dealerPrice;
 }
 
-/**
- * Margin engine:
- * 1) If margin-toggle ON → use global margin
- * 2) Else if custom margin provided → use custom
- * 3) Else → no margin
- */
 function applyMargin(base, sectionId) {
   const global = getGlobalMargin();
   const toggle = document.querySelector(".margin-toggle[data-target='" + sectionId + "']");
@@ -112,11 +105,7 @@ function applyMargin(base, sectionId) {
   }
 }
 
-/**
- * On-grid GST:
- * Inverter + Panels → 5%
- * Others → 18%
- */
+// On-grid GST logic
 function getGstPercent(sectionId) {
   if (sectionId === "inverter" || sectionId === "panels") return 5;
   return 18;
@@ -130,22 +119,31 @@ window.addEventListener("DOMContentLoaded", () => {
   loadPanels();
   loadACDB();
   loadDCDB();
+  loadMeters();
 
   document.getElementById("panelSelect").addEventListener("change", recalcPanelsCard);
-  document.getElementById("systemKW").addEventListener("input", () => {
-    recalcPanelsCard();
-    recalcInstallStructure();
-  });
+  document.getElementById("systemKW").addEventListener("input", handleSystemKwChange);
 
   document.getElementById("inverterSelect").addEventListener("change", recalcInverterCard);
   document.getElementById("acdbSelect").addEventListener("change", recalcAcdbCard);
   document.getElementById("dcdbSelect").addEventListener("change", recalcDcdbCard);
+  document.getElementById("meterType").addEventListener("change", recalcMeterCard);
+  document.getElementById("meterQty").addEventListener("input", recalcMeterCard);
+
+  // installation / structure inputs
+  document.getElementById("installationQty").addEventListener("input", recalcInstallationCard);
+  document.getElementById("installationBaseRate").addEventListener("input", recalcInstallationCard);
+  document.getElementById("structureQty").addEventListener("input", recalcStructureCard);
+  document.getElementById("structureBaseRate").addEventListener("input", recalcStructureCard);
 
   document.getElementById("globalMargin").addEventListener("input", () => {
     recalcInverterCard();
     recalcPanelsCard();
     recalcAcdbCard();
     recalcDcdbCard();
+    recalcMeterCard();
+    recalcInstallationCard();
+    recalcStructureCard();
   });
 
   document.querySelectorAll(".custom-margin").forEach(inp => {
@@ -154,22 +152,30 @@ window.addEventListener("DOMContentLoaded", () => {
       recalcPanelsCard();
       recalcAcdbCard();
       recalcDcdbCard();
+      recalcMeterCard();
+      recalcInstallationCard();
+      recalcStructureCard();
     });
   });
 
-  // manual price override change
   document.querySelectorAll(".manual-price-toggle, .manual-price-input").forEach(el => {
     el.addEventListener("change", () => {
       recalcInverterCard();
       recalcPanelsCard();
       recalcAcdbCard();
       recalcDcdbCard();
+      recalcMeterCard();
+      recalcInstallationCard();
+      recalcStructureCard();
     });
     el.addEventListener("input", () => {
       recalcInverterCard();
       recalcPanelsCard();
       recalcAcdbCard();
       recalcDcdbCard();
+      recalcMeterCard();
+      recalcInstallationCard();
+      recalcStructureCard();
     });
   });
 
@@ -185,6 +191,13 @@ window.addEventListener("DOMContentLoaded", () => {
 
   // custom products
   document.getElementById("addCustomProduct").addEventListener("click", addCustomProductRow);
+  // delegate delete button
+  document.getElementById("customProducts").addEventListener("click", e => {
+    if (e.target.classList.contains("cp-delete")) {
+      const row = e.target.closest(".custom-row");
+      if (row) row.remove();
+    }
+  });
 
   // quote buttons
   document.getElementById("generateDetailed").addEventListener("click", () => {
@@ -199,12 +212,15 @@ window.addEventListener("DOMContentLoaded", () => {
     openInNewWindow(html);
   });
 
-  // initial
+  // initial defaults
+  handleSystemKwChange();
   recalcInverterCard();
   recalcPanelsCard();
   recalcAcdbCard();
   recalcDcdbCard();
-  recalcInstallStructure();
+  recalcMeterCard();
+  recalcInstallationCard();
+  recalcStructureCard();
 });
 
 /*----------------------------------------------
@@ -255,28 +271,37 @@ function loadDCDB() {
   });
 }
 
+function loadMeters() {
+  const sel = document.getElementById("meterType");
+  meterOptions.forEach(m => {
+    const opt = document.createElement("option");
+    opt.value = m.code;
+    opt.dataset.price = m.price;
+    opt.textContent = `${m.label} – ${fmt(m.price)}`;
+    sel.appendChild(opt);
+  });
+}
+
 /*----------------------------------------------
-  5. CARD CALCULATIONS
+  5. CARD RECALC
 -----------------------------------------------*/
 function recalcInverterCard() {
   if (!isSectionEnabled("inverter")) return;
-
   const sel = document.getElementById("inverterSelect");
   const opt = sel.selectedOptions[0];
   if (!opt) return;
 
   const dealer = n(opt.dataset.price);
   const base = getBasePrice("inverter", dealer);
-  const finalRate = applyMargin(base, "inverter");
+  const rate = applyMargin(base, "inverter");
   const gst = getGstPercent("inverter");
   const qty = 1;
-
-  const amount = finalRate * qty;
+  const amount = rate * qty;
   const gstAmt = amount * gst / 100;
   const total = amount + gstAmt;
 
   document.getElementById("inverterDealer").value = fmt(dealer);
-  document.getElementById("inverterRate").value = fmt(finalRate);
+  document.getElementById("inverterRate").value = fmt(rate);
   document.getElementById("inverterGst").value = gst + "%";
   document.getElementById("inverterTotal").value = fmt(total);
 }
@@ -335,15 +360,94 @@ function recalcDcdbCard() {
   document.getElementById("dcdbRate").value = fmt(rate);
 }
 
-function recalcInstallStructure() {
+function recalcMeterCard() {
+  if (!isSectionEnabled("meter")) return;
+  const sel = document.getElementById("meterType");
+  const opt = sel.selectedOptions[0];
+  if (!opt) return;
+
+  const dealer = n(opt.dataset.price);
+  const qty = n(document.getElementById("meterQty").value) || 1;
+  const base = getBasePrice("meter", dealer);
+  const rate = applyMargin(base, "meter");
+  const gst = getGstPercent("meter");
+  const amount = rate * qty;
+  const gstAmt = amount * gst / 100;
+  const total = amount + gstAmt;
+
+  document.getElementById("meterDealer").value = fmt(dealer);
+  document.getElementById("meterRate").value = fmt(rate);
+  document.getElementById("meterGst").value = gst + "%";
+  document.getElementById("meterTotal").value = fmt(total);
+}
+
+function handleSystemKwChange() {
   const kw = n(document.getElementById("systemKW").value);
-  const installField = document.getElementById("installationCost");
-  const structField = document.getElementById("structureCost");
+
+  const instQty = document.getElementById("installationQty");
+  const instBase = document.getElementById("installationBaseRate");
+  const structQty = document.getElementById("structureQty");
+  const structBase = document.getElementById("structureBaseRate");
 
   if (kw > 0) {
-    if (!installField.value) installField.value = kw * 5000;
-    if (!structField.value) structField.value = kw * 8000;
+    if (!instQty.value || n(instQty.value) === 0) instQty.value = kw;
+    if (!structQty.value || n(structQty.value) === 0) structQty.value = kw;
   }
+
+  if (!instBase.value || n(instBase.value) === 0) instBase.value = 5000;
+  if (!structBase.value || n(structBase.value) === 0) structBase.value = 8000;
+
+  recalcPanelsCard();
+  recalcInstallationCard();
+  recalcStructureCard();
+}
+
+function recalcInstallationCard() {
+  if (!isSectionEnabled("installation")) return;
+
+  const qty = n(document.getElementById("installationQty").value);
+  const dealerBase = n(document.getElementById("installationBaseRate").value);
+  if (!qty || !dealerBase) {
+    document.getElementById("installationRate").value = "";
+    document.getElementById("installationGst").value = "";
+    document.getElementById("installationTotal").value = "";
+    return;
+  }
+
+  const base = getBasePrice("installation", dealerBase);
+  const rate = applyMargin(base, "installation");
+  const gst = getGstPercent("installation");
+  const amount = rate * qty;
+  const gstAmt = amount * gst / 100;
+  const total = amount + gstAmt;
+
+  document.getElementById("installationRate").value = fmt(rate);
+  document.getElementById("installationGst").value = gst + "%";
+  document.getElementById("installationTotal").value = fmt(total);
+}
+
+function recalcStructureCard() {
+  if (!isSectionEnabled("structure")) return;
+
+  const qty = n(document.getElementById("structureQty").value);
+  const dealerBase = n(document.getElementById("structureBaseRate").value);
+  if (!qty || !dealerBase) {
+    document.getElementById("structureRate").value = "";
+    document.getElementById("structureGst").value = "";
+    document.getElementById("structureTotal").value = "";
+    return;
+  }
+
+  const base = getBasePrice("structure", dealerBase);
+  const rate = applyMargin(base, "structure");
+  const gst = getGstPercent("structure");
+  const amount = rate * qty;
+  const gstAmt = amount * gst / 100;
+  const total = amount + gstAmt;
+
+  document.getElementById("structureRate").value = fmt(rate);
+  document.getElementById("structureGst").value = gst + "%";
+  document.getElementById("structureTotal").value = fmt(total);
 }
 
 /*----------------------------------------------
@@ -357,11 +461,10 @@ function addCustomProductRow() {
     <input type="text" placeholder="Product Name" class="cp-name">
     <input type="number" placeholder="Qty" class="cp-qty">
     <input type="number" placeholder="Price" class="cp-price">
-    <label>Enable</label>
-    <input type="checkbox" class="cp-enable" checked>
     <label>Use Global Margin</label>
     <input type="checkbox" class="cp-margin-global" checked>
     <input type="number" placeholder="Custom Margin %" class="cp-custom-margin">
+    <button type="button" class="cp-delete">Delete</button>
   `;
   box.appendChild(row);
 }
@@ -411,6 +514,27 @@ function buildLineItems() {
         unit: "Nos",
         baseRate: rate,
         gstPercent: gst
+      });
+    }
+  }
+
+  // meter
+  if (isSectionEnabled("meter")) {
+    const sel = document.getElementById("meterType");
+    const opt = sel.selectedOptions[0];
+    const qty = n(document.getElementById("meterQty").value) || 1;
+    if (opt && qty > 0) {
+      const dealer = n(opt.dataset.price);
+      const base = getBasePrice("meter", dealer);
+      const rate = applyMargin(base, "meter");
+      items.push({
+        type: "meter",
+        item: "Bi-Directional Meter",
+        desc: opt.textContent,
+        qty,
+        unit: "Nos",
+        baseRate: rate,
+        gstPercent: getGstPercent("meter")
       });
     }
   }
@@ -493,17 +617,18 @@ function buildLineItems() {
     }
   }
 
-  // installation (use editable total)
+  // installation (rate per kW, qty from field)
   if (isSectionEnabled("installation")) {
-    const kw = n(document.getElementById("systemKW").value);
-    const total = n(document.getElementById("installationCost").value);
-    if (kw > 0 && total > 0) {
-      const rate = total / kw;
+    const qty = n(document.getElementById("installationQty").value);
+    const dealerBase = n(document.getElementById("installationBaseRate").value);
+    if (qty > 0 && dealerBase > 0) {
+      const base = getBasePrice("installation", dealerBase);
+      const rate = applyMargin(base, "installation");
       items.push({
         type: "installation",
         item: "Installation & Commissioning",
         desc: "Installation services",
-        qty: kw,
+        qty,
         unit: "kW",
         baseRate: rate,
         gstPercent: getGstPercent("installation")
@@ -511,17 +636,18 @@ function buildLineItems() {
     }
   }
 
-  // structure (use editable total)
+  // structure
   if (isSectionEnabled("structure")) {
-    const kw = n(document.getElementById("systemKW").value);
-    const total = n(document.getElementById("structureCost").value);
-    if (kw > 0 && total > 0) {
-      const rate = total / kw;
+    const qty = n(document.getElementById("structureQty").value);
+    const dealerBase = n(document.getElementById("structureBaseRate").value);
+    if (qty > 0 && dealerBase > 0) {
+      const base = getBasePrice("structure", dealerBase);
+      const rate = applyMargin(base, "structure");
       items.push({
         type: "structure",
         item: "Module Mounting Structure",
         desc: "Structure for PV modules",
-        qty: kw,
+        qty,
         unit: "kW",
         baseRate: rate,
         gstPercent: getGstPercent("structure")
@@ -549,8 +675,6 @@ function buildLineItems() {
 
   // custom products
   document.querySelectorAll(".custom-row").forEach(row => {
-    const enabled = row.querySelector(".cp-enable").checked;
-    if (!enabled) return;
     const name = row.querySelector(".cp-name").value || "Custom Item";
     const qty = n(row.querySelector(".cp-qty").value);
     const price = n(row.querySelector(".cp-price").value);
@@ -597,13 +721,12 @@ function calcTotals() {
 }
 
 /*----------------------------------------------
-  9. QUOTATION HTML (DETAILED & SUMMARY)
+  9. QUOTATION HTML (same as previous version)
 -----------------------------------------------*/
 function buildDetailedQuotationHtml(totals) {
   const plantKw = n(document.getElementById("systemKW").value);
   const margin = getGlobalMargin();
 
-  // subsidy
   let subsidyText = "";
   if (plantKw > 0) {
     if (plantKw <= 2) {
@@ -915,7 +1038,7 @@ function buildSummaryQuotationHtml(totals) {
 }
 
 /*----------------------------------------------
-  10. OPEN IN NEW WINDOW (NO AUTO PRINT)
+  10. OPEN IN NEW WINDOW
 -----------------------------------------------*/
 function openInNewWindow(html) {
   const w = window.open("", "_blank");
