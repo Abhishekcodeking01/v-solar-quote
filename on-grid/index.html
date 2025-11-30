@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="stylesheet" href="style.css" />
   <style>
-    /* small helper for inline fields if not already in style.css */
+    /* helper layout if not present in style.css */
     .inline-fields {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
@@ -17,6 +17,22 @@
     }
     .manual-price-input {
       margin-top: 6px;
+    }
+    .custom-row {
+      display: grid;
+      grid-template-columns: 2fr repeat(2, minmax(80px, 1fr)) minmax(110px, 1fr) minmax(110px, 1fr) auto;
+      gap: 6px;
+      margin-bottom: 8px;
+      align-items: center;
+    }
+    .custom-row button.cp-delete {
+      padding: 4px 8px;
+      border-radius: 6px;
+      border: none;
+      background: #fee2e2;
+      color: #b91c1c;
+      cursor: pointer;
+      font-size: 11px;
     }
   </style>
 </head>
@@ -34,7 +50,7 @@
       <input type="number" id="globalMargin" value="20" />
       <p class="note">
         Each product card can use this common margin or a custom margin.
-        Manual price override works on top of the dealer price.
+        Manual price override works on top of the dealer/base price.
       </p>
     </section>
 
@@ -175,7 +191,7 @@
       </div>
     </section>
 
-    <!-- METER (no price, just type selection for now) -->
+    <!-- BI-DIRECTIONAL METER -->
     <section class="card">
       <div class="card-header">
         <h2>4. Bi-Directional Meter</h2>
@@ -183,11 +199,59 @@
           <input type="checkbox" checked data-target="meter" />
           <span></span> Enable
         </label>
+        <label class="toggle">
+          <input type="checkbox" checked class="margin-toggle" data-target="meter" />
+          <span></span> Use Global Margin
+        </label>
       </div>
-      <select id="meterType">
-        <option value="Single Phase">Single Phase</option>
-        <option value="Three Phase">Three Phase</option>
-      </select>
+
+      <label>Select Meter Type</label>
+      <select id="meterType"></select>
+
+      <div class="inline-fields">
+        <div>
+          <label>Quantity</label>
+          <input type="number" id="meterQty" value="1" />
+        </div>
+        <div>
+          <label>Dealer Price (Auto)</label>
+          <input type="text" id="meterDealer" readonly />
+        </div>
+        <div>
+          <label>Effective Rate (after Margin)</label>
+          <input type="text" id="meterRate" readonly />
+        </div>
+      </div>
+
+      <div class="inline-fields">
+        <div>
+          <label>GST %</label>
+          <input type="text" id="meterGst" readonly />
+        </div>
+        <div>
+          <label>Total (incl. GST)</label>
+          <input type="text" id="meterTotal" readonly />
+        </div>
+      </div>
+
+      <div class="inline-fields">
+        <div>
+          <label>Custom Margin (%)</label>
+          <input type="number" class="custom-margin" data-target="meter" />
+        </div>
+        <div>
+          <label class="toggle small">
+            <input type="checkbox" class="manual-price-toggle" data-target="meter" />
+            <span></span> Manual Price Override
+          </label>
+          <input
+            type="number"
+            class="manual-price-input"
+            data-target="meter"
+            placeholder="Override Dealer Price"
+          />
+        </div>
+      </div>
     </section>
 
     <!-- ACDB -->
@@ -286,7 +350,7 @@
       </div>
     </section>
 
-    <!-- AC CABLE -->
+    <!-- AC CABLE (simple) -->
     <section class="card">
       <div class="card-header">
         <h2>7. AC Cable</h2>
@@ -313,7 +377,7 @@
       <input type="number" class="custom-margin" data-target="accable" />
     </section>
 
-    <!-- EARTHING CABLE -->
+    <!-- EARTHING CABLE (simple) -->
     <section class="card">
       <div class="card-header">
         <h2>8. Earthing Cable</h2>
@@ -340,7 +404,7 @@
       <input type="number" class="custom-margin" data-target="earthing" />
     </section>
 
-    <!-- INSTALLATION -->
+    <!-- INSTALLATION CHARGES -->
     <section class="card">
       <div class="card-header">
         <h2>9. Installation Charges</h2>
@@ -348,11 +412,61 @@
           <input type="checkbox" checked data-target="installation" />
           <span></span> Enable
         </label>
+        <label class="toggle">
+          <input type="checkbox" checked class="margin-toggle" data-target="installation" />
+          <span></span> Use Global Margin
+        </label>
       </div>
 
-      <p class="note">Auto: kW × 5000 (you can manually adjust the total amount below).</p>
-      <label>Total Installation Amount (Editable)</label>
-      <input type="number" id="installationCost" />
+      <p class="note">
+        Auto: Base Rate starts at 5000 per kW. Qty defaults to plant kW.
+        You can edit both base rate and quantity. Margin & GST are applied on the final rate.
+      </p>
+
+      <div class="inline-fields">
+        <div>
+          <label>Qty (kW)</label>
+          <input type="number" id="installationQty" />
+        </div>
+        <div>
+          <label>Base Rate per kW</label>
+          <input type="number" id="installationBaseRate" />
+        </div>
+        <div>
+          <label>Effective Rate (after Margin)</label>
+          <input type="text" id="installationRate" readonly />
+        </div>
+      </div>
+
+      <div class="inline-fields">
+        <div>
+          <label>GST %</label>
+          <input type="text" id="installationGst" readonly />
+        </div>
+        <div>
+          <label>Total (incl. GST)</label>
+          <input type="text" id="installationTotal" readonly />
+        </div>
+      </div>
+
+      <div class="inline-fields">
+        <div>
+          <label>Custom Margin (%)</label>
+          <input type="number" class="custom-margin" data-target="installation" />
+        </div>
+        <div>
+          <label class="toggle small">
+            <input type="checkbox" class="manual-price-toggle" data-target="installation" />
+            <span></span> Manual Price Override
+          </label>
+          <input
+            type="number"
+            class="manual-price-input"
+            data-target="installation"
+            placeholder="Override Base Rate per kW"
+          />
+        </div>
+      </div>
     </section>
 
     <!-- STRUCTURE -->
@@ -363,13 +477,64 @@
           <input type="checkbox" checked data-target="structure" />
           <span></span> Enable
         </label>
+        <label class="toggle">
+          <input type="checkbox" checked class="margin-toggle" data-target="structure" />
+          <span></span> Use Global Margin
+        </label>
       </div>
-      <p class="note">Auto: kW × 8000 (you can manually adjust the total amount below).</p>
-      <label>Total Structure Amount (Editable)</label>
-      <input type="number" id="structureCost" />
+
+      <p class="note">
+        Auto: Base Rate starts at 8000 per kW. Qty defaults to plant kW.
+        You can edit both base rate and quantity. Margin & GST are applied on the final rate.
+      </p>
+
+      <div class="inline-fields">
+        <div>
+          <label>Qty (kW)</label>
+          <input type="number" id="structureQty" />
+        </div>
+        <div>
+          <label>Base Rate per kW</label>
+          <input type="number" id="structureBaseRate" />
+        </div>
+        <div>
+          <label>Effective Rate (after Margin)</label>
+          <input type="text" id="structureRate" readonly />
+        </div>
+      </div>
+
+      <div class="inline-fields">
+        <div>
+          <label>GST %</label>
+          <input type="text" id="structureGst" readonly />
+        </div>
+        <div>
+          <label>Total (incl. GST)</label>
+          <input type="text" id="structureTotal" readonly />
+        </div>
+      </div>
+
+      <div class="inline-fields">
+        <div>
+          <label>Custom Margin (%)</label>
+          <input type="number" class="custom-margin" data-target="structure" />
+        </div>
+        <div>
+          <label class="toggle small">
+            <input type="checkbox" class="manual-price-toggle" data-target="structure" />
+            <span></span> Manual Price Override
+          </label>
+          <input
+            type="number"
+            class="manual-price-input"
+            data-target="structure"
+            placeholder="Override Base Rate per kW"
+          />
+        </div>
+      </div>
     </section>
 
-    <!-- LIGHTNING ARRESTOR -->
+    <!-- LIGHTNING ARRESTOR (simple) -->
     <section class="card">
       <div class="card-header">
         <h2>11. Lightning Arrestor</h2>
@@ -406,7 +571,7 @@
       <button id="generateSummary" class="alt">Generate Summary Quotation</button>
     </section>
 
-    <!-- Not used (we now open new window) -->
+    <!-- Not used (quotes open in new tab) -->
     <section id="quotationOutput" style="display:none;"></section>
   </div>
 
