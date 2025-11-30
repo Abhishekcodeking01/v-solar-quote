@@ -1,650 +1,1189 @@
 /****************************************************
- * V-SUSTAIN SOLAR SOLUTIONS – OFF-GRID BILLING ENGINE
+ * V-SUSTAIN SOLAR SOLUTIONS – OFF GRID BILLING ENGINE
  ****************************************************/
 
 /*----------------------------------------------
-  1. DATASETS (Off-grid Inverters, Batteries, Panels, ACDB, DCDB)
+  1. DATASETS
 -----------------------------------------------*/
 
-// OFFGRID INVERTER LIST
-const offGridInverters = [
-  { model: "NXG 850E (NXG PWM)", voc: "18V–25V", price: 4135 },
-  { model: "NXG 1150E (NXG PWM)", voc: "18V–25V", price: 5274 },
-  { model: "NXG 1450E (NXG PWM)", voc: "18V–25V", price: 6375 },
-  { model: "NXG 1850E (NXG PWM)", voc: "36V–60V", price: 7515 },
-  { model: "NXG 2350 (NXG PWM)", voc: "36V–60V", price: 9527 },
-  { model: "NXP 3500 (NXG PWM)", voc: "36V–60V", price: 13701 },
-  { model: "NXP PRO 3500 (NXP PRO MPPT)", voc: "36V–60V", price: 22507 },
-  { model: "SOLAR NXE 5KVA/48V (NXE PWM)", voc: "130V–220V", price: 30592 },
-  { model: "NXG PRO 1KVA/12V (NXG MPPT)", voc: "35V–55V", price: 8946 },
-  { model: "NXG PRO 1KVA/24V (NXG MPPT)", voc: "35V–55V", price: 8946 },
-  { model: "SOLARVERTER 2KVA/24V (PWM)", voc: "36V–60V", price: 11177 },
-  { model: "SOLARVERTER 3KVA/36V (PWM)", voc: "72V–120V", price: 16286 },
-  { model: "SOLARVERTER 5KVA/48V (PWM)", voc: "130V–220V", price: 30592 },
-  { model: "SOLARVERTER PRO 2KVA ECO (MPPT)", voc: "55V–107V", price: 16159 },
-  { model: "SOLARVERTER PRO 3KVA ECO (MPPT)", voc: "75V–150V", price: 23778 },
-  { model: "SOLARVERTER PRO 3.5KVA (MPPT)", voc: "130V–220V", price: 30701 },
-  { model: "SOLARVERTER PRO 5KVA (MPPT)", voc: "130V–220V", price: 40666 },
-  { model: "SOLARVERTER PRO 6KVA (MPPT)", voc: "180V–250V", price: 47247 },
-  { model: "SOLARVERTER PRO 7.5KVA (MPPT)", voc: "250V–400V", price: 64266 },
-  { model: "SOLARVERTER PRO 10.1KVA (MPPT)", voc: "200V–400V", price: 82817 }
+// OFFGRID INVERTERS
+const inverterList = [
+  { model: "NXG 850E (NXG PWM)", price: 4135 },
+  { model: "NXG 1150E (NXG PWM)", price: 5274 },
+  { model: "NXG 1450E (NXG PWM)", price: 6375 },
+  { model: "NXG 1850E (NXG PWM)", price: 7515 },
+  { model: "NXG 2350 (NXG PWM)", price: 9527 },
+  { model: "NXP 3500 (NXG PWM)", price: 13701 },
+  { model: "NXP PRO 3500 (NXP PRO MPPT)", price: 22507 },
+  { model: "SOLAR NXE 5KVA/48V (NXE PWM)", price: 30592 },
+  { model: "NXG PRO 1KVA/12V (NXG MPPT)", price: 8946 },
+  { model: "NXG PRO 1KVA/24V (NXG MPPT)", price: 8946 },
+  { model: "SOLARVERTER 2KVA/24V (PWM)", price: 11177 },
+  { model: "SOLARVERTER 3KVA/36V (PWM)", price: 16286 },
+  { model: "SOLARVERTER 5KVA/48V (PWM)", price: 30592 },
+  { model: "SOLARVERTER PRO 2KVA ECO (MPPT)", price: 16159 },
+  { model: "SOLARVERTER PRO 3KVA ECO (MPPT)", price: 23778 },
+  { model: "SOLARVERTER PRO 3.5KVA (MPPT)", price: 30701 },
+  { model: "SOLARVERTER PRO 5KVA (MPPT)", price: 40666 },
+  { model: "SOLARVERTER PRO 6KVA (MPPT)", price: 47247 },
+  { model: "SOLARVERTER PRO 7.5KVA (MPPT)", price: 64266 },
+  { model: "SOLARVERTER PRO 10.1KVA (MPPT)", price: 82817 }
+];
+
+// SHARED SOLAR PANELS (same as on-grid)
+const panelList = [
+  { model: "POLY 170W/12V", watt: 170, price: 3815 },
+  { model: "PV MOD LUM24550M DCR BI-TS EXWH31", watt: 550, price: 14025 },
+  { model: "PV MOD LUM 24585T144 TCHC 144C EXWH31", watt: 585, price: 9694 },
+  { model: "PV MOD LUM 24590T144 BI-TS-31", watt: 590, price: 9694 }
 ];
 
 // SOLAR BATTERIES
 const batteryList = [
-  { model: "LPT 1240L (40Ah)", capacity: "40AH", price: 4300 },
-  { model: "LPT 1240H (40Ah)", capacity: "40AH", price: 4765 },
-  { model: "LPT 1280H (80Ah)", capacity: "80AH", price: 7587 },
-  { model: "LPTT 12100H (100Ah)", capacity: "100AH", price: 9370 },
-  { model: "LPTT 12120H (120Ah)", capacity: "120AH", price: 10006 },
-  { model: "LPTT 12150L (150Ah)", capacity: "150AH", price: 11526 },
-  { model: "LPTT 12150H (150Ah)", capacity: "150AH", price: 12554 },
-  { model: "LPTT 12200L (200Ah)", capacity: "200AH", price: 15561 },
-  { model: "LPTT 12200H (200Ah)", capacity: "200AH", price: 16311 }
+  { model: "LPT 1240L (40Ah, 60M*)", price: 4300 },
+  { model: "LPT 1240H (40Ah, 72M*)", price: 4765 },
+  { model: "LPT 1280H (80Ah, 72M*)", price: 7587 },
+  { model: "LPTT 12100H (100Ah, 72M*)", price: 9370 },
+  { model: "LPTT12120H (120Ah, 72M*)", price: 10006 },
+  { model: "LPTT 12150L (150Ah, 60M*)", price: 11526 },
+  { model: "LPTT 12150H (150Ah, 72M*)", price: 12554 },
+  { model: "LPTT 12200L (200Ah, 60M*)", price: 15561 },
+  { model: "LPTT 12200H (200Ah, 72M*)", price: 16311 }
 ];
 
-// SOLAR PANELS (same list as on-grid, but using accurate data)
-const panelList = [
-  { model: "POLY 170W/12V", watt: 170, price: 3815 },
-  { model: "PV MOD LUM24550M DCR BI-TS EXWH31 (550W)", watt: 550, price: 14025 },
-  { model: "PV MOD LUM 24585T144 TCHC 144C EXWH31 (585W)", watt: 585, price: 9694 },
-  { model: "PV MOD LUM 24590T144 BI-TS-31 (590W)", watt: 590, price: 9694 }
-];
-
-// ACDB / DCDB (same as on-grid for now, simple label)
+// ACDB / DCDB – same as on-grid
 const acdbList = [
-  "TSAD0AC32PH1 – Single Phase 32A (0–5kW)",
-  "TSAD0AC63PH1 – Single Phase 63A (7kW)",
-  "TSAD0AC40PH1 – Single Phase 40A (9kW)",
-  "TSAD0AC80PH1 – Single Phase 80A (11kW)",
-  "TSADAC100PH1 – Single Phase 100A",
-  "TSAD0AC32PH3 – Three Phase 32A"
+  { sku: "TSAD0AC32PH1", desc: "ACDB Single Phase 32 Amp (0-5 Kw)", price: 1899.80 },
+  { sku: "TSAD0AC63PH1", desc: "ACDB Single Phase 63 Amp (7 Kw)", price: 2312.80 },
+  { sku: "TSAD0AC40PH1", desc: "ACDB Single Phase 40 Amp (9 Kw)", price: 2277.40 },
+  { sku: "TSAD0AC80PH1", desc: "ACDB Single Phase 80 Amp (11 Kw)", price: 4708.20 },
+  { sku: "TSADAC100PH1", desc: "ACDB Single Phase 100 Amp", price: 4920.60 },
+  { sku: "TSAD0AC32PH3", desc: "ACDB Three Phase 32 Amp", price: 4177.20 }
 ];
 
 const dcdbList = [
-  "TSADDC600V11 – 1 In 1 Out MCB",
-  "TSADDC600V22 – 2 In 2 Out Fuse",
-  "TSADDC600V21 – 2 In 1 Out MCB",
-  "TSADDC600V31 – 3 In 1 Out MCB",
-  "TSADDC600V41 – 4 In 1 Out MCB",
-  "TSADDC600V11F – 1 In 1 Out Fuse",
-  "TSADC600V21F – 2 In 1 Out Fuse",
-  "TSADC600V31F – 3 In 1 Out Fuse",
-  "TSADC600V41F – 4 In 1 Out Fuse"
+  { sku: "TSADDC600V11", desc: "DCDB 1 In 1 Out With MCB", price: 1939.92 },
+  { sku: "TSADDC600V22", desc: "DCDB 2 In 2 Out With Fuse", price: 2808.40 },
+  { sku: "TSADDC600V21", desc: "DCDB 2 In 1 Out With MCB", price: 2997.20 },
+  { sku: "TSADDC600V31", desc: "DCDB 3 In 1 Out With MCB", price: 3835.00 },
+  { sku: "TSADDC600V41", desc: "DCDB 4 In 1 Out With MCB", price: 4224.40 },
+  { sku: "TSADDC600V11F", desc: "DCDB 1 In 1 Out With Fuse (A)", price: 1711.00 },
+  { sku: "TSADC600V21F", desc: "DCDB 2 In 1 Out With Fuse", price: 2383.60 },
+  { sku: "TSADC600V31F", desc: "DCDB 3 In 1 Out With Fuse", price: 2725.80 },
+  { sku: "TSADC600V41F", desc: "DCDB 4 In 1 Out With Fuse", price: 3103.40 }
+];
+
+// RANDOM METER PRICES (same structure as on-grid)
+const meterOptions = [
+  { code: "single", label: "Single Phase", price: 4500 },
+  { code: "three", label: "Three Phase", price: 7500 }
 ];
 
 /*----------------------------------------------
   2. HELPERS
 -----------------------------------------------*/
+const n = v => (isNaN(parseFloat(v)) ? 0 : parseFloat(v));
+const fmt = v => "₹" + n(v).toLocaleString("en-IN", { maximumFractionDigits: 2 });
 
-const fmt = (n) => {
-  if (isNaN(n) || n == null) return "₹0";
-  return "₹" + Number(n).toLocaleString("en-IN", { maximumFractionDigits: 2 });
-};
-
-const parseNum = (val) => {
-  const n = parseFloat(val);
-  return isNaN(n) ? 0 : n;
-};
-
-/*----------------------------------------------
-  3. INITIALIZATION
------------------------------------------------*/
-
-window.addEventListener("DOMContentLoaded", () => {
-  loadOffGridInverters();
-  loadBatteries();
-  loadPanels();
-  loadACDB();
-  loadDCDB();
-
-  setupPanelAutoQty();
-  setupInstallStructureAuto();
-  setupEnableDisable();
-  setupCustomProducts();
-  setupQuoteButtons();
-});
-
-/*--- Populate selects ---*/
-
-function loadOffGridInverters() {
-  const sel = document.getElementById("inverterSelect");
-  offGridInverters.forEach((inv) => {
-    const opt = document.createElement("option");
-    opt.value = inv.price;
-    opt.textContent = `${inv.model} – VOC ${inv.voc} – ${fmt(inv.price)}`;
-    sel.appendChild(opt);
-  });
+function isSectionEnabled(id) {
+  const chk = document.querySelector("input[type='checkbox'][data-target='" + id + "']");
+  return chk ? chk.checked : true;
 }
 
-function loadBatteries() {
-  const sel = document.getElementById("batterySelect");
-  batteryList.forEach((b) => {
+function getGlobalMargin() {
+  return n(document.getElementById("globalMargin").value);
+}
+
+function getBasePrice(sectionId, dealerPrice) {
+  const toggle = document.querySelector(".manual-price-toggle[data-target='" + sectionId + "']");
+  const inp = document.querySelector(".manual-price-input[data-target='" + sectionId + "']");
+  if (toggle && toggle.checked && inp) {
+    const val = n(inp.value);
+    if (val > 0) return val;
+  }
+  return dealerPrice;
+}
+
+function applyMargin(base, sectionId) {
+  const global = getGlobalMargin();
+  const toggle = document.querySelector(".margin-toggle[data-target='" + sectionId + "']");
+  const customInp = document.querySelector(".custom-margin[data-target='" + sectionId + "']");
+  const custom = customInp ? n(customInp.value) : 0;
+
+  if (toggle && toggle.checked) {
+    return base + (base * global / 100);
+  } else if (custom > 0) {
+    return base + (base * custom / 100);
+  } else {
+    return base;
+  }
+}
+
+// For non triad items: always 18% GST
+function getFixedGstPercent(sectionId) {
+  // panels, inverter, battery are handled via special logic
+  if (sectionId === "panels" || sectionId === "inverter" || sectionId === "battery") {
+    return 0; // placeholder; real GST computed via triad logic
+  }
+  return 18;
+}
+
+/**
+ * OFF-GRID TRIAD GST LOGIC:
+ * - Panels always 5%
+ * - Inverter + Battery:
+ *    -> 5% each only when Panels + Inverter + Battery are all present
+ *    -> otherwise 18% each
+ */
+function getOffgridTriadGst() {
+  const panelQty = n((document.getElementById("panelQty") || {}).value);
+  const battQty = n((document.getElementById("batteryQty") || {}).value);
+  const hasPanels = isSectionEnabled("panels") && panelQty > 0;
+  const hasInv = isSectionEnabled("inverter");
+  const hasBatt = isSectionEnabled("battery") && battQty > 0;
+
+  const panelGst = 5;
+  const trio = hasPanels && hasInv && hasBatt;
+  const inverterGst = trio ? 5 : 18;
+  const batteryGst = trio ? 5 : 18;
+
+  return { panelGst, inverterGst, batteryGst };
+}
+
+/*----------------------------------------------
+  3. INIT
+-----------------------------------------------*/
+window.addEventListener("DOMContentLoaded", () => {
+  loadInverters();
+  loadPanels();
+  loadBatteries();
+  loadACDB();
+  loadDCDB();
+  loadMeters();
+
+  // Listeners
+  document.getElementById("panelSelect").addEventListener("change", recalcPanelsCard);
+  document.getElementById("systemKW").addEventListener("input", handleSystemKwChange);
+
+  document.getElementById("inverterSelect").addEventListener("change", recalcInverterCard);
+
+  document.getElementById("batterySelect").addEventListener("change", recalcBatteryCard);
+  document.getElementById("batteryQty").addEventListener("input", recalcBatteryCard);
+
+  document.getElementById("acdbSelect").addEventListener("change", recalcAcdbCard);
+  document.getElementById("dcdbSelect").addEventListener("change", recalcDcdbCard);
+
+  document.getElementById("meterType").addEventListener("change", recalcMeterCard);
+  document.getElementById("meterQty").addEventListener("input", recalcMeterCard);
+
+  // Installation / structure
+  document.getElementById("installationQty").addEventListener("input", recalcInstallationCard);
+  document.getElementById("installationBaseRate").addEventListener("input", recalcInstallationCard);
+  document.getElementById("structureQty").addEventListener("input", recalcStructureCard);
+  document.getElementById("structureBaseRate").addEventListener("input", recalcStructureCard);
+
+  // Global margin
+  document.getElementById("globalMargin").addEventListener("input", () => {
+    recalcInverterCard();
+    recalcPanelsCard();
+    recalcBatteryCard();
+    recalcAcdbCard();
+    recalcDcdbCard();
+    recalcMeterCard();
+    recalcInstallationCard();
+    recalcStructureCard();
+  });
+
+  // custom margins
+  document.querySelectorAll(".custom-margin").forEach(inp => {
+    inp.addEventListener("input", () => {
+      recalcInverterCard();
+      recalcPanelsCard();
+      recalcBatteryCard();
+      recalcAcdbCard();
+      recalcDcdbCard();
+      recalcMeterCard();
+      recalcInstallationCard();
+      recalcStructureCard();
+    });
+  });
+
+  // manual price override
+  document.querySelectorAll(".manual-price-toggle, .manual-price-input").forEach(el => {
+    el.addEventListener("change", () => {
+      recalcInverterCard();
+      recalcPanelsCard();
+      recalcBatteryCard();
+      recalcAcdbCard();
+      recalcDcdbCard();
+      recalcMeterCard();
+      recalcInstallationCard();
+      recalcStructureCard();
+    });
+    el.addEventListener("input", () => {
+      recalcInverterCard();
+      recalcPanelsCard();
+      recalcBatteryCard();
+      recalcAcdbCard();
+      recalcDcdbCard();
+      recalcMeterCard();
+      recalcInstallationCard();
+      recalcStructureCard();
+    });
+  });
+
+  // enable/disable cards
+  document.querySelectorAll("input[type='checkbox'][data-target]").forEach(chk => {
+    chk.addEventListener("change", function () {
+      const card = this.closest(".card");
+      if (!card) return;
+      if (this.checked) card.classList.remove("disabled");
+      else card.classList.add("disabled");
+      // recalc triad when on/off
+      recalcInverterCard();
+      recalcPanelsCard();
+      recalcBatteryCard();
+    });
+  });
+
+  // custom products
+  document.getElementById("addCustomProduct").addEventListener("click", addCustomProductRow);
+  document.getElementById("customProducts").addEventListener("click", e => {
+    if (e.target.classList.contains("cp-delete")) {
+      const row = e.target.closest(".custom-row");
+      if (row) row.remove();
+    }
+  });
+
+  // quote buttons
+  document.getElementById("generateDetailed").addEventListener("click", () => {
+    const totals = calcTotals();
+    const html = buildDetailedQuotationHtml(totals);
+    openInNewWindow(html);
+  });
+
+  document.getElementById("generateSummary").addEventListener("click", () => {
+    const totals = calcTotals();
+    const html = buildSummaryQuotationHtml(totals);
+    openInNewWindow(html);
+  });
+
+  // Initial defaults
+  handleSystemKwChange();
+  recalcInverterCard();
+  recalcPanelsCard();
+  recalcBatteryCard();
+  recalcAcdbCard();
+  recalcDcdbCard();
+  recalcMeterCard();
+  recalcInstallationCard();
+  recalcStructureCard();
+});
+
+/*----------------------------------------------
+  4. LOADERS
+-----------------------------------------------*/
+function loadInverters() {
+  const sel = document.getElementById("inverterSelect");
+  inverterList.forEach(inv => {
     const opt = document.createElement("option");
-    opt.value = b.price;
-    opt.textContent = `${b.model} – ${b.capacity} – ${fmt(b.price)}`;
+    opt.value = inv.model;
+    opt.dataset.price = inv.price;
+    opt.textContent = `${inv.model} – ${fmt(inv.price)}`;
     sel.appendChild(opt);
   });
 }
 
 function loadPanels() {
   const sel = document.getElementById("panelSelect");
-  panelList.forEach((p) => {
+  panelList.forEach(p => {
     const opt = document.createElement("option");
-    opt.value = p.price;
-    opt.textContent = `${p.model} – ${p.watt}W – ${fmt(p.price)}`;
+    opt.value = p.model;
+    opt.dataset.price = p.price;
     opt.dataset.watt = p.watt;
+    opt.textContent = `${p.model} – ${p.watt}W – ${fmt(p.price)}`;
+    sel.appendChild(opt);
+  });
+}
+
+function loadBatteries() {
+  const sel = document.getElementById("batterySelect");
+  batteryList.forEach(b => {
+    const opt = document.createElement("option");
+    opt.value = b.model;
+    opt.dataset.price = b.price;
+    opt.textContent = `${b.model} – ${fmt(b.price)}`;
     sel.appendChild(opt);
   });
 }
 
 function loadACDB() {
   const sel = document.getElementById("acdbSelect");
-  acdbList.forEach((v) => {
+  acdbList.forEach(a => {
     const opt = document.createElement("option");
-    opt.textContent = v;
+    opt.value = a.sku;
+    opt.dataset.price = a.price;
+    opt.textContent = `${a.desc} (${a.sku}) – ${fmt(a.price)}`;
     sel.appendChild(opt);
   });
 }
 
 function loadDCDB() {
   const sel = document.getElementById("dcdbSelect");
-  dcdbList.forEach((v) => {
+  dcdbList.forEach(a => {
     const opt = document.createElement("option");
-    opt.textContent = v;
+    opt.value = a.sku;
+    opt.dataset.price = a.price;
+    opt.textContent = `${a.desc} (${a.sku}) – ${fmt(a.price)}`;
+    sel.appendChild(opt);
+  });
+}
+
+function loadMeters() {
+  const sel = document.getElementById("meterType");
+  meterOptions.forEach(m => {
+    const opt = document.createElement("option");
+    opt.value = m.code;
+    opt.dataset.price = m.price;
+    opt.textContent = `${m.label} – ${fmt(m.price)}`;
     sel.appendChild(opt);
   });
 }
 
 /*----------------------------------------------
-  4. PANEL QUANTITY AUTOCALC (kW → qty)
+  5. CARD RECALC
 -----------------------------------------------*/
-function setupPanelAutoQty() {
-  const kwInput = document.getElementById("systemKW");
-  const panelSel = document.getElementById("panelSelect");
+function recalcInverterCard() {
+  if (!isSectionEnabled("inverter")) {
+    document.getElementById("inverterDealer").value = "";
+    document.getElementById("inverterRate").value = "";
+    document.getElementById("inverterGst").value = "";
+    document.getElementById("inverterTotal").value = "";
+    return;
+  }
+  const sel = document.getElementById("inverterSelect");
+  const opt = sel.selectedOptions[0];
+  if (!opt) return;
 
-  const calc = () => {
-    const kw = parseNum(kwInput.value);
-    const selected = panelSel.selectedOptions[0];
-    if (!kw || !selected || !selected.dataset.watt) {
-      document.getElementById("panelQty").value = "";
-      return;
-    }
-    const watt = parseNum(selected.dataset.watt);
-    const totalWatt = kw * 1000;
-    const qty = Math.ceil(totalWatt / watt);
-    document.getElementById("panelQty").value = qty;
-  };
+  const dealer = n(opt.dataset.price);
+  const base = getBasePrice("inverter", dealer);
+  const rate = applyMargin(base, "inverter");
+  const { inverterGst } = getOffgridTriadGst();
+  const gst = inverterGst;
+  const qty = 1;
+  const amount = rate * qty;
+  const gstAmt = amount * gst / 100;
+  const total = amount + gstAmt;
 
-  kwInput.addEventListener("input", calc);
-  panelSel.addEventListener("change", calc);
+  document.getElementById("inverterDealer").value = fmt(dealer);
+  document.getElementById("inverterRate").value = fmt(rate);
+  document.getElementById("inverterGst").value = gst + "%";
+  document.getElementById("inverterTotal").value = fmt(total);
+}
+
+function recalcPanelsCard() {
+  if (!isSectionEnabled("panels")) {
+    document.getElementById("panelDealer").value = "";
+    document.getElementById("panelRate").value = "";
+    document.getElementById("panelQty").value = "";
+    document.getElementById("panelCapacityKw").value = "";
+    document.getElementById("panelGst").value = "";
+    document.getElementById("panelTotal").value = "";
+    return;
+  }
+
+  const kw = n(document.getElementById("systemKW").value);
+  const sel = document.getElementById("panelSelect");
+  const opt = sel.selectedOptions[0];
+  if (!kw || !opt) return;
+
+  const watt = n(opt.dataset.watt);
+  const dealer = n(opt.dataset.price);
+  const base = getBasePrice("panels", dealer);
+  const perRate = applyMargin(base, "panels");
+
+  const totalWatt = kw * 1000;
+  const qty = Math.ceil(totalWatt / watt);
+  const dcCapacityKw = (qty * watt) / 1000;
+
+  const { panelGst } = getOffgridTriadGst();
+  const gst = panelGst;
+  const amount = perRate * qty;
+  const gstAmt = amount * gst / 100;
+  const total = amount + gstAmt;
+
+  document.getElementById("panelQty").value = qty;
+  document.getElementById("panelCapacityKw").value = dcCapacityKw.toFixed(2) + " kW";
+  document.getElementById("panelDealer").value = fmt(dealer);
+  document.getElementById("panelRate").value = fmt(perRate);
+  document.getElementById("panelGst").value = gst + "%";
+  document.getElementById("panelTotal").value = fmt(total);
+}
+
+function recalcBatteryCard() {
+  if (!isSectionEnabled("battery")) {
+    document.getElementById("batteryDealer").value = "";
+    document.getElementById("batteryRate").value = "";
+    document.getElementById("batteryGst").value = "";
+    document.getElementById("batteryTotal").value = "";
+    return;
+  }
+  const sel = document.getElementById("batterySelect");
+  const opt = sel.selectedOptions[0];
+  if (!opt) return;
+
+  const qty = n(document.getElementById("batteryQty").value) || 1;
+  const dealer = n(opt.dataset.price);
+  const base = getBasePrice("battery", dealer);
+  const rate = applyMargin(base, "battery");
+  const { batteryGst } = getOffgridTriadGst();
+  const gst = batteryGst;
+  const amount = rate * qty;
+  const gstAmt = amount * gst / 100;
+  const total = amount + gstAmt;
+
+  document.getElementById("batteryDealer").value = fmt(dealer);
+  document.getElementById("batteryRate").value = fmt(rate);
+  document.getElementById("batteryGst").value = gst + "%";
+  document.getElementById("batteryTotal").value = fmt(total);
+}
+
+function recalcAcdbCard() {
+  if (!isSectionEnabled("acdb")) {
+    document.getElementById("acdbDealer").value = "";
+    document.getElementById("acdbRate").value = "";
+    return;
+  }
+  const sel = document.getElementById("acdbSelect");
+  const opt = sel.selectedOptions[0];
+  if (!opt) return;
+  const dealer = n(opt.dataset.price);
+  const base = getBasePrice("acdb", dealer);
+  const rate = applyMargin(base, "acdb");
+  document.getElementById("acdbDealer").value = fmt(dealer);
+  document.getElementById("acdbRate").value = fmt(rate);
+}
+
+function recalcDcdbCard() {
+  if (!isSectionEnabled("dcdb")) {
+    document.getElementById("dcdbDealer").value = "";
+    document.getElementById("dcdbRate").value = "";
+    return;
+  }
+  const sel = document.getElementById("dcdbSelect");
+  const opt = sel.selectedOptions[0];
+  if (!opt) return;
+  const dealer = n(opt.dataset.price);
+  const base = getBasePrice("dcdb", dealer);
+  const rate = applyMargin(base, "dcdb");
+  document.getElementById("dcdbDealer").value = fmt(dealer);
+  document.getElementById("dcdbRate").value = fmt(rate);
+}
+
+function recalcMeterCard() {
+  if (!isSectionEnabled("meter")) {
+    document.getElementById("meterDealer").value = "";
+    document.getElementById("meterRate").value = "";
+    document.getElementById("meterGst").value = "";
+    document.getElementById("meterTotal").value = "";
+    return;
+  }
+  const sel = document.getElementById("meterType");
+  const opt = sel.selectedOptions[0];
+  if (!opt) return;
+
+  const dealer = n(opt.dataset.price);
+  const qty = n(document.getElementById("meterQty").value) || 1;
+  const base = getBasePrice("meter", dealer);
+  const rate = applyMargin(base, "meter");
+  const gst = getFixedGstPercent("meter");
+  const amount = rate * qty;
+  const gstAmt = amount * gst / 100;
+  const total = amount + gstAmt;
+
+  document.getElementById("meterDealer").value = fmt(dealer);
+  document.getElementById("meterRate").value = fmt(rate);
+  document.getElementById("meterGst").value = gst + "%";
+  document.getElementById("meterTotal").value = fmt(total);
+}
+
+// System KW changes: update installation & structure defaults, panel recalc, etc.
+function handleSystemKwChange() {
+  const kw = n(document.getElementById("systemKW").value);
+
+  const instQty = document.getElementById("installationQty");
+  const instBase = document.getElementById("installationBaseRate");
+  const structQty = document.getElementById("structureQty");
+  const structBase = document.getElementById("structureBaseRate");
+
+  if (kw > 0) {
+    if (!instQty.value || n(instQty.value) === 0) instQty.value = kw;
+    if (!structQty.value || n(structQty.value) === 0) structQty.value = kw;
+  }
+
+  if (!instBase.value || n(instBase.value) === 0) instBase.value = 5000;
+  if (!structBase.value || n(structBase.value) === 0) structBase.value = 8000;
+
+  recalcPanelsCard();
+  recalcInstallationCard();
+  recalcStructureCard();
+}
+
+function recalcInstallationCard() {
+  if (!isSectionEnabled("installation")) {
+    document.getElementById("installationRate").value = "";
+    document.getElementById("installationGst").value = "";
+    document.getElementById("installationTotal").value = "";
+    return;
+  }
+
+  const qty = n(document.getElementById("installationQty").value);
+  const dealerBase = n(document.getElementById("installationBaseRate").value);
+  if (!qty || !dealerBase) {
+    document.getElementById("installationRate").value = "";
+    document.getElementById("installationGst").value = "";
+    document.getElementById("installationTotal").value = "";
+    return;
+  }
+
+  const base = getBasePrice("installation", dealerBase);
+  const rate = applyMargin(base, "installation");
+  const gst = getFixedGstPercent("installation");
+  const amount = rate * qty;
+  const gstAmt = amount * gst / 100;
+  const total = amount + gstAmt;
+
+  document.getElementById("installationRate").value = fmt(rate);
+  document.getElementById("installationGst").value = gst + "%";
+  document.getElementById("installationTotal").value = fmt(total);
+}
+
+function recalcStructureCard() {
+  if (!isSectionEnabled("structure")) {
+    document.getElementById("structureRate").value = "";
+    document.getElementById("structureGst").value = "";
+    document.getElementById("structureTotal").value = "";
+    return;
+  }
+
+  const qty = n(document.getElementById("structureQty").value);
+  const dealerBase = n(document.getElementById("structureBaseRate").value);
+  if (!qty || !dealerBase) {
+    document.getElementById("structureRate").value = "";
+    document.getElementById("structureGst").value = "";
+    document.getElementById("structureTotal").value = "";
+    return;
+  }
+
+  const base = getBasePrice("structure", dealerBase);
+  const rate = applyMargin(base, "structure");
+  const gst = getFixedGstPercent("structure");
+  const amount = rate * qty;
+  const gstAmt = amount * gst / 100;
+  const total = amount + gstAmt;
+
+  document.getElementById("structureRate").value = fmt(rate);
+  document.getElementById("structureGst").value = gst + "%";
+  document.getElementById("structureTotal").value = fmt(total);
 }
 
 /*----------------------------------------------
-  5. INSTALLATION & STRUCTURE AUTOCALC
+  6. CUSTOM PRODUCTS
 -----------------------------------------------*/
-function setupInstallStructureAuto() {
-  const kwInput = document.getElementById("systemKW");
-  const installField = document.getElementById("installationCost");
-  const structureField = document.getElementById("structureCost");
-
-  const calc = () => {
-    const kw = parseNum(kwInput.value);
-    installField.value = kw ? kw * 5000 : "";
-    structureField.value = kw ? kw * 8000 : "";
-  };
-
-  kwInput.addEventListener("input", calc);
+function addCustomProductRow() {
+  const box = document.getElementById("customProducts");
+  const row = document.createElement("div");
+  row.className = "custom-row";
+  row.innerHTML = `
+    <input type="text" placeholder="Product Name" class="cp-name">
+    <input type="number" placeholder="Qty" class="cp-qty">
+    <input type="number" placeholder="Price" class="cp-price">
+    <label>Use Global Margin</label>
+    <input type="checkbox" class="cp-margin-global" checked>
+    <input type="number" placeholder="Custom Margin %" class="cp-custom-margin">
+    <button type="button" class="cp-delete">Delete</button>
+  `;
+  box.appendChild(row);
 }
 
 /*----------------------------------------------
-  6. ENABLE / DISABLE CARDS (grey-out)
+  7. BUILD LINE ITEMS
 -----------------------------------------------*/
-function setupEnableDisable() {
-  document
-    .querySelectorAll("input[type='checkbox'][data-target]")
-    .forEach((chk) => {
-      chk.addEventListener("change", function () {
-        const card = this.closest(".card");
-        if (!card) return;
-        if (this.checked) {
-          card.classList.remove("disabled");
-        } else {
-          card.classList.add("disabled");
-        }
+function buildLineItems() {
+  const items = [];
+  const triad = getOffgridTriadGst();
+
+  // Inverter
+  if (isSectionEnabled("inverter")) {
+    const sel = document.getElementById("inverterSelect");
+    const opt = sel.selectedOptions[0];
+    if (opt) {
+      const dealer = n(opt.dataset.price);
+      const base = getBasePrice("inverter", dealer);
+      const rate = applyMargin(base, "inverter");
+      items.push({
+        type: "inverter",
+        item: "Off-Grid Inverter",
+        desc: opt.textContent,
+        qty: 1,
+        unit: "Nos",
+        baseRate: rate,
+        gstPercent: triad.inverterGst
       });
-    });
-}
-
-/*----------------------------------------------
-  7. CUSTOM PRODUCTS HANDLER
------------------------------------------------*/
-function setupCustomProducts() {
-  const addBtn = document.getElementById("addCustomProduct");
-  const container = document.getElementById("customProducts");
-
-  addBtn.addEventListener("click", () => {
-    const row = document.createElement("div");
-    row.className = "custom-row";
-    row.innerHTML = `
-      <input type="text" placeholder="Product Name" class="cp-name" />
-      <input type="number" placeholder="Qty" class="cp-qty" />
-      <input type="number" placeholder="Price" class="cp-price" />
-      
-      <label>Enable</label>
-      <input type="checkbox" class="cp-enable" checked />
-
-      <label>Use Global Margin</label>
-      <input type="checkbox" class="cp-margin-global" checked />
-
-      <input type="number" placeholder="Custom Margin %" class="cp-custom-margin" />
-    `;
-    container.appendChild(row);
-  });
-}
-
-/*----------------------------------------------
-  8. MARGIN ENGINE (Global + Custom)
------------------------------------------------*/
-function applyMargin(basePrice, sectionId) {
-  const globalMargin = parseNum(document.getElementById("globalMargin").value);
-
-  const marginToggle = document.querySelector(
-    `.margin-toggle[data-target='${sectionId}']`
-  );
-  const customMarginInput = document.querySelector(
-    `.custom-margin[data-target='${sectionId}']`
-  );
-  const customMargin = customMarginInput ? parseNum(customMarginInput.value) : 0;
-
-  // Priority:
-  // 1) If margin toggle ON → use global margin
-  // 2) Else if custom margin > 0 → use custom margin
-  // 3) Else → no margin
-  if (marginToggle && marginToggle.checked) {
-    return basePrice + (basePrice * globalMargin) / 100;
-  } else if (customMargin > 0) {
-    return basePrice + (basePrice * customMargin) / 100;
-  } else {
-    return basePrice;
-  }
-}
-
-/*----------------------------------------------
-  9. GST ENGINE (Off-grid rules)
------------------------------------------------*/
-/*
-  Off-grid GST rules:
-
-  - Solar panels → 5% GST always.
-  - If inverter + battery + panels are ALL enabled:
-        → 5% GST on inverter + battery + panels.
-  - Else:
-        → Inverter & battery = 18% GST
-        → Panels remain 5% GST.
-  - All other items (ACDB, DCDB, cables, structure, etc.) = 18%.
-*/
-
-function computeGst(amount, sectionId, ctx) {
-  let gstPercent = 18;
-
-  if (sectionId === "panels") {
-    gstPercent = 5;
-  } else if (sectionId === "inverter" || sectionId === "battery") {
-    if (ctx.inverter && ctx.battery && ctx.panels) {
-      gstPercent = 5;
-    } else {
-      gstPercent = 18;
     }
-  } else if (sectionId === "custom") {
-    // Assume 18% GST for custom items by default
-    gstPercent = 18;
-  } else {
-    gstPercent = 18;
   }
 
-  const gstAmount = (amount * gstPercent) / 100;
-  const totalWithGST = amount + gstAmount;
+  // Panels
+  if (isSectionEnabled("panels")) {
+    const sel = document.getElementById("panelSelect");
+    const opt = sel.selectedOptions[0];
+    const qty = n(document.getElementById("panelQty").value);
+    if (opt && qty > 0) {
+      const dealer = n(opt.dataset.price);
+      const base = getBasePrice("panels", dealer);
+      const rate = applyMargin(base, "panels");
+      items.push({
+        type: "panels",
+        item: "Solar PV Modules",
+        desc: opt.textContent,
+        qty,
+        unit: "Nos",
+        baseRate: rate,
+        gstPercent: triad.panelGst
+      });
+    }
+  }
 
-  return { gstPercent, gstAmount, totalWithGST };
+  // Battery
+  if (isSectionEnabled("battery")) {
+    const sel = document.getElementById("batterySelect");
+    const opt = sel.selectedOptions[0];
+    const qty = n(document.getElementById("batteryQty").value) || 1;
+    if (opt && qty > 0) {
+      const dealer = n(opt.dataset.price);
+      const base = getBasePrice("battery", dealer);
+      const rate = applyMargin(base, "battery");
+      items.push({
+        type: "battery",
+        item: "Solar Battery",
+        desc: opt.textContent,
+        qty,
+        unit: "Nos",
+        baseRate: rate,
+        gstPercent: triad.batteryGst
+      });
+    }
+  }
+
+  // Meter
+  if (isSectionEnabled("meter")) {
+    const sel = document.getElementById("meterType");
+    const opt = sel.selectedOptions[0];
+    const qty = n(document.getElementById("meterQty").value) || 1;
+    if (opt && qty > 0) {
+      const dealer = n(opt.dataset.price);
+      const base = getBasePrice("meter", dealer);
+      const rate = applyMargin(base, "meter");
+      items.push({
+        type: "meter",
+        item: "Bi-Directional Meter",
+        desc: opt.textContent,
+        qty,
+        unit: "Nos",
+        baseRate: rate,
+        gstPercent: getFixedGstPercent("meter")
+      });
+    }
+  }
+
+  // ACDB
+  if (isSectionEnabled("acdb")) {
+    const sel = document.getElementById("acdbSelect");
+    const opt = sel.selectedOptions[0];
+    if (opt) {
+      const dealer = n(opt.dataset.price);
+      const base = getBasePrice("acdb", dealer);
+      const rate = applyMargin(base, "acdb");
+      items.push({
+        type: "acdb",
+        item: "ACDB",
+        desc: opt.textContent,
+        qty: 1,
+        unit: "Nos",
+        baseRate: rate,
+        gstPercent: getFixedGstPercent("acdb")
+      });
+    }
+  }
+
+  // DCDB
+  if (isSectionEnabled("dcdb")) {
+    const sel = document.getElementById("dcdbSelect");
+    const opt = sel.selectedOptions[0];
+    if (opt) {
+      const dealer = n(opt.dataset.price);
+      const base = getBasePrice("dcdb", dealer);
+      const rate = applyMargin(base, "dcdb");
+      items.push({
+        type: "dcdb",
+        item: "DCDB",
+        desc: opt.textContent,
+        qty: 1,
+        unit: "Nos",
+        baseRate: rate,
+        gstPercent: getFixedGstPercent("dcdb")
+      });
+    }
+  }
+
+  // AC cable
+  if (isSectionEnabled("accable")) {
+    const gauge = document.getElementById("acGauge").value || "";
+    const qty = n(document.getElementById("acQty").value);
+    const price = n(document.getElementById("acPrice").value);
+    if (qty > 0 && price > 0) {
+      const rate = applyMargin(price, "accable");
+      items.push({
+        type: "accable",
+        item: "AC Cable",
+        desc: gauge,
+        qty,
+        unit: "Mtr",
+        baseRate: rate,
+        gstPercent: getFixedGstPercent("accable")
+      });
+    }
+  }
+
+  // Earthing cable
+  if (isSectionEnabled("earthing")) {
+    const gauge = document.getElementById("earthGauge").value || "";
+    const qty = n(document.getElementById("earthQty").value);
+    const price = n(document.getElementById("earthPrice").value);
+    if (qty > 0 && price > 0) {
+      const rate = applyMargin(price, "earthing");
+      items.push({
+        type: "earthing",
+        item: "Earthing Cable",
+        desc: gauge,
+        qty,
+        unit: "Mtr",
+        baseRate: rate,
+        gstPercent: getFixedGstPercent("earthing")
+      });
+    }
+  }
+
+  // Installation
+  if (isSectionEnabled("installation")) {
+    const qty = n(document.getElementById("installationQty").value);
+    const dealerBase = n(document.getElementById("installationBaseRate").value);
+    if (qty > 0 && dealerBase > 0) {
+      const base = getBasePrice("installation", dealerBase);
+      const rate = applyMargin(base, "installation");
+      items.push({
+        type: "installation",
+        item: "Installation & Commissioning",
+        desc: "Installation services",
+        qty,
+        unit: "kW",
+        baseRate: rate,
+        gstPercent: getFixedGstPercent("installation")
+      });
+    }
+  }
+
+  // Structure
+  if (isSectionEnabled("structure")) {
+    const qty = n(document.getElementById("structureQty").value);
+    const dealerBase = n(document.getElementById("structureBaseRate").value);
+    if (qty > 0 && dealerBase > 0) {
+      const base = getBasePrice("structure", dealerBase);
+      const rate = applyMargin(base, "structure");
+      items.push({
+        type: "structure",
+        item: "Module Mounting Structure",
+        desc: "Structure for PV modules",
+        qty,
+        unit: "kW",
+        baseRate: rate,
+        gstPercent: getFixedGstPercent("structure")
+      });
+    }
+  }
+
+  // Lightning
+  if (isSectionEnabled("lightning")) {
+    const qty = n(document.getElementById("lightQty").value);
+    const price = n(document.getElementById("lightPrice").value);
+    if (qty > 0 && price > 0) {
+      const rate = applyMargin(price, "lightning");
+      items.push({
+        type: "lightning",
+        item: "Lightning Arrestor",
+        desc: "",
+        qty,
+        unit: "Nos",
+        baseRate: rate,
+        gstPercent: getFixedGstPercent("lightning")
+      });
+    }
+  }
+
+  // Custom products
+  document.querySelectorAll(".custom-row").forEach(row => {
+    const name = row.querySelector(".cp-name").value || "Custom Item";
+    const qty = n(row.querySelector(".cp-qty").value);
+    const price = n(row.querySelector(".cp-price").value);
+    if (!qty || !price) return;
+    const useGlobal = row.querySelector(".cp-margin-global").checked;
+    const customMargin = n(row.querySelector(".cp-custom-margin").value);
+    let rate = price;
+    if (useGlobal) {
+      rate = price + price * getGlobalMargin() / 100;
+    } else if (customMargin > 0) {
+      rate = price + price * customMargin / 100;
+    }
+    items.push({
+      type: "custom",
+      item: name,
+      desc: "",
+      qty,
+      unit: "Nos",
+      baseRate: rate,
+      gstPercent: getFixedGstPercent("custom")
+    });
+  });
+
+  return items;
 }
 
 /*----------------------------------------------
-  10. QUOTATION BUILDERS
+  8. TOTALS
 -----------------------------------------------*/
-function setupQuoteButtons() {
-  document
-    .getElementById("generateDetailed")
-    .addEventListener("click", generateDetailedQuote);
-  document
-    .getElementById("generateSummary")
-    .addEventListener("click", generateSummaryQuote);
+function calcTotals() {
+  const items = buildLineItems();
+  let subtotal = 0;
+  let totalGst = 0;
+
+  items.forEach(it => {
+    const amount = it.baseRate * it.qty;
+    const gstAmt = amount * it.gstPercent / 100;
+    subtotal += amount;
+    totalGst += gstAmt;
+  });
+
+  const grandTotal = subtotal + totalGst;
+  return { items, subtotal, totalGst, grandTotal };
 }
 
-/*---------- DETAILED ----------*/
-function generateDetailedQuote() {
-  const out = document.getElementById("quotationOutput");
-  out.innerHTML = "";
+/*----------------------------------------------
+  9. QUOTATION HTML (DETAILED & SUMMARY)
+-----------------------------------------------*/
+function buildDetailedQuotationHtml(totals) {
+  const plantKw = n(document.getElementById("systemKW").value);
+  const margin = getGlobalMargin();
 
-  // Determine combo condition flags for GST:
-  const inverterEnabled =
-    document.querySelector("input[data-target='inverter']").checked &&
-    document.getElementById("inverterSelect").selectedIndex >= 0;
-  const batteryEnabled =
-    document.querySelector("input[data-target='battery']").checked &&
-    document.getElementById("batterySelect").selectedIndex >= 0 &&
-    parseNum(document.getElementById("batteryQty").value) > 0;
-  const panelEnabled =
-    document.querySelector("input[data-target='panels']").checked &&
-    document.getElementById("panelSelect").selectedIndex >= 0 &&
-    parseNum(document.getElementById("panelQty").value) > 0;
+  const rowsHtml = totals.items.map((it, idx) => {
+    const amount = it.baseRate * it.qty;
+    const gstAmt = amount * it.gstPercent / 100;
+    const total = amount + gstAmt;
+    return `
+      <tr>
+        <td>${idx + 1}</td>
+        <td>${it.item}</td>
+        <td>${it.desc || ""}</td>
+        <td>${it.qty}</td>
+        <td>${it.unit}</td>
+        <td>${fmt(it.baseRate)}</td>
+        <td>${fmt(amount)}</td>
+        <td>${it.gstPercent}%</td>
+        <td>${fmt(gstAmt)}</td>
+        <td>${fmt(total)}</td>
+      </tr>
+    `;
+  }).join("");
 
-  const ctx = {
-    inverter: inverterEnabled,
-    battery: batteryEnabled,
-    panels: panelEnabled
-  };
+  const html = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>Off-Grid Quotation - V-Sustain Solar Solutions</title>
+  <style>
+    body { font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; background:#f9fafb; color:#0f172a; padding:20px; }
+    .quotation-wrapper { max-width:900px; margin:0 auto; background:#fff; padding:20px 24px; border-radius:12px; box-shadow:0 8px 30px rgba(15,23,42,0.18); }
+    header { display:flex; justify-content:space-between; gap:16px; margin-bottom:16px; }
+    .brand-left { display:flex; gap:10px; }
+    .logo-placeholder { width:52px; height:52px; border-radius:999px; background:radial-gradient(circle at 30% 20%, #bbf7d0, #22c55e); box-shadow:0 0 15px rgba(34,197,94,0.7); }
+    h1 { margin:0; font-size:22px; }
+    h2 { margin-top:20px; margin-bottom:6px; font-size:18px; }
+    .tagline { font-size:13px; color:#64748b; }
+    .contact p { margin:2px 0; font-size:12px; color:#475569; }
+    table { width:100%; border-collapse:collapse; margin-top:14px; font-size:12px; }
+    th, td { border:1px solid #e2e8f0; padding:6px 6px; vertical-align:top; }
+    th { background:#f8fafc; text-align:left; }
+    tfoot td { font-weight:600; }
+    .totals { margin-top:10px; text-align:right; font-size:13px; }
+    .totals strong { font-size:18px; color:#16a34a; }
+    .section { margin-top:18px; font-size:12px; }
+    .section p { margin:3px 0; }
+    .warranty-grid { display:flex; gap:10px; flex-wrap:wrap; margin-top:6px; }
+    .w-card { flex:1 1 120px; background:#f1f5f9; padding:8px 10px; border-radius:8px; border:1px solid #e2e8f0; }
+    .w-label { font-size:11px; color:#64748b; }
+    .w-value { font-weight:600; font-size:13px; }
+    .why-grid { display:flex; flex-wrap:wrap; gap:8px; margin-top:6px; }
+    .why-card { flex:1 1 140px; background:#f8fafc; border-radius:8px; border:1px solid #e5e7eb; padding:8px; font-size:12px; }
+    .why-icon { font-size:16px; }
+    .why-title { font-weight:600; margin-top:2px; }
+    .why-text { font-size:11px; color:#6b7280; margin-top:2px; }
+    .bank { margin-top:8px; }
+    .fine-print { font-size:11px; color:#6b7280; margin-top:4px; }
+    .footer { margin-top:16px; font-size:11px; text-align:center; color:#6b7280; }
+    .print-btn { margin-bottom:10px; padding:6px 12px; border-radius:8px; border:none; background:#1d4ed8; color:#fff; cursor:pointer; font-size:13px; float:right; }
+    @media print {
+      body { background:#fff; padding:0; }
+      .quotation-wrapper { box-shadow:none; border-radius:0; }
+      .print-btn { display:none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="quotation-wrapper">
+    <button class="print-btn" onclick="window.print()">Print / Save as PDF</button>
+    <header>
+      <div class="brand-left">
+        <div class="logo-placeholder"></div>
+        <div>
+          <h1>V-Sustain Solar Solutions</h1>
+          <div class="tagline">Authorized Luminous Partner – Off-Grid Solar Quotation</div>
+        </div>
+      </div>
+      <div class="contact">
+        <p>Email: <strong>vsustainsolarsolutions@gmail.com</strong></p>
+        <p>Phone: <strong>+91 99-000-00476</strong></p>
+        <p>Location: Bengaluru, Karnataka</p>
+      </div>
+    </header>
 
-  let html = `
-    <div class="quote">
-      <h1>Quotation – V-Sustain Solar Solutions</h1>
-      <table>
+    <h2>Quotation Details</h2>
+    <p>System Capacity: <strong>${plantKw} kW</strong></p>
+    <p>Global Margin Applied: <strong>${margin}%</strong></p>
+
+    <table>
+      <thead>
         <tr>
+          <th>S.No</th>
           <th>Item</th>
           <th>Description</th>
           <th>Qty</th>
+          <th>Unit</th>
           <th>Rate (₹)</th>
           <th>Amount (₹)</th>
           <th>GST%</th>
           <th>GST Amt (₹)</th>
           <th>Total (₹)</th>
         </tr>
-  `;
-
-  let grandTotal = 0;
-
-  function addRow(sectionId, name, desc, qty, rate) {
-    if (!qty || qty <= 0) return;
-    const amount = qty * rate;
-    const gst = computeGst(amount, sectionId, ctx);
-    grandTotal += gst.totalWithGST;
-
-    html += `
-      <tr>
-        <td>${name}</td>
-        <td>${desc || ""}</td>
-        <td>${qty}</td>
-        <td>${fmt(rate)}</td>
-        <td>${fmt(amount)}</td>
-        <td>${gst.gstPercent}%</td>
-        <td>${fmt(gst.gstAmount)}</td>
-        <td>${fmt(gst.totalWithGST)}</td>
-      </tr>
-    `;
-  }
-
-  /* Inverter */
-  if (inverterEnabled) {
-    const sel = document.getElementById("inverterSelect");
-    const price = parseNum(sel.value);
-    const rate = applyMargin(price, "inverter");
-    addRow(
-      "inverter",
-      "Off-Grid Inverter",
-      sel.selectedOptions[0].textContent,
-      1,
-      rate
-    );
-  }
-
-  /* Battery */
-  if (batteryEnabled) {
-    const sel = document.getElementById("batterySelect");
-    const qty = parseNum(document.getElementById("batteryQty").value);
-    const price = parseNum(sel.value);
-    const rate = applyMargin(price, "battery");
-    addRow(
-      "battery",
-      "Solar Battery",
-      sel.selectedOptions[0].textContent,
-      qty,
-      rate
-    );
-  }
-
-  /* Panels */
-  if (panelEnabled) {
-    const sel = document.getElementById("panelSelect");
-    const qty = parseNum(document.getElementById("panelQty").value);
-    const price = parseNum(sel.value);
-    const rate = applyMargin(price, "panels");
-    addRow(
-      "panels",
-      "Solar PV Modules",
-      sel.selectedOptions[0].textContent,
-      qty,
-      rate
-    );
-  }
-
-  /* ACDB */
-  if (document.querySelector("input[data-target='acdb']").checked) {
-    const sel = document.getElementById("acdbSelect");
-    const base = 2000; // mock base
-    const rate = applyMargin(base, "acdb");
-    addRow("acdb", "ACDB", sel.value, 1, rate);
-  }
-
-  /* DCDB */
-  if (document.querySelector("input[data-target='dcdb']").checked) {
-    const sel = document.getElementById("dcdbSelect");
-    const base = 2000; // mock base
-    const rate = applyMargin(base, "dcdb");
-    addRow("dcdb", "DCDB", sel.value, 1, rate);
-  }
-
-  /* AC Cable */
-  if (document.querySelector("input[data-target='accable']").checked) {
-    const gauge = document.getElementById("acGauge").value;
-    const qty = parseNum(document.getElementById("acQty").value);
-    const price = parseNum(document.getElementById("acPrice").value);
-    if (qty && price) {
-      const rate = applyMargin(price, "accable");
-      addRow("accable", "AC Cable", gauge, qty, rate);
-    }
-  }
-
-  /* Earthing Cable */
-  if (document.querySelector("input[data-target='earthing']").checked) {
-    const gauge = document.getElementById("earthGauge").value;
-    const qty = parseNum(document.getElementById("earthQty").value);
-    const price = parseNum(document.getElementById("earthPrice").value);
-    if (qty && price) {
-      const rate = applyMargin(price, "earthing");
-      addRow("earthing", "Earthing Cable", gauge, qty, rate);
-    }
-  }
-
-  /* Installation */
-  if (document.querySelector("input[data-target='installation']").checked) {
-    const kw = parseNum(document.getElementById("systemKW").value);
-    const pricePerKw = 5000;
-    const rate = pricePerKw; // per kW rate; margin typically in-built or can be controlled later
-    addRow(
-      "installation",
-      "Installation & Commissioning",
-      "Installation @ 5000/kW",
-      kw,
-      rate
-    );
-  }
-
-  /* Structure */
-  if (document.querySelector("input[data-target='structure']").checked) {
-    const kw = parseNum(document.getElementById("systemKW").value);
-    const pricePerKw = 8000;
-    const rate = pricePerKw;
-    addRow(
-      "structure",
-      "Module Mounting Structure",
-      "Structure @ 8000/kW",
-      kw,
-      rate
-    );
-  }
-
-  /* Lightning Arrestor */
-  if (document.querySelector("input[data-target='lightning']").checked) {
-    const qty = parseNum(document.getElementById("lightQty").value);
-    const price = parseNum(document.getElementById("lightPrice").value);
-    if (qty && price) {
-      const rate = applyMargin(price, "lightning");
-      addRow("lightning", "Lightning Arrestor", "", qty, rate);
-    }
-  }
-
-  /* Custom Products */
-  document.querySelectorAll(".custom-row").forEach((row) => {
-    const enabled = row.querySelector(".cp-enable").checked;
-    if (!enabled) return;
-
-    const name = row.querySelector(".cp-name").value || "Custom Item";
-    const qty = parseNum(row.querySelector(".cp-qty").value);
-    const basePrice = parseNum(row.querySelector(".cp-price").value);
-    if (!qty || !basePrice) return;
-
-    const useGlobal = row.querySelector(".cp-margin-global").checked;
-    const customMargin = parseNum(row.querySelector(".cp-custom-margin").value);
-    let rate = basePrice;
-
-    const globalMargin = parseNum(document.getElementById("globalMargin").value);
-    if (useGlobal) {
-      rate = basePrice + (basePrice * globalMargin) / 100;
-    } else if (customMargin > 0) {
-      rate = basePrice + (basePrice * customMargin) / 100;
-    }
-
-    addRow("custom", name, "", qty, rate);
-  });
-
-  html += `
+      </thead>
+      <tbody>
+        ${rowsHtml}
+      </tbody>
+      <tfoot>
         <tr>
-          <td colspan="7" style="text-align:right;font-weight:bold;">Grand Total (incl. GST)</td>
-          <td>${fmt(grandTotal)}</td>
+          <td colspan="6"></td>
+          <td>${fmt(totals.subtotal)}</td>
+          <td></td>
+          <td>${fmt(totals.totalGst)}</td>
+          <td>${fmt(totals.grandTotal)}</td>
         </tr>
-      </table>
-      <button class="pdf-btn" onclick="window.print()">Download / Print PDF</button>
-    </div>
-  `;
+      </tfoot>
+    </table>
 
-  out.innerHTML = html;
+    <div class="totals">
+      Total contract value (incl. GST): <strong>${fmt(totals.grandTotal)}</strong>
+    </div>
+
+    <div class="section">
+      <h2>Warranty Overview</h2>
+      <div class="warranty-grid">
+        <div class="w-card">
+          <div class="w-label">PV Modules</div>
+          <div class="w-value">30 Years*</div>
+        </div>
+        <div class="w-card">
+          <div class="w-label">Inverter</div>
+          <div class="w-value">3 Years*</div>
+        </div>
+        <div class="w-card">
+          <div class="w-label">System</div>
+          <div class="w-value">5 Years*</div>
+        </div>
+      </div>
+      <div class="fine-print">
+        *Warranty as per OEM terms & conditions. Please refer to detailed warranty documents.
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Why Luminous Solar</h2>
+      <div class="why-grid">
+        <div class="why-card">
+          <div class="why-icon">⚙️</div>
+          <div class="why-title">Customized Solution</div>
+          <div class="why-text">System engineered for your load profile and backup requirements.</div>
+        </div>
+        <div class="why-card">
+          <div class="why-icon">🧰</div>
+          <div class="why-title">Minimal Maintenance</div>
+          <div class="why-text">Rugged components with easy serviceability and support.</div>
+        </div>
+        <div class="why-card">
+          <div class="why-icon">🛡️</div>
+          <div class="why-title">Highest Safety Standards</div>
+          <div class="why-text">Proper protections, earthing and high-quality BOS components.</div>
+        </div>
+        <div class="why-card">
+          <div class="why-icon">🏅</div>
+          <div class="why-title">Quality Products</div>
+          <div class="why-text">Proven Luminous inverters, batteries and solar modules.</div>
+        </div>
+        <div class="why-card">
+          <div class="why-icon">⚡</div>
+          <div class="why-title">Reliable Backup</div>
+          <div class="why-text">Designed for stable off-grid performance and long life.</div>
+        </div>
+        <div class="why-card">
+          <div class="why-icon">🌱</div>
+          <div class="why-title">Eco-Friendly Power</div>
+          <div class="why-text">Clean energy with reduced diesel or grid dependency.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Payment Terms</h2>
+      <p>• 40% Advance with PO</p>
+      <p>• 50% on Material Delivery</p>
+      <p>• 10% after Commissioning</p>
+    </div>
+
+    <div class="section">
+      <h2>General Terms & Conditions</h2>
+      <p><strong>Taxes & Duties:</strong> Any change in tax structure due to government policy will be to the consumer's account. Prices are inclusive of standard packing.</p>
+      <p><strong>Validity:</strong> This quotation is valid for 15 days from the date of submission.</p>
+      <p><strong>Packing:</strong> Standard packing included. Non-standard packing, if required, will be charged extra.</p>
+      <p><strong>Delivery:</strong> As per mutually agreed terms and subject to Force Majeure conditions.</p>
+      <p><strong>Exclusions:</strong> Damages due to improper use, third-party installation, or non-OEM accessories are not covered under warranty.</p>
+      <p><strong>Cancellation:</strong> Orders once accepted cannot be cancelled without prior consent. Cancellation charges may apply as per company policy.</p>
+      <p><strong>Force Majeure:</strong> Delays due to events beyond reasonable control (strikes, natural disasters, etc.) are exempt.</p>
+    </div>
+
+    <div class="section bank">
+      <h2>Bank Details</h2>
+      <p><strong>Bank Name:</strong> BANK OF INDIA (SANJAY NAGAR)</p>
+      <p><strong>Account No:</strong> 849330150000010</p>
+      <p><strong>IFSC Code:</strong> BKID0008493</p>
+    </div>
+
+    <div class="footer">
+      <p>Proposal by V-Sustain Solar Solutions</p>
+      <p>Authorized Luminous Partner</p>
+      <p>This is a computer generated quotation. No signature is required.</p>
+    </div>
+  </div>
+</body>
+</html>
+  `;
+  return html;
 }
 
-/*---------- SUMMARY ----------*/
-function generateSummaryQuote() {
-  const out = document.getElementById("quotationOutput");
-  out.innerHTML = "";
+function buildSummaryQuotationHtml(totals) {
+  const plantKw = n(document.getElementById("systemKW").value);
+  const rowsHtml = totals.items.map((it, idx) => `
+    <tr>
+      <td>${idx + 1}</td>
+      <td>${it.item}</td>
+      <td>${it.desc || ""}</td>
+      <td>${it.qty}</td>
+      <td>${it.unit}</td>
+    </tr>
+  `).join("");
 
-  let html = `
-    <div class="quote">
-      <h1>Summary Quotation – V-Sustain Solar Solutions</h1>
-      <table>
+  const html = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>Summary Quotation - V-Sustain Solar Solutions (Off-Grid)</title>
+  <style>
+    body { font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; background:#f9fafb; color:#0f172a; padding:20px; }
+    .quotation-wrapper { max-width:800px; margin:0 auto; background:#fff; padding:20px 24px; border-radius:12px; box-shadow:0 8px 30px rgba(15,23,42,0.18); }
+    header { display:flex; justify-content:space-between; gap:16px; margin-bottom:16px; }
+    .logo-placeholder { width:52px; height:52px; border-radius:999px; background:radial-gradient(circle at 30% 20%, #bbf7d0, #22c55e); box-shadow:0 0 15px rgba(34,197,94,0.7); }
+    h1 { margin:0; font-size:22px; }
+    .tagline { font-size:13px; color:#64748b; }
+    table { width:100%; border-collapse:collapse; margin-top:14px; font-size:12px; }
+    th, td { border:1px solid #e2e8f0; padding:6px 6px; vertical-align:top; }
+    th { background:#f8fafc; text-align:left; }
+    .footer { margin-top:16px; font-size:11px; text-align:center; color:#6b7280; }
+    .print-btn { margin-bottom:10px; padding:6px 12px; border-radius:8px; border:none; background:#1d4ed8; color:#fff; cursor:pointer; float:right; }
+    @media print { body { background:#fff; padding:0; } .quotation-wrapper { box-shadow:none; border-radius:0; } .print-btn { display:none; } }
+  </style>
+</head>
+<body>
+  <div class="quotation-wrapper">
+    <button class="print-btn" onclick="window.print()">Print / Save as PDF</button>
+    <header>
+      <div style="display:flex;gap:10px;align-items:center;">
+        <div class="logo-placeholder"></div>
+        <div>
+          <h1>V-Sustain Solar Solutions</h1>
+          <div class="tagline">Summary Quotation – Off-Grid Solar</div>
+        </div>
+      </div>
+      <div style="font-size:12px;color:#475569;">
+        <div>Capacity: <strong>${plantKw} kW</strong></div>
+        <div>Email: vsustainsolarsolutions@gmail.com</div>
+        <div>Phone: +91 99-000-00476</div>
+      </div>
+    </header>
+
+    <table>
+      <thead>
         <tr>
+          <th>S.No</th>
           <th>Item</th>
           <th>Description</th>
           <th>Qty</th>
+          <th>Unit</th>
         </tr>
-  `;
+      </thead>
+      <tbody>
+        ${rowsHtml}
+      </tbody>
+    </table>
 
-  function addRow(name, desc, qty) {
-    if (!qty || qty <= 0) return;
-    html += `
-      <tr>
-        <td>${name}</td>
-        <td>${desc || ""}</td>
-        <td>${qty}</td>
-      </tr>
-    `;
-  }
-
-  /* Inverter */
-  if (document.querySelector("input[data-target='inverter']").checked) {
-    const sel = document.getElementById("inverterSelect");
-    addRow("Off-Grid Inverter", sel.selectedOptions[0].textContent, 1);
-  }
-
-  /* Battery */
-  if (document.querySelector("input[data-target='battery']").checked) {
-    const sel = document.getElementById("batterySelect");
-    const qty = parseNum(document.getElementById("batteryQty").value);
-    addRow("Solar Battery", sel.selectedOptions[0].textContent, qty);
-  }
-
-  /* Panels */
-  if (document.querySelector("input[data-target='panels']").checked) {
-    const sel = document.getElementById("panelSelect");
-    const qty = parseNum(document.getElementById("panelQty").value);
-    addRow("Solar PV Modules", sel.selectedOptions[0].textContent, qty);
-  }
-
-  /* ACDB */
-  if (document.querySelector("input[data-target='acdb']").checked) {
-    const sel = document.getElementById("acdbSelect");
-    addRow("ACDB", sel.value, 1);
-  }
-
-  /* DCDB */
-  if (document.querySelector("input[data-target='dcdb']").checked) {
-    const sel = document.getElementById("dcdbSelect");
-    addRow("DCDB", sel.value, 1);
-  }
-
-  /* AC Cable */
-  if (document.querySelector("input[data-target='accable']").checked) {
-    const gauge = document.getElementById("acGauge").value;
-    const qty = parseNum(document.getElementById("acQty").value);
-    addRow("AC Cable", gauge, qty);
-  }
-
-  /* Earthing Cable */
-  if (document.querySelector("input[data-target='earthing']").checked) {
-    const gauge = document.getElementById("earthGauge").value;
-    const qty = parseNum(document.getElementById("earthQty").value);
-    addRow("Earthing Cable", gauge, qty);
-  }
-
-  /* Installation */
-  if (document.querySelector("input[data-target='installation']").checked) {
-    const kw = parseNum(document.getElementById("systemKW").value);
-    addRow("Installation & Commissioning", "Based on kW", kw);
-  }
-
-  /* Structure */
-  if (document.querySelector("input[data-target='structure']").checked) {
-    const kw = parseNum(document.getElementById("systemKW").value);
-    addRow("Module Mounting Structure", "Based on kW", kw);
-  }
-
-  /* Lightning Arrestor */
-  if (document.querySelector("input[data-target='lightning']").checked) {
-    const qty = parseNum(document.getElementById("lightQty").value);
-    addRow("Lightning Arrestor", "", qty);
-  }
-
-  /* Custom Products */
-  document.querySelectorAll(".custom-row").forEach((row) => {
-    const enabled = row.querySelector(".cp-enable").checked;
-    if (!enabled) return;
-    const name = row.querySelector(".cp-name").value || "Custom Item";
-    const qty = parseNum(row.querySelector(".cp-qty").value);
-    addRow(name, "", qty);
-  });
-
-  html += `
-      </table>
-      <button class="pdf-btn" onclick="window.print()">Download / Print PDF</button>
+    <div class="footer">
+      <p>Proposal by V-Sustain Solar Solutions</p>
+      <p>Authorized Luminous Partner</p>
     </div>
+  </div>
+</body>
+</html>
   `;
+  return html;
+}
 
-  out.innerHTML = html;
+/*----------------------------------------------
+  10. OPEN IN NEW WINDOW
+-----------------------------------------------*/
+function openInNewWindow(html) {
+  const w = window.open("", "_blank");
+  if (!w) {
+    alert("Popup blocked. Please allow popups for this site to see the quotation.");
+    return;
+  }
+  w.document.open();
+  w.document.write(html);
+  w.document.close();
 }
