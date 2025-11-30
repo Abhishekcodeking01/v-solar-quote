@@ -1,277 +1,643 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8" />
-    <title>Off-Grid Quotation – V-Sustain Solar Solutions</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8" />
+  <title>Off-Grid Quotation – V-Sustain Solar Solutions</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    /* Helpers (if not already in shared CSS) */
+    .inline-fields {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 10px;
+    }
+    .toggle.small {
+      font-size: 12px;
+    }
+    .manual-price-input {
+      margin-top: 6px;
+    }
+    .custom-row {
+      display: grid;
+      grid-template-columns: 2fr repeat(2, minmax(80px, 1fr)) minmax(110px, 1fr) minmax(110px, 1fr) auto;
+      gap: 6px;
+      margin-bottom: 8px;
+      align-items: center;
+    }
+    .custom-row button.cp-delete {
+      padding: 4px 8px;
+      border-radius: 6px;
+      border: none;
+      background: #fee2e2;
+      color: #b91c1c;
+      cursor: pointer;
+      font-size: 11px;
+    }
+  </style>
 </head>
-
 <body>
-    <div class="page">
+  <div class="page">
+    <header class="header">
+      <h1>Off-Grid Solar Quotation</h1>
+      <a href="../index.html" class="back-btn">← Back to Home</a>
+    </header>
 
-        <header class="header">
-            <h1>Off-Grid Solar Quotation</h1>
-            <a href="../index.html" class="back-btn">← Back to Home</a>
-        </header>
+    <!-- GLOBAL MARGIN -->
+    <section class="margin-box">
+      <h2>Global Margin</h2>
+      <label>Common Margin (%)</label>
+      <input type="number" id="globalMargin" value="20" />
+      <p class="note">
+        Each product card can use this common margin or its own custom margin.
+        Manual price override works on top of the dealer/base price.
+      </p>
+    </section>
 
-        <!-- GLOBAL MARGIN -->
-        <section class="margin-box">
-            <h2>Global Margin</h2>
-            <label>Common Margin (%)</label>
-            <input type="number" id="globalMargin" value="20">
-            <p class="note">Enable global margin in any section to use this value.</p>
-        </section>
+    <!-- SYSTEM CAPACITY -->
+    <section class="card">
+      <div class="card-header">
+        <h2>1. System Capacity (kW)</h2>
+        <label class="toggle">
+          <input type="checkbox" checked data-target="capacity" />
+          <span></span> Enable
+        </label>
+      </div>
+      <input type="number" id="systemKW" placeholder="Enter required kW" />
+    </section>
 
-        <!-- SYSTEM CAPACITY -->
-        <section class="card">
-            <div class="card-header">
-                <h2>1. System Capacity (kW)</h2>
-                <label class="toggle">
-                    <input type="checkbox" checked data-target="capacity">
-                    <span></span> Enable
-                </label>
-            </div>
-            <input type="number" id="systemKW" placeholder="Enter required kW">
-        </section>
+    <!-- INVERTER (OFF-GRID) -->
+    <section class="card">
+      <div class="card-header">
+        <h2>2. Off-Grid Inverter</h2>
+        <label class="toggle">
+          <input type="checkbox" checked data-target="inverter" />
+          <span></span> Enable
+        </label>
+        <label class="toggle">
+          <input type="checkbox" checked class="margin-toggle" data-target="inverter" />
+          <span></span> Use Global Margin
+        </label>
+      </div>
 
-        <!-- OFF-GRID INVERTER -->
-        <section class="card">
-            <div class="card-header">
-                <h2>2. Off-Grid Inverter</h2>
+      <label>Select Inverter Model</label>
+      <select id="inverterSelect"></select>
 
-                <label class="toggle">
-                    <input type="checkbox" checked data-target="inverter">
-                    <span></span> Enable
-                </label>
+      <div class="inline-fields">
+        <div>
+          <label>Dealer Price (Auto)</label>
+          <input type="text" id="inverterDealer" readonly />
+        </div>
+        <div>
+          <label>Final Rate (after Margin)</label>
+          <input type="text" id="inverterRate" readonly />
+        </div>
+      </div>
 
-                <label class="toggle">
-                    <input type="checkbox" checked class="margin-toggle" data-target="inverter">
-                    <span></span> Use Global Margin
-                </label>
-            </div>
+      <div class="inline-fields">
+        <div>
+          <label>GST %</label>
+          <input type="text" id="inverterGst" readonly />
+        </div>
+        <div>
+          <label>Estimated Total (incl. GST)</label>
+          <input type="text" id="inverterTotal" readonly />
+        </div>
+      </div>
 
-            <label>Select Off-Grid Inverter</label>
-            <select id="inverterSelect"></select>
+      <div class="inline-fields">
+        <div>
+          <label>Custom Margin (%)</label>
+          <input type="number" class="custom-margin" data-target="inverter" />
+        </div>
+        <div>
+          <label class="toggle small">
+            <input type="checkbox" class="manual-price-toggle" data-target="inverter" />
+            <span></span> Manual Price Override
+          </label>
+          <input
+            type="number"
+            class="manual-price-input"
+            data-target="inverter"
+            placeholder="Override Dealer Price"
+          />
+        </div>
+      </div>
+    </section>
 
-            <label>Custom Margin (%)</label>
-            <input type="number" class="custom-margin" data-target="inverter">
-        </section>
+    <!-- SOLAR PANELS -->
+    <section class="card">
+      <div class="card-header">
+        <h2>3. Solar Panels</h2>
+        <label class="toggle">
+          <input type="checkbox" checked data-target="panels" />
+          <span></span> Enable
+        </label>
+        <label class="toggle">
+          <input type="checkbox" checked class="margin-toggle" data-target="panels" />
+          <span></span> Use Global Margin
+        </label>
+      </div>
 
-        <!-- SOLAR BATTERY -->
-        <section class="card">
-            <div class="card-header">
-                <h2>3. Solar Battery</h2>
+      <label>Select Panel Model</label>
+      <select id="panelSelect"></select>
 
-                <label class="toggle">
-                    <input type="checkbox" checked data-target="battery">
-                    <span></span> Enable
-                </label>
+      <div class="inline-fields">
+        <div>
+          <label>Dealer Price / Panel (Auto)</label>
+          <input type="text" id="panelDealer" readonly />
+        </div>
+        <div>
+          <label>Rate / Panel (after Margin)</label>
+          <input type="text" id="panelRate" readonly />
+        </div>
+      </div>
 
-                <label class="toggle">
-                    <input type="checkbox" checked class="margin-toggle" data-target="battery">
-                    <span></span> Use Global Margin
-                </label>
-            </div>
+      <label>Auto-calculated Quantity</label>
+      <input type="number" id="panelQty" readonly />
 
-            <label>Select Battery Model</label>
-            <select id="batterySelect"></select>
+      <div class="inline-fields">
+        <div>
+          <label>DC Capacity</label>
+          <input type="text" id="panelCapacityKw" readonly />
+        </div>
+        <div>
+          <label>GST %</label>
+          <input type="text" id="panelGst" readonly />
+        </div>
+        <div>
+          <label>Estimated Total (incl. GST)</label>
+          <input type="text" id="panelTotal" readonly />
+        </div>
+      </div>
 
-            <label>Quantity</label>
-            <input type="number" id="batteryQty" value="1">
+      <div class="inline-fields">
+        <div>
+          <label>Custom Margin (%)</label>
+          <input type="number" class="custom-margin" data-target="panels" />
+        </div>
+        <div>
+          <label class="toggle small">
+            <input type="checkbox" class="manual-price-toggle" data-target="panels" />
+            <span></span> Manual Price Override
+          </label>
+          <input
+            type="number"
+            class="manual-price-input"
+            data-target="panels"
+            placeholder="Override Dealer Price / Panel"
+          />
+        </div>
+      </div>
+    </section>
 
-            <label>Custom Margin (%)</label>
-            <input type="number" class="custom-margin" data-target="battery">
-        </section>
+    <!-- SOLAR BATTERIES -->
+    <section class="card">
+      <div class="card-header">
+        <h2>4. Solar Batteries</h2>
+        <label class="toggle">
+          <input type="checkbox" checked data-target="battery" />
+          <span></span> Enable
+        </label>
+        <label class="toggle">
+          <input type="checkbox" checked class="margin-toggle" data-target="battery" />
+          <span></span> Use Global Margin
+        </label>
+      </div>
 
-        <!-- SOLAR PANELS -->
-        <section class="card">
-            <div class="card-header">
-                <h2>4. Solar Panels</h2>
+      <label>Select Battery Model</label>
+      <select id="batterySelect"></select>
 
-                <label class="toggle">
-                    <input type="checkbox" checked data-target="panels">
-                    <span></span> Enable
-                </label>
-                <label class="toggle">
-                    <input type="checkbox" checked class="margin-toggle" data-target="panels">
-                    <span></span> Use Global Margin
-                </label>
-            </div>
+      <div class="inline-fields">
+        <div>
+          <label>Quantity</label>
+          <input type="number" id="batteryQty" value="1" />
+        </div>
+        <div>
+          <label>Dealer Price (Auto)</label>
+          <input type="text" id="batteryDealer" readonly />
+        </div>
+        <div>
+          <label>Effective Rate (after Margin)</label>
+          <input type="text" id="batteryRate" readonly />
+        </div>
+      </div>
 
-            <label>Select Panel Model</label>
-            <select id="panelSelect"></select>
+      <div class="inline-fields">
+        <div>
+          <label>GST %</label>
+          <input type="text" id="batteryGst" readonly />
+        </div>
+        <div>
+          <label>Total (incl. GST)</label>
+          <input type="text" id="batteryTotal" readonly />
+        </div>
+      </div>
 
-            <label>Auto-calculated Quantity</label>
-            <input type="number" id="panelQty" readonly>
+      <div class="inline-fields">
+        <div>
+          <label>Custom Margin (%)</label>
+          <input type="number" class="custom-margin" data-target="battery" />
+        </div>
+        <div>
+          <label class="toggle small">
+            <input type="checkbox" class="manual-price-toggle" data-target="battery" />
+            <span></span> Manual Price Override
+          </label>
+          <input
+            type="number"
+            class="manual-price-input"
+            data-target="battery"
+            placeholder="Override Dealer Price"
+          />
+        </div>
+      </div>
+    </section>
 
-            <label>Custom Margin (%)</label>
-            <input type="number" class="custom-margin" data-target="panels">
-        </section>
+    <!-- BI-DIRECTIONAL METER -->
+    <section class="card">
+      <div class="card-header">
+        <h2>5. Bi-Directional Meter</h2>
+        <label class="toggle">
+          <input type="checkbox" checked data-target="meter" />
+          <span></span> Enable
+        </label>
+        <label class="toggle">
+          <input type="checkbox" checked class="margin-toggle" data-target="meter" />
+          <span></span> Use Global Margin
+        </label>
+      </div>
 
-        <!-- ACDB -->
-        <section class="card">
-            <div class="card-header">
-                <h2>5. ACDB</h2>
-                <label class="toggle">
-                    <input type="checkbox" checked data-target="acdb">
-                    <span></span> Enable
-                </label>
-                <label class="toggle">
-                    <input type="checkbox" checked class="margin-toggle" data-target="acdb">
-                    <span></span> Use Global Margin
-                </label>
-            </div>
+      <label>Select Meter Type</label>
+      <select id="meterType"></select>
 
-            <select id="acdbSelect"></select>
+      <div class="inline-fields">
+        <div>
+          <label>Quantity</label>
+          <input type="number" id="meterQty" value="1" />
+        </div>
+        <div>
+          <label>Dealer Price (Auto)</label>
+          <input type="text" id="meterDealer" readonly />
+        </div>
+        <div>
+          <label>Effective Rate (after Margin)</label>
+          <input type="text" id="meterRate" readonly />
+        </div>
+      </div>
 
-            <label>Custom Margin (%)</label>
-            <input type="number" class="custom-margin" data-target="acdb">
-        </section>
+      <div class="inline-fields">
+        <div>
+          <label>GST %</label>
+          <input type="text" id="meterGst" readonly />
+        </div>
+        <div>
+          <label>Total (incl. GST)</label>
+          <input type="text" id="meterTotal" readonly />
+        </div>
+      </div>
 
-        <!-- DCDB -->
-        <section class="card">
-            <div class="card-header">
-                <h2>6. DCDB</h2>
-                <label class="toggle">
-                    <input type="checkbox" checked data-target="dcdb">
-                    <span></span> Enable
-                </label>
-                <label class="toggle">
-                    <input type="checkbox" checked class="margin-toggle" data-target="dcdb">
-                    <span></span> Use Global Margin
-                </label>
-            </div>
+      <div class="inline-fields">
+        <div>
+          <label>Custom Margin (%)</label>
+          <input type="number" class="custom-margin" data-target="meter" />
+        </div>
+        <div>
+          <label class="toggle small">
+            <input type="checkbox" class="manual-price-toggle" data-target="meter" />
+            <span></span> Manual Price Override
+          </label>
+          <input
+            type="number"
+            class="manual-price-input"
+            data-target="meter"
+            placeholder="Override Dealer Price"
+          />
+        </div>
+      </div>
+    </section>
 
-            <select id="dcdbSelect"></select>
+    <!-- ACDB -->
+    <section class="card">
+      <div class="card-header">
+        <h2>6. ACDB</h2>
+        <label class="toggle">
+          <input type="checkbox" checked data-target="acdb" />
+          <span></span> Enable
+        </label>
+        <label class="toggle">
+          <input type="checkbox" checked class="margin-toggle" data-target="acdb" />
+          <span></span> Use Global Margin
+        </label>
+      </div>
 
-            <label>Custom Margin (%)</label>
-            <input type="number" class="custom-margin" data-target="dcdb">
-        </section>
+      <label>Select ACDB</label>
+      <select id="acdbSelect"></select>
 
-        <!-- AC CABLE -->
-        <section class="card">
-            <div class="card-header">
-                <h2>7. AC Cable</h2>
-                <label class="toggle">
-                    <input type="checkbox" checked data-target="accable">
-                    <span></span> Enable
-                </label>
-                <label class="toggle">
-                    <input type="checkbox" checked class="margin-toggle" data-target="accable">
-                    <span></span> Use Global Margin
-                </label>
-            </div>
+      <div class="inline-fields">
+        <div>
+          <label>Dealer Price (Auto)</label>
+          <input type="text" id="acdbDealer" readonly />
+        </div>
+        <div>
+          <label>Effective Rate (after Margin)</label>
+          <input type="text" id="acdbRate" readonly />
+        </div>
+      </div>
 
-            <label>Gauge</label>
-            <input type="text" id="acGauge">
+      <div class="inline-fields">
+        <div>
+          <label>Custom Margin (%)</label>
+          <input type="number" class="custom-margin" data-target="acdb" />
+        </div>
+        <div>
+          <label class="toggle small">
+            <input type="checkbox" class="manual-price-toggle" data-target="acdb" />
+            <span></span> Manual Price Override
+          </label>
+          <input
+            type="number"
+            class="manual-price-input"
+            data-target="acdb"
+            placeholder="Override Dealer Price"
+          />
+        </div>
+      </div>
+    </section>
 
-            <label>Quantity (m)</label>
-            <input type="number" id="acQty">
+    <!-- DCDB -->
+    <section class="card">
+      <div class="card-header">
+        <h2>7. DCDB</h2>
+        <label class="toggle">
+          <input type="checkbox" checked data-target="dcdb" />
+          <span></span> Enable
+        </label>
+        <label class="toggle">
+          <input type="checkbox" checked class="margin-toggle" data-target="dcdb" />
+          <span></span> Use Global Margin
+        </label>
+      </div>
 
-            <label>Price / meter</label>
-            <input type="number" id="acPrice">
+      <label>Select DCDB</label>
+      <select id="dcdbSelect"></select>
 
-            <label>Custom Margin (%)</label>
-            <input type="number" class="custom-margin" data-target="accable">
-        </section>
+      <div class="inline-fields">
+        <div>
+          <label>Dealer Price (Auto)</label>
+          <input type="text" id="dcdbDealer" readonly />
+        </div>
+        <div>
+          <label>Effective Rate (after Margin)</label>
+          <input type="text" id="dcdbRate" readonly />
+        </div>
+      </div>
 
-        <!-- EARTHING CABLE -->
-        <section class="card">
-            <div class="card-header">
-                <h2>8. Earthing Cable</h2>
-                <label class="toggle">
-                    <input type="checkbox" checked data-target="earthing">
-                    <span></span> Enable
-                </label>
-                <label class="toggle">
-                    <input type="checkbox" checked class="margin-toggle" data-target="earthing">
-                    <span></span> Use Global Margin
-                </label>
-            </div>
+      <div class="inline-fields">
+        <div>
+          <label>Custom Margin (%)</label>
+          <input type="number" class="custom-margin" data-target="dcdb" />
+        </div>
+        <div>
+          <label class="toggle small">
+            <input type="checkbox" class="manual-price-toggle" data-target="dcdb" />
+            <span></span> Manual Price Override
+          </label>
+          <input
+            type="number"
+            class="manual-price-input"
+            data-target="dcdb"
+            placeholder="Override Dealer Price"
+          />
+        </div>
+      </div>
+    </section>
 
-            <label>Gauge</label>
-            <input type="text" id="earthGauge">
+    <!-- AC CABLE (simple) -->
+    <section class="card">
+      <div class="card-header">
+        <h2>8. AC Cable</h2>
+        <label class="toggle">
+          <input type="checkbox" checked data-target="accable" />
+          <span></span> Enable
+        </label>
+        <label class="toggle">
+          <input type="checkbox" checked class="margin-toggle" data-target="accable" />
+          <span></span> Use Global Margin
+        </label>
+      </div>
 
-            <label>Quantity (m)</label>
-            <input type="number" id="earthQty">
+      <label>Gauge</label>
+      <input type="text" id="acGauge" />
 
-            <label>Price / meter</label>
-            <input type="number" id="earthPrice">
+      <label>Quantity (m)</label>
+      <input type="number" id="acQty" />
 
-            <label>Custom Margin (%)</label>
-            <input type="number" class="custom-margin" data-target="earthing">
-        </section>
+      <label>Price / meter (Base)</label>
+      <input type="number" id="acPrice" />
 
-        <!-- INSTALLATION -->
-        <section class="card">
-            <div class="card-header">
-                <h2>9. Installation Charges</h2>
-                <label class="toggle">
-                    <input type="checkbox" checked data-target="installation">
-                    <span></span> Enable
-                </label>
-            </div>
+      <label>Custom Margin (%)</label>
+      <input type="number" class="custom-margin" data-target="accable" />
+    </section>
 
-            <input type="number" id="installationCost" readonly placeholder="Auto: kW × 5000">
-        </section>
+    <!-- EARTHING CABLE (simple) -->
+    <section class="card">
+      <div class="card-header">
+        <h2>9. Earthing Cable</h2>
+        <label class="toggle">
+          <input type="checkbox" checked data-target="earthing" />
+          <span></span> Enable
+        </label>
+        <label class="toggle">
+          <input type="checkbox" checked class="margin-toggle" data-target="earthing" />
+          <span></span> Use Global Margin
+        </label>
+      </div>
 
-        <!-- STRUCTURE -->
-        <section class="card">
-            <div class="card-header">
-                <h2>10. Structure</h2>
-                <label class="toggle">
-                    <input type="checkbox" checked data-target="structure">
-                    <span></span> Enable
-                </label>
-            </div>
+      <label>Gauge</label>
+      <input type="text" id="earthGauge" />
 
-            <input type="number" id="structureCost" readonly placeholder="Auto: kW × 8000">
-        </section>
+      <label>Quantity (m)</label>
+      <input type="number" id="earthQty" />
 
-        <!-- LIGHTNING ARRESTOR -->
-        <section class="card">
-            <div class="card-header">
-                <h2>11. Lightning Arrestor</h2>
-                <label class="toggle">
-                    <input type="checkbox" checked data-target="lightning">
-                    <span></span> Enable
-                </label>
-                <label class="toggle">
-                    <input type="checkbox" checked class="margin-toggle" data-target="lightning">
-                    <span></span> Use Global Margin
-                </label>
-            </div>
+      <label>Price / meter (Base)</label>
+      <input type="number" id="earthPrice" />
 
-            <label>Quantity</label>
-            <input type="number" id="lightQty">
+      <label>Custom Margin (%)</label>
+      <input type="number" class="custom-margin" data-target="earthing" />
+    </section>
 
-            <label>Price</label>
-            <input type="number" id="lightPrice">
+    <!-- INSTALLATION CHARGES -->
+    <section class="card">
+      <div class="card-header">
+        <h2>10. Installation Charges</h2>
+        <label class="toggle">
+          <input type="checkbox" checked data-target="installation" />
+          <span></span> Enable
+        </label>
+        <label class="toggle">
+          <input type="checkbox" checked class="margin-toggle" data-target="installation" />
+          <span></span> Use Global Margin
+        </label>
+      </div>
 
-            <label>Custom Margin (%)</label>
-            <input type="number" class="custom-margin" data-target="lightning">
-        </section>
+      <p class="note">
+        Auto: Base Rate starts at 5000 per kW. Qty defaults to plant kW.
+        You can edit both base rate and quantity. Margin & GST are applied on the final rate.
+      </p>
 
-        <!-- CUSTOM PRODUCT ADDER -->
-        <section class="card">
-            <h2>Custom Products</h2>
-            <div id="customProducts"></div>
-            <button id="addCustomProduct" class="add-btn">+ Add Product</button>
-        </section>
+      <div class="inline-fields">
+        <div>
+          <label>Qty (kW)</label>
+          <input type="number" id="installationQty" />
+        </div>
+        <div>
+          <label>Base Rate per kW</label>
+          <input type="number" id="installationBaseRate" />
+        </div>
+        <div>
+          <label>Effective Rate (after Margin)</label>
+          <input type="text" id="installationRate" readonly />
+        </div>
+      </div>
 
-        <!-- BUTTONS -->
-        <section class="button-row">
-            <button id="generateDetailed">Generate Detailed Quotation</button>
-            <button id="generateSummary" class="alt">Generate Summary Quotation</button>
-        </section>
+      <div class="inline-fields">
+        <div>
+          <label>GST %</label>
+          <input type="text" id="installationGst" readonly />
+        </div>
+        <div>
+          <label>Total (incl. GST)</label>
+          <input type="text" id="installationTotal" readonly />
+        </div>
+      </div>
 
-        <!-- QUOTE OUTPUT -->
-        <section id="quotationOutput"></section>
-    </div>
+      <div class="inline-fields">
+        <div>
+          <label>Custom Margin (%)</label>
+          <input type="number" class="custom-margin" data-target="installation" />
+        </div>
+        <div>
+          <label class="toggle small">
+            <input type="checkbox" class="manual-price-toggle" data-target="installation" />
+            <span></span> Manual Price Override
+          </label>
+          <input
+            type="number"
+            class="manual-price-input"
+            data-target="installation"
+            placeholder="Override Base Rate per kW"
+          />
+        </div>
+      </div>
+    </section>
 
-    <script src="script.js"></script>
+    <!-- STRUCTURE -->
+    <section class="card">
+      <div class="card-header">
+        <h2>11. Structure</h2>
+        <label class="toggle">
+          <input type="checkbox" checked data-target="structure" />
+          <span></span> Enable
+        </label>
+        <label class="toggle">
+          <input type="checkbox" checked class="margin-toggle" data-target="structure" />
+          <span></span> Use Global Margin
+        </label>
+      </div>
+
+      <p class="note">
+        Auto: Base Rate starts at 8000 per kW. Qty defaults to plant kW.
+        You can edit both base rate and quantity. Margin & GST are applied on the final rate.
+      </p>
+
+      <div class="inline-fields">
+        <div>
+          <label>Qty (kW)</label>
+          <input type="number" id="structureQty" />
+        </div>
+        <div>
+          <label>Base Rate per kW</label>
+          <input type="number" id="structureBaseRate" />
+        </div>
+        <div>
+          <label>Effective Rate (after Margin)</label>
+          <input type="text" id="structureRate" readonly />
+        </div>
+      </div>
+
+      <div class="inline-fields">
+        <div>
+          <label>GST %</label>
+          <input type="text" id="structureGst" readonly />
+        </div>
+        <div>
+          <label>Total (incl. GST)</label>
+          <input type="text" id="structureTotal" readonly />
+        </div>
+      </div>
+
+      <div class="inline-fields">
+        <div>
+          <label>Custom Margin (%)</label>
+          <input type="number" class="custom-margin" data-target="structure" />
+        </div>
+        <div>
+          <label class="toggle small">
+            <input type="checkbox" class="manual-price-toggle" data-target="structure" />
+            <span></span> Manual Price Override
+          </label>
+          <input
+            type="number"
+            class="manual-price-input"
+            data-target="structure"
+            placeholder="Override Base Rate per kW"
+          />
+        </div>
+      </div>
+    </section>
+
+    <!-- LIGHTNING ARRESTOR (simple) -->
+    <section class="card">
+      <div class="card-header">
+        <h2>12. Lightning Arrestor</h2>
+        <label class="toggle">
+          <input type="checkbox" checked data-target="lightning" />
+          <span></span> Enable
+        </label>
+        <label class="toggle">
+          <input type="checkbox" checked class="margin-toggle" data-target="lightning" />
+          <span></span> Use Global Margin
+        </label>
+      </div>
+
+      <label>Quantity</label>
+      <input type="number" id="lightQty" />
+
+      <label>Price (Base)</label>
+      <input type="number" id="lightPrice" />
+
+      <label>Custom Margin (%)</label>
+      <input type="number" class="custom-margin" data-target="lightning" />
+    </section>
+
+    <!-- CUSTOM PRODUCTS -->
+    <section class="card">
+      <h2>Custom Products</h2>
+      <div id="customProducts"></div>
+      <button id="addCustomProduct" class="add-btn">+ Add Product</button>
+    </section>
+
+    <!-- BUTTONS -->
+    <section class="button-row">
+      <button id="generateDetailed">Generate Detailed Quotation</button>
+      <button id="generateSummary" class="alt">Generate Summary Quotation</button>
+    </section>
+
+    <!-- Hidden container (quotes open in new tab) -->
+    <section id="quotationOutput" style="display:none;"></section>
+  </div>
+
+  <script src="script.js"></script>
 </body>
-
 </html>
