@@ -727,22 +727,47 @@ function buildDetailedQuotationHtml(totals) {
   const plantKw = n(document.getElementById("systemKW").value);
   const margin = getGlobalMargin();
 
-  let subsidyText = "";
-  if (plantKw > 0) {
-    if (plantKw <= 2) {
-      subsidyText = "For on-grid residential projects up to 2 kW, government subsidy of ₹60,000 may be applicable (as per current scheme).";
-    } else if (plantKw >= 3 && plantKw <= 10) {
-      subsidyText = "For on-grid residential projects from 3 kW to 10 kW, government subsidy of ₹78,000 may be applicable (as per current scheme).";
-    } else {
-      subsidyText = "Government subsidy currently applies up to 10 kW. Please confirm scheme details at the time of ordering.";
-    }
-  }
+  // Try to pull customer info from existing inputs; fallback to placeholders
+  const customerName =
+    (document.getElementById("customerName") || {}).value || "Customer Name";
+  const customerAddress =
+    (document.getElementById("customerAddress") || {}).value ||
+    "Customer address line 1, line 2";
+  const customerCity =
+    (document.getElementById("customerCity") || {}).value ||
+    "City, State, Pincode";
 
-  const rowsHtml = totals.items.map((it, idx) => {
-    const amount = it.baseRate * it.qty;
-    const gstAmt = amount * it.gstPercent / 100;
-    const total = amount + gstAmt;
-    return `
+  const today = new Date();
+  const proposalDate = today.toLocaleDateString("en-IN", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
+  const proposalNo = "VSS-" + today.getFullYear() + (today.getMonth() + 1) + "-" + today.getDate();
+
+  // Specification table (no pricing, just component list)
+  const specRowsHtml = totals.items
+    .map(
+      (it, idx) => `
+      <tr>
+        <td>${idx + 1}</td>
+        <td>${it.item}</td>
+        <td>${it.desc || ""}</td>
+        <td>V-Sustain / Luminous</td>
+        <td>${it.qty}</td>
+        <td>${it.unit}</td>
+      </tr>
+    `
+    )
+    .join("");
+
+  // Commercial table (pricing summary for each line item)
+  const commercialRowsHtml = totals.items
+    .map((it, idx) => {
+      const amount = it.baseRate * it.qty;
+      const gstAmt = (amount * it.gstPercent) / 100;
+      const total = amount + gstAmt;
+      return `
       <tr>
         <td>${idx + 1}</td>
         <td>${it.item}</td>
@@ -756,286 +781,834 @@ function buildDetailedQuotationHtml(totals) {
         <td>${fmt(total)}</td>
       </tr>
     `;
-  }).join("");
+    })
+    .join("");
 
   const html = `
 <!DOCTYPE html>
 <html>
 <head>
   <meta charset="UTF-8" />
-  <title>On-Grid Quotation - V-Sustain Solar Solutions</title>
+  <title>On-Grid Techno-Commercial Proposal - V-Sustain Solar Solutions</title>
   <style>
-    body { font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; background:#f9fafb; color:#0f172a; padding:20px; }
-    .quotation-wrapper { max-width:900px; margin:0 auto; background:#fff; padding:20px 24px; border-radius:12px; box-shadow:0 8px 30px rgba(15,23,42,0.18); }
-    header { display:flex; justify-content:space-between; gap:16px; margin-bottom:16px; }
-    .brand-left { display:flex; gap:10px; }
-    .logo-placeholder { width:52px; height:52px; border-radius:999px; background:radial-gradient(circle at 30% 20%, #bbf7d0, #22c55e); box-shadow:0 0 15px rgba(34,197,94,0.7); }
-    h1 { margin:0; font-size:22px; }
-    h2 { margin-top:20px; margin-bottom:6px; font-size:18px; }
-    .tagline { font-size:13px; color:#64748b; }
-    .contact p { margin:2px 0; font-size:12px; color:#475569; }
-    table { width:100%; border-collapse:collapse; margin-top:14px; font-size:12px; }
-    th, td { border:1px solid #e2e8f0; padding:6px 6px; vertical-align:top; }
-    th { background:#f8fafc; text-align:left; }
-    tfoot td { font-weight:600; }
-    .totals { margin-top:10px; text-align:right; font-size:13px; }
-    .totals strong { font-size:18px; color:#16a34a; }
-    .section { margin-top:18px; font-size:12px; }
-    .section p { margin:3px 0; }
-    .warranty-grid { display:flex; gap:10px; flex-wrap:wrap; margin-top:6px; }
-    .w-card { flex:1 1 120px; background:#f1f5f9; padding:8px 10px; border-radius:8px; border:1px solid #e2e8f0; }
-    .w-label { font-size:11px; color:#64748b; }
-    .w-value { font-weight:600; font-size:13px; }
-    .why-grid { display:flex; flex-wrap:wrap; gap:8px; margin-top:6px; }
-    .why-card { flex:1 1 140px; background:#f8fafc; border-radius:8px; border:1px solid #e5e7eb; padding:8px; font-size:12px; }
-    .why-icon { font-size:16px; }
-    .why-title { font-weight:600; margin-top:2px; }
-    .why-text { font-size:11px; color:#6b7280; margin-top:2px; }
-    .bank { margin-top:8px; }
-    .fine-print { font-size:11px; color:#6b7280; margin-top:4px; }
-    .subsidy-box { margin-top:12px; padding:10px; border-radius:8px; background:#ecfdf5; border:1px solid #bbf7d0; font-size:12px; }
-    .footer { margin-top:16px; font-size:11px; text-align:center; color:#6b7280; }
-    .print-btn { margin-bottom:10px; padding:6px 12px; border-radius:8px; border:none; background:#1d4ed8; color:#fff; cursor:pointer; font-size:13px; float:right; }
-    @media print {
-      body { background:#fff; padding:0; }
-      .quotation-wrapper { box-shadow:none; border-radius:0; }
-      .print-btn { display:none; }
+    :root {
+      --brand-blue: #0057b7;
+      --brand-blue-soft: #eff6ff;
+      --brand-orange: #f97316;
+      --brand-bg: #f3f4f6;
+      --text-main: #0f172a;
+      --text-muted: #6b7280;
+      --card-radius: 16px;
+    }
+    * { box-sizing:border-box; }
+    body {
+      margin:0;
+      padding:20px;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:#e5e7eb;
+      color:var(--text-main);
+    }
+    .proposal {
+      max-width:900px;
+      margin:0 auto;
+      background:#fff;
+      box-shadow:0 10px 40px rgba(15,23,42,0.25);
+      border-radius:20px;
+      overflow:hidden;
+    }
+    .page {
+      padding:28px 32px;
+      min-height:1120px; /* A4-ish */
+      position:relative;
+    }
+    .page:not(:last-child) {
+      page-break-after: always;
+      border-bottom:1px solid #e5e7eb;
+    }
+    .page-header-top {
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:16px;
+      margin-bottom:20px;
+    }
+    .logo-slot {
+      width:72px;
+      height:72px;
+      border-radius:18px;
+      background:linear-gradient(135deg,#dbeafe,#1d4ed8);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      color:#eff6ff;
+      font-size:11px;
+      text-align:center;
+      box-shadow:0 8px 24px rgba(37,99,235,0.4);
+    }
+    .brand-text h1 {
+      margin:0;
+      font-size:22px;
+      color:#0f172a;
+    }
+    .brand-text p {
+      margin:2px 0;
+      font-size:12px;
+      color:var(--text-muted);
+    }
+    .badge-year {
+      padding:8px 14px;
+      background:var(--brand-orange);
+      color:#fff;
+      border-radius:999px;
+      font-weight:600;
+      font-size:12px;
+      box-shadow:0 4px 12px rgba(248,113,113,0.4);
+    }
+    .cover-hero {
+      margin-top:12px;
+      border-radius:18px;
+      overflow:hidden;
+      position:relative;
+      height:420px;
+      background:#111827;
+      color:#e5e7eb;
+    }
+    .cover-hero-main {
+      position:absolute;
+      inset:0;
+      background-image:linear-gradient(to bottom,rgba(15,23,42,0.15),rgba(15,23,42,0.7)),
+        url("cover-banner-placeholder.jpg");
+      background-size:cover;
+      background-position:center;
+    }
+    .cover-overlay {
+      position:absolute;
+      inset:0;
+      display:flex;
+      flex-direction:column;
+      justify-content:space-between;
+      padding:22px;
+    }
+    .cover-tagline {
+      font-size:13px;
+      letter-spacing:0.08em;
+      text-transform:uppercase;
+      color:#bfdbfe;
+    }
+    .cover-title {
+      font-size:26px;
+      font-weight:700;
+      max-width:340px;
+    }
+    .cover-bottom {
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-end;
+      gap:16px;
+      font-size:12px;
+    }
+    .cover-proposal-meta p {
+      margin:2px 0;
+    }
+    .mini-card {
+      width:150px;
+      padding:10px 12px;
+      border-radius:16px;
+      background:rgba(15,23,42,0.85);
+      border:1px solid rgba(148,163,184,0.5);
+      font-size:11px;
+    }
+    .mini-card strong { display:block; font-size:12px; margin-bottom:2px; }
+
+    .page-title {
+      display:flex;
+      align-items:center;
+      gap:8px;
+      margin-bottom:12px;
+      margin-top:4px;
+    }
+    .page-title-icon {
+      width:24px;
+      height:24px;
+      border-radius:999px;
+      background:var(--brand-blue-soft);
+      color:var(--brand-blue);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:14px;
+    }
+    .page-title h2 {
+      margin:0;
+      font-size:18px;
+    }
+    .section-subtitle {
+      font-size:12px;
+      color:var(--text-muted);
+      margin-bottom:12px;
+    }
+
+    .two-col {
+      display:grid;
+      grid-template-columns: minmax(0,2fr) minmax(0,1.4fr);
+      gap:18px;
+    }
+    .card {
+      background:#f9fafb;
+      border-radius:var(--card-radius);
+      padding:14px 16px;
+      border:1px solid #e5e7eb;
+    }
+    .card h3 {
+      margin:0 0 6px;
+      font-size:14px;
+    }
+    .card p {
+      margin:3px 0;
+      font-size:12px;
+      color:var(--text-muted);
+    }
+
+    .info-list {
+      list-style:none;
+      padding:0;
+      margin:0;
+      font-size:12px;
+      color:var(--text-muted);
+    }
+    .info-list li {
+      margin-bottom:4px;
+    }
+
+    table {
+      width:100%;
+      border-collapse:collapse;
+      font-size:11.5px;
+      margin-top:8px;
+    }
+    th, td {
+      padding:6px 6px;
+      border:1px solid #e5e7eb;
+      vertical-align:top;
+    }
+    th {
+      background:#eff6ff;
+      text-align:left;
+      font-size:11px;
+    }
+
+    .notes-box {
+      margin-top:10px;
+      padding:10px;
+      border-radius:10px;
+      border:1px dashed #cbd5f5;
+      font-size:11px;
+      color:var(--text-muted);
+      min-height:60px;
+    }
+
+    .why-grid {
+      display:grid;
+      grid-template-columns: repeat(auto-fit,minmax(150px,1fr));
+      gap:12px;
+      margin-top:10px;
+    }
+    .why-card {
+      background:#ecfeff;
+      border-radius:16px;
+      padding:10px 12px;
+      border:1px solid #bae6fd;
+      box-shadow:0 6px 12px rgba(8,47,73,0.09);
+      font-size:12px;
+    }
+    .why-card-title {
+      font-weight:600;
+      margin-bottom:4px;
+      display:flex;
+      align-items:center;
+      gap:6px;
+    }
+    .why-icon {
+      width:22px;
+      height:22px;
+      border-radius:999px;
+      background:#0ea5e9;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:13px;
+      color:#e0f2fe;
+    }
+    .why-card p {
+      margin:0;
+      color:#475569;
+      font-size:11px;
+    }
+
+    .testimonial-row {
+      margin-top:14px;
+      display:grid;
+      grid-template-columns: repeat(4,1fr);
+      gap:8px;
+    }
+    .testimonial-placeholder {
+      height:80px;
+      border-radius:10px;
+      background:repeating-linear-gradient(
+          135deg,#e5e7eb,#e5e7eb 4px,#f9fafb 4px,#f9fafb 8px
+      );
+      border:1px dashed #c4c4c4;
+      font-size:9px;
+      color:#6b7280;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      text-align:center;
+      padding:4px;
+    }
+
+    .payment-flow {
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      margin:10px 0 16px;
+      font-size:11px;
+    }
+    .payment-step {
+      flex:1;
+      text-align:center;
+    }
+    .payment-circle {
+      width:56px;
+      height:56px;
+      border-radius:999px;
+      margin:0 auto 4px;
+      background:#dbeafe;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:24px;
+      color:#1d4ed8;
+    }
+
+    .warranty-strip {
+      margin-top:8px;
+      background:#ecfccb;
+      border-radius:14px;
+      padding:10px 12px;
+      display:flex;
+      justify-content:space-around;
+      font-size:11px;
+    }
+    .w-block {
+      text-align:center;
+      flex:1;
+    }
+    .w-label {
+      font-size:11px;
+      color:#4b5563;
+    }
+    .w-value {
+      font-size:15px;
+      font-weight:700;
+      color:#166534;
+    }
+
+    .summary-highlight {
+      margin-top:10px;
+      padding:10px 12px;
+      border-radius:14px;
+      background:#fefce8;
+      border:1px solid #facc15;
+      font-size:12px;
+    }
+    .summary-highlight strong {
+      font-size:15px;
+      color:#b45309;
+    }
+
+    .fine-print {
+      margin-top:6px;
+      font-size:10px;
+      color:#6b7280;
+    }
+
+    .flex-row {
+      display:flex;
+      gap:16px;
+    }
+    .flex-1 { flex:1; }
+
+    .charge-table td, .charge-table th {
+      font-size:11px;
+    }
+
+    .terms p {
+      font-size:11px;
+      color:#4b5563;
+      margin:3px 0 5px;
+    }
+    .terms strong {
+      color:#111827;
+    }
+
+    .footer-strip {
+      position:absolute;
+      bottom:16px;
+      left:32px;
+      right:32px;
+      display:flex;
+      justify-content:space-between;
+      font-size:10px;
+      color:#9ca3af;
+    }
+
+    .editable[contenteditable="true"] {
+      outline:1px dashed transparent;
+      transition:outline-color 0.15s;
+      cursor:text;
+    }
+    .editable[contenteditable="true"]:hover {
+      outline-color:#bfdbfe;
+    }
+    .editable[contenteditable="true"]:focus {
+      outline-color:#2563eb;
+      background:#eff6ff;
     }
   </style>
 </head>
 <body>
-  <div class="quotation-wrapper">
-    <button class="print-btn" onclick="window.print()">Print / Save as PDF</button>
-    <header>
-      <div class="brand-left">
-        <div class="logo-placeholder"></div>
+  <div class="proposal">
+
+    <!-- PAGE 1: COVER -->
+    <section class="page">
+      <div class="page-header-top">
+        <div style="display:flex;gap:10px;align-items:center;">
+          <div class="logo-slot editable" contenteditable="true">
+            LOGO<br />PLACEHOLDER
+          </div>
+          <div class="brand-text">
+            <h1 class="editable" contenteditable="true">V-Sustain Solar Solutions</h1>
+            <p class="editable" contenteditable="true">Authorized Luminous Partner • Bengaluru, Karnataka</p>
+            <p class="editable" contenteditable="true">Techno-Commercial Solar Rooftop Proposal</p>
+          </div>
+        </div>
         <div>
-          <h1>V-Sustain Solar Solutions</h1>
-          <div class="tagline">Authorized Luminous Partner – On-Grid Solar Quotation</div>
+          <div class="badge-year">${today.getFullYear()}</div>
         </div>
       </div>
-      <div class="contact">
-        <p>Email: <strong>vsustainsolarsolutions@gmail.com</strong></p>
-        <p>Phone: <strong>+91 99-000-00476</strong></p>
-        <p>Location: Bengaluru, Karnataka</p>
-      </div>
-    </header>
 
-    <h2>Quotation Details</h2>
-    <p>System Capacity: <strong>${plantKw} kW</strong></p>
-    <p>Global Margin Applied: <strong>${margin}%</strong></p>
-
-    <table>
-      <thead>
-        <tr>
-          <th>S.No</th>
-          <th>Item</th>
-          <th>Description</th>
-          <th>Qty</th>
-          <th>Unit</th>
-          <th>Rate (₹)</th>
-          <th>Amount (₹)</th>
-          <th>GST%</th>
-          <th>GST Amt (₹)</th>
-          <th>Total (₹)</th>
-        </tr>
-      </thead>
-      <tbody>
-        ${rowsHtml}
-      </tbody>
-      <tfoot>
-        <tr>
-          <td colspan="6"></td>
-          <td>${fmt(totals.subtotal)}</td>
-          <td></td>
-          <td>${fmt(totals.totalGst)}</td>
-          <td>${fmt(totals.grandTotal)}</td>
-        </tr>
-      </tfoot>
-    </table>
-
-    <div class="totals">
-      Total contract value (incl. GST): <strong>${fmt(totals.grandTotal)}</strong>
-    </div>
-
-    <div class="subsidy-box">
-      <strong>Government Subsidy (On-Grid Only):</strong>
-      <p>Projects up to <strong>2 kW</strong> may receive a subsidy of <strong>₹60,000</strong>.</p>
-      <p>Projects from <strong>3 kW to 10 kW</strong> may receive a subsidy of <strong>₹78,000</strong>.</p>
-      ${subsidyText ? "<p>" + subsidyText + "</p>" : ""}
-      <p class="fine-print">Note: Subsidy schemes are subject to government policy at the time of application.</p>
-    </div>
-
-    <div class="section">
-      <h2>Warranty Overview</h2>
-      <div class="warranty-grid">
-        <div class="w-card">
-          <div class="w-label">PV Modules</div>
-          <div class="w-value">30 Years*</div>
-        </div>
-        <div class="w-card">
-          <div class="w-label">Inverter</div>
-          <div class="w-value">8 Years*</div>
-        </div>
-        <div class="w-card">
-          <div class="w-label">System</div>
-          <div class="w-value">5 Years*</div>
+      <div class="cover-hero">
+        <div class="cover-hero-main"></div>
+        <div class="cover-overlay">
+          <div>
+            <div class="cover-tagline editable" contenteditable="true">
+              Sustainable Rooftop Solar • Clean Energy • Smart Investment
+            </div>
+            <div class="cover-title editable" contenteditable="true">
+              ${plantKw || "XX"} kW Rooftop Solar Solution
+            </div>
+          </div>
+          <div class="cover-bottom">
+            <div class="cover-proposal-meta">
+              <p><strong>Proposal For:</strong> <span class="editable" contenteditable="true">${customerName}</span></p>
+              <p class="editable" contenteditable="true">${customerAddress}</p>
+              <p class="editable" contenteditable="true">${customerCity}</p>
+            </div>
+            <div class="mini-card">
+              <strong>Proposal Details</strong>
+              <div>Type: On-Grid Solar</div>
+              <div>Date: ${proposalDate}</div>
+              <div>Proposal No: ${proposalNo}</div>
+            </div>
+          </div>
         </div>
       </div>
-      <div class="fine-print">
-        *Warranty as per OEM terms & conditions. Please refer to detailed warranty documents.
-      </div>
-    </div>
 
-    <div class="section">
-      <h2>Why Luminous Solar</h2>
+      <div class="footer-strip">
+        <span class="editable" contenteditable="true">
+          V-Sustain Solar Solutions • Techno-commercial Offer
+        </span>
+        <span>Page 1</span>
+      </div>
+    </section>
+
+    <!-- PAGE 2: PROJECT OVERVIEW & SYSTEM SPEC -->
+    <section class="page">
+      <div class="page-title">
+        <div class="page-title-icon">➤</div>
+        <h2 class="editable" contenteditable="true">Project Overview</h2>
+      </div>
+      <p class="section-subtitle editable" contenteditable="true">
+        This section summarizes the proposed on-grid rooftop solar solution, project configuration and key
+        technical parameters for the system.
+      </p>
+
+      <div class="two-col">
+        <div class="card">
+          <h3 class="editable" contenteditable="true">On-Grid Solar Working Methodology</h3>
+          <p class="editable" contenteditable="true">
+            Solar PV modules convert sunlight into DC power, which is fed to the on-grid inverter. The inverter
+            synchronizes with the utility grid and supplies power to your home or facility. Excess energy can be
+            exported to the grid as per net-metering policy.
+          </p>
+          <div class="notes-box editable" contenteditable="true">
+            [Placeholder for working methodology diagram / infographic]<br />
+            Replace this box with an image like: sun → panels → inverter → bidirectional meter → grid / home.
+          </div>
+        </div>
+        <div class="card">
+          <h3 class="editable" contenteditable="true">Project Snapshot</h3>
+          <ul class="info-list">
+            <li><strong>Customer:</strong> <span class="editable" contenteditable="true">${customerName}</span></li>
+            <li><strong>Location:</strong> <span class="editable" contenteditable="true">${customerCity}</span></li>
+            <li><strong>System Capacity:</strong> <span class="editable" contenteditable="true">${plantKw || "XX"} kW On-Grid</span></li>
+            <li><strong>Application:</strong> <span class="editable" contenteditable="true">Residential / Commercial Rooftop</span></li>
+            <li><strong>Expected Life:</strong> <span class="editable" contenteditable="true">25+ years for PV modules</span></li>
+            <li><strong>Grid Type:</strong> <span class="editable" contenteditable="true">3 Phase / Single Phase (as per site)</span></li>
+          </ul>
+          <p class="editable" contenteditable="true">
+            This proposal is prepared based on preliminary load understanding and site assumptions. Final design
+            will be confirmed post detailed site survey.
+          </p>
+        </div>
+      </div>
+
+      <div class="page-title" style="margin-top:24px;">
+        <div class="page-title-icon">➤</div>
+        <h2 class="editable" contenteditable="true">System Specification</h2>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Component</th>
+            <th>Description</th>
+            <th>Make</th>
+            <th>Qty</th>
+            <th>UoM</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${specRowsHtml}
+        </tbody>
+      </table>
+
+      <div class="notes-box editable" contenteditable="true">
+        Notes: Miscellaneous items such as fasteners, conduits, termination accessories, labels, etc., are considered
+        as per standard design & Luminous-approved bill of materials.
+      </div>
+
+      <div class="footer-strip">
+        <span class="editable" contenteditable="true">System Specification • V-Sustain Solar Solutions</span>
+        <span>Page 2</span>
+      </div>
+    </section>
+
+    <!-- PAGE 3: WHY LUMINOUS & TESTIMONIALS -->
+    <section class="page">
+      <div class="page-title">
+        <div class="page-title-icon">➤</div>
+        <h2 class="editable" contenteditable="true">Why Luminous Solar with V-Sustain</h2>
+      </div>
+      <p class="section-subtitle editable" contenteditable="true">
+        Eco-Friendly Branding • Loyal • Sustainable Future.
+      </p>
+
       <div class="why-grid">
         <div class="why-card">
-          <div class="why-icon">⚙️</div>
-          <div class="why-title">Customized Solution</div>
-          <div class="why-text">System engineered for your roof, load profile and future expansion.</div>
+          <div class="why-card-title">
+            <div class="why-icon">⚙️</div>
+            <span class="editable" contenteditable="true">Customized Solution</span>
+          </div>
+          <p class="editable" contenteditable="true">
+            System engineered for your specific roof, load pattern and future expansion needs.
+          </p>
         </div>
         <div class="why-card">
-          <div class="why-icon">🧰</div>
-          <div class="why-title">Minimal Maintenance</div>
-          <div class="why-text">Rugged components with low downtime and easy serviceability.</div>
+          <div class="why-card-title">
+            <div class="why-icon">🧰</div>
+            <span class="editable" contenteditable="true">Minimal Maintenance</span>
+          </div>
+          <p class="editable" contenteditable="true">
+            Robust components with low downtime, backed by reliable service support.
+          </p>
         </div>
         <div class="why-card">
-          <div class="why-icon">🛡️</div>
-          <div class="why-title">Highest Safety Standards</div>
-          <div class="why-text">Proper earthing, protection devices and best-practice installation.</div>
+          <div class="why-card-title">
+            <div class="why-icon">🛡️</div>
+            <span class="editable" contenteditable="true">Highest Safety Standards</span>
+          </div>
+          <p class="editable" contenteditable="true">
+            Proper protection devices, earthing, and wiring practices ensure safe operation.
+          </p>
         </div>
         <div class="why-card">
-          <div class="why-icon">🏅</div>
-          <div class="why-title">Quality Products</div>
-          <div class="why-text">Luminous modules, inverters and BOS with proven field performance.</div>
+          <div class="why-card-title">
+            <div class="why-icon">🏅</div>
+            <span class="editable" contenteditable="true">Quality Products & Services</span>
+          </div>
+          <p class="editable" contenteditable="true">
+            Luminous modules, inverters and BOS with proven performance across India.
+          </p>
         </div>
         <div class="why-card">
-          <div class="why-icon">⚡</div>
-          <div class="why-title">Reliable Power & ROI</div>
-          <div class="why-text">Stable output, faster payback and attractive lifetime savings.</div>
+          <div class="why-card-title">
+            <div class="why-icon">⚡</div>
+            <span class="editable" contenteditable="true">Reliable Power & Quick ROI</span>
+          </div>
+          <p class="editable" contenteditable="true">
+            Designed for stable energy output and attractive payback period.
+          </p>
         </div>
         <div class="why-card">
-          <div class="why-icon">🌱</div>
-          <div class="why-title">Eco-Friendly Branding</div>
-          <div class="why-text">A visible commitment to sustainability and green energy.</div>
+          <div class="why-card-title">
+            <div class="why-icon">🌱</div>
+            <span class="editable" contenteditable="true">Smart & Sustainable Investment</span>
+          </div>
+          <p class="editable" contenteditable="true">
+            Demonstrate your commitment to sustainability while reducing electricity bills.
+          </p>
         </div>
       </div>
-    </div>
 
-    <div class="section">
-      <h2>Payment Terms</h2>
-      <p>• 40% Advance with PO</p>
-      <p>• 50% on Material Delivery</p>
-      <p>• 10% after Commissioning</p>
-    </div>
+      <div style="margin-top:22px;">
+        <h3 class="editable" contenteditable="true">Customer Testimonials & Site Gallery</h3>
+        <div class="testimonial-row">
+          <div class="testimonial-placeholder editable" contenteditable="true">
+            Image Placeholder 1<br />Replace with project photo / testimonial
+          </div>
+          <div class="testimonial-placeholder editable" contenteditable="true">
+            Image Placeholder 2
+          </div>
+          <div class="testimonial-placeholder editable" contenteditable="true">
+            Image Placeholder 3
+          </div>
+          <div class="testimonial-placeholder editable" contenteditable="true">
+            Image Placeholder 4
+          </div>
+        </div>
+      </div>
 
-    <div class="section">
-      <h2>General Terms & Conditions</h2>
-      <p><strong>Taxes & Duties:</strong> Any change in tax structure due to government policy will be to the consumer's account. Prices are inclusive of standard packing.</p>
-      <p><strong>Validity:</strong> This quotation is valid for 15 days from the date of submission.</p>
-      <p><strong>Packing:</strong> Standard packing included. Non-standard packing, if required, will be charged extra.</p>
-      <p><strong>Delivery:</strong> As per mutually agreed terms and subject to Force Majeure conditions.</p>
-      <p><strong>Exclusions:</strong> Damages due to improper use, third-party installation, or non-OEM accessories are not covered under warranty.</p>
-      <p><strong>Cancellation:</strong> Orders once accepted cannot be cancelled without prior consent. Cancellation charges may apply as per company policy.</p>
-      <p><strong>Force Majeure:</strong> Delays due to events beyond reasonable control (strikes, natural disasters, etc.) are exempt.</p>
-    </div>
+      <div class="footer-strip">
+        <span class="editable" contenteditable="true">Why Luminous Solar • Testimonials</span>
+        <span>Page 3</span>
+      </div>
+    </section>
 
-    <div class="section bank">
-      <h2>Bank Details</h2>
-      <p><strong>Bank Name:</strong> BANK OF INDIA (SANJAY NAGAR)</p>
-      <p><strong>Account No:</strong> 849330150000010</p>
-      <p><strong>IFSC Code:</strong> BKID0008493</p>
-    </div>
+    <!-- PAGE 4: PAYMENT TERMS & WARRANTY -->
+    <section class="page">
+      <div class="page-title">
+        <div class="page-title-icon">➤</div>
+        <h2 class="editable" contenteditable="true">Payment & Warranty Terms</h2>
+      </div>
 
-    <div class="footer">
-      <p>Proposal by V-Sustain Solar Solutions</p>
-      <p>Authorized Luminous Partner</p>
-      <p>This is a computer generated quotation. No signature is required.</p>
-    </div>
+      <h3 class="editable" contenteditable="true">Payment Terms</h3>
+      <div class="payment-flow">
+        <div class="payment-step">
+          <div class="payment-circle">1</div>
+          <div class="editable" contenteditable="true">40% Advance with Purchase Order</div>
+        </div>
+        <div class="payment-step">
+          <div class="payment-circle">2</div>
+          <div class="editable" contenteditable="true">50% on Material Delivery</div>
+        </div>
+        <div class="payment-step">
+          <div class="payment-circle">3</div>
+          <div class="editable" contenteditable="true">10% after Commissioning</div>
+        </div>
+      </div>
+
+      <h3 class="editable" contenteditable="true">Warranty Terms</h3>
+      <div class="warranty-strip">
+        <div class="w-block">
+          <div class="w-label editable" contenteditable="true">PV Modules</div>
+          <div class="w-value editable" contenteditable="true">30 Years*</div>
+        </div>
+        <div class="w-block">
+          <div class="w-label editable" contenteditable="true">Inverter</div>
+          <div class="w-value editable" contenteditable="true">8 Years*</div>
+        </div>
+        <div class="w-block">
+          <div class="w-label editable" contenteditable="true">System</div>
+          <div class="w-value editable" contenteditable="true">5 Years*</div>
+        </div>
+      </div>
+      <div class="fine-print editable" contenteditable="true">
+        *Note: Please refer to the detailed terms & conditions and OEM warranty cards for more information.
+        Warranty is as per manufacturer / OEM guidelines and may vary by model.
+      </div>
+
+      <div class="footer-strip">
+        <span class="editable" contenteditable="true">Payment & Warranty Terms</span>
+        <span>Page 4</span>
+      </div>
+    </section>
+
+    <!-- PAGE 5: COMMERCIAL OFFER & CHARGEABLE SERVICES -->
+    <section class="page">
+      <div class="page-title">
+        <div class="page-title-icon">➤</div>
+        <h2 class="editable" contenteditable="true">Commercial Offer</h2>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>S.No</th>
+            <th>Item</th>
+            <th>Description</th>
+            <th>Qty</th>
+            <th>Unit</th>
+            <th>Rate (₹)</th>
+            <th>Amount (₹)</th>
+            <th>GST%</th>
+            <th>GST Amt (₹)</th>
+            <th>Total (₹)</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${commercialRowsHtml}
+        </tbody>
+      </table>
+
+      <div class="summary-highlight">
+        <div>Subtotal (before GST): <strong>${fmt(totals.subtotal)}</strong></div>
+        <div>GST Total: <strong>${fmt(totals.totalGst)}</strong></div>
+        <div>Grand Total (inclusive of GST): <strong>${fmt(totals.grandTotal)}</strong></div>
+      </div>
+
+      <div class="flex-row" style="margin-top:18px;">
+        <div class="flex-1">
+          <h3 class="editable" contenteditable="true">Chargeable Services (Optional)</h3>
+          <table class="charge-table">
+            <thead>
+              <tr>
+                <th>No.</th>
+                <th>Description</th>
+                <th>Tenure</th>
+                <th>Cost (INR)</th>
+              </tr>
+            </thead>
+            <tbody class="editable" contenteditable="true">
+              <tr>
+                <td>01</td>
+                <td>Annual Maintenance Contract (AMC)</td>
+                <td>60 Months</td>
+                <td>As discussed</td>
+              </tr>
+              <tr>
+                <td>02</td>
+                <td>Cleaning & Preventive Check-up</td>
+                <td>6 Months</td>
+                <td>As discussed</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="flex-1">
+          <h3 class="editable" contenteditable="true">Project Notes</h3>
+          <div class="notes-box editable" contenteditable="true">
+            Add any special commercial remarks here: scope boundaries, inclusions/exclusions, schedule
+            assumptions, etc.
+          </div>
+        </div>
+      </div>
+
+      <div class="footer-strip">
+        <span class="editable" contenteditable="true">Commercial Offer & Services</span>
+        <span>Page 5</span>
+      </div>
+    </section>
+
+    <!-- PAGE 6: GENERAL TERMS & CONDITIONS -->
+    <section class="page">
+      <div class="page-title">
+        <div class="page-title-icon">➤</div>
+        <h2 class="editable" contenteditable="true">General Terms & Conditions</h2>
+      </div>
+
+      <div class="terms editable" contenteditable="true">
+        <p>These General Terms and Conditions have been agreed between the customer/consumer and the Channel Partner only.</p>
+
+        <p><strong>Validity</strong><br/>
+        Quotation is valid for 15 Days from the date of submission.</p>
+
+        <p><strong>Taxes & Duties</strong><br/>
+        On Materials, if after acceptance of Purchase Order due to change of government policy any new taxes are applicable,
+        such rates will be to the Consumer's account. Prices are inclusive of standard packing.</p>
+
+        <p><strong>Packing</strong><br/>
+        Packing shall be done as per our standard. In case non-standard packaging, customer needs to pay extra.</p>
+
+        <p><strong>Delivery Period</strong><br/>
+        The goods will be delivered as per the agreed terms & conditions as per duly accepted PO. Deliveries are subject to
+        "Force Majeure".</p>
+
+        <p><strong>Force Majeure</strong><br/>
+        The offer is subject to force majeure by which it means cause beyond our reasonable control such as war invasion,
+        civil disobedience, government orders or restrictions, strikes, lockouts, riots, materials wagons, shipping space or
+        any other earthquakes, goods, accident, breakdown of machinery, delay or inability to obtain labour, raw material,
+        causes whatsoever beyond our reasonable control, affecting us or our subcontractors, suppliers, etc.</p>
+
+        <p><strong>Exclusions</strong><br/>
+        The warranty shall not apply to defects resulting from:
+        • Any materials, components, tools, design, or software provided by Consumers.<br/>
+        • Negligence or willful misconduct of Consumers.<br/>
+        • Parts, accessories or attachments other than those supplied by Consumers.<br/>
+        • Improper service work, installation or alterations carried out by Consumers or third party without V-Sustain Solar Solutions' written consent.<br/>
+        • Any trial or experiment carried out by the Consumers on the system without V-Sustain Solar Solutions' written consent.<br/>
+        • Use of unsuitable material or consumables by Consumers; OR<br/>
+        • Any use, service or operation of any equipment, parts or components which is not in conformity with manuals,
+          instructions or specifications provided by the manufacturer or which is otherwise not in accordance with
+          normal industry practice.</p>
+
+        <p><strong>Cancellation</strong><br/>
+        Order received and acknowledged by us shall not be subject to cancellation, either wholly or partly for any reason
+        whatsoever, without our consent. Cancellation may attract cancellation charges as per company policy.</p>
+      </div>
+
+      <div class="flex-row" style="margin-top:14px;">
+        <div class="flex-1">
+          <h3 class="editable" contenteditable="true">Bank Details</h3>
+          <p class="editable" contenteditable="true">
+            BANK NAME: BANK OF INDIA (SANJAY NAGAR)<br/>
+            ACCOUNT NO: 849330150000010<br/>
+            IFSC CODE: BKID0008493
+          </p>
+        </div>
+        <div class="flex-1">
+          <h3 class="editable" contenteditable="true">Contact</h3>
+          <p class="editable" contenteditable="true">
+            Proposal by V-Sustain Solar Solutions<br/>
+            Authorized Luminous Partner<br/>
+            vsustainsolarsolutions@gmail.com<br/>
+            Pravesh Kumar Tiwari<br/>
+            +91 99-000-00476
+          </p>
+        </div>
+      </div>
+
+      <div class="footer-strip">
+        <span class="editable" contenteditable="true">General Terms & Conditions</span>
+        <span>Page 6</span>
+      </div>
+    </section>
+
   </div>
+
+  <script>
+    // Small helper: remove contenteditable before print if needed (optional)
+    // window.addEventListener('beforeprint', () => {
+    //   document.querySelectorAll('.editable').forEach(el => el.removeAttribute('contenteditable'));
+    // });
+  </script>
 </body>
 </html>
   `;
   return html;
 }
 
-function buildSummaryQuotationHtml(totals) {
-  const plantKw = n(document.getElementById("systemKW").value);
-  const rowsHtml = totals.items.map((it, idx) => `
-    <tr>
-      <td>${idx + 1}</td>
-      <td>${it.item}</td>
-      <td>${it.desc || ""}</td>
-      <td>${it.qty}</td>
-      <td>${it.unit}</td>
-    </tr>
-  `).join("");
-
-  const html = `
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="UTF-8" />
-  <title>Summary Quotation - V-Sustain Solar Solutions</title>
-  <style>
-    body { font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; background:#f9fafb; color:#0f172a; padding:20px; }
-    .quotation-wrapper { max-width:800px; margin:0 auto; background:#fff; padding:20px 24px; border-radius:12px; box-shadow:0 8px 30px rgba(15,23,42,0.18); }
-    header { display:flex; justify-content:space-between; gap:16px; margin-bottom:16px; }
-    .logo-placeholder { width:52px; height:52px; border-radius:999px; background:radial-gradient(circle at 30% 20%, #bbf7d0, #22c55e); box-shadow:0 0 15px rgba(34,197,94,0.7); }
-    h1 { margin:0; font-size:22px; }
-    .tagline { font-size:13px; color:#64748b; }
-    table { width:100%; border-collapse:collapse; margin-top:14px; font-size:12px; }
-    th, td { border:1px solid #e2e8f0; padding:6px 6px; vertical-align:top; }
-    th { background:#f8fafc; text-align:left; }
-    .footer { margin-top:16px; font-size:11px; text-align:center; color:#6b7280; }
-    .print-btn { margin-bottom:10px; padding:6px 12px; border-radius:8px; border:none; background:#1d4ed8; color:#fff; cursor:pointer; float:right; }
-    @media print { body { background:#fff; padding:0; } .quotation-wrapper { box-shadow:none; border-radius:0; } .print-btn { display:none; } }
-  </style>
-</head>
-<body>
-  <div class="quotation-wrapper">
-    <button class="print-btn" onclick="window.print()">Print / Save as PDF</button>
-    <header>
-      <div style="display:flex;gap:10px;align-items:center;">
-        <div class="logo-placeholder"></div>
-        <div>
-          <h1>V-Sustain Solar Solutions</h1>
-          <div class="tagline">Summary Quotation – On-Grid Solar</div>
-        </div>
-      </div>
-      <div style="font-size:12px;color:#475569;">
-        <div>Capacity: <strong>${plantKw} kW</strong></div>
-        <div>Email: vsustainsolarsolutions@gmail.com</div>
-        <div>Phone: +91 99-000-00476</div>
-      </div>
-    </header>
-
-    <table>
-      <thead>
-        <tr>
-          <th>S.No</th>
-          <th>Item</th>
-          <th>Description</th>
-          <th>Qty</th>
-          <th>Unit</th>
-        </tr>
-      </thead>
-      <tbody>
-        ${rowsHtml}
-      </tbody>
-    </table>
-
-    <div class="footer">
-      <p>Proposal by V-Sustain Solar Solutions</p>
-      <p>Authorized Luminous Partner</p>
-    </div>
-  </div>
-</body>
-</html>
-  `;
-  return html;
-}
 
 /*----------------------------------------------
   10. OPEN IN NEW WINDOW
