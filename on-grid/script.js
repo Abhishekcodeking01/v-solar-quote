@@ -585,6 +585,7 @@ function recalcAllCards() {
   updateInstallationData();
   updateStructureData();
   updateCustomProductsPreview(); // updates any visible UI for custom products
+  updateEarthingSetData();
 }
 
 /* ===========================
@@ -785,6 +786,24 @@ function buildLineItemsForQuotation() {
       items.push({ type:'la', item: 'Lightning Arrestor', desc:'', qty, unit:'Nos', baseRate: rate, gstPercent: getGstFor('la') });
     }
   }
+
+   // Earthing Set
+if (isEnabled('earthingSet')) {
+  const qty = Math.max(1, n($('earthingSetQty').value));
+  const dealer = 3000;
+  const base = computeBasePrice('earthingSet', dealer);
+  const rate = applyMarginTo(base, 'earthingSet');
+
+  items.push({
+    type: 'earthingSet',
+    item: 'Earthing Set',
+    desc: 'Earthing Set (Complete Kit)',
+    qty,
+    unit: 'Nos',
+    baseRate: rate,
+    gstPercent: 18
+  });
+}
 
   // installation
   if (isEnabled('installation')) {
