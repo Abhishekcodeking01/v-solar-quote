@@ -677,7 +677,15 @@ function buildLineItemsForQuotation() {
       const dealer = n(sel.dataset.price);
       const base = computeBasePrice('inverter', dealer);
       const rate = applyMarginTo(base, 'inverter');
-      items.push({ type:'inverter', item: sel.value, desc: sel.textContent, qty, unit: 'Nos', baseRate: rate, gstPercent: getGstFor('inverter') });
+      items.push({
+  type: 'inverter',
+  item: sel.value,
+  desc: `${sel.value} (${sel.dataset.capacity} kW)`,
+  qty,
+  unit: 'Nos',
+  baseRate: rate,
+  gstPercent: getGstFor('inverter')
+});
     }
   }
 
@@ -689,7 +697,15 @@ function buildLineItemsForQuotation() {
       const dealer = n(sel.dataset.price);
       const base = computeBasePrice('panels', dealer);
       const rate = applyMarginTo(base, 'panels');
-      items.push({ type:'panels', item: sel.value, desc: sel.textContent, qty, unit: 'Nos', baseRate: rate, gstPercent: getGstFor('panels') });
+      items.push({
+  type: 'panels',
+  item: sel.value,
+  desc: `${sel.value} (${sel.dataset.watt} Wp)`,
+  qty,
+  unit: 'Nos',
+  baseRate: rate,
+  gstPercent: getGstFor('panels')
+});
     }
   }
 
@@ -701,7 +717,15 @@ function buildLineItemsForQuotation() {
       const dealer = n(sel.dataset.price);
       const base = computeBasePrice('meter', dealer);
       const rate = applyMarginTo(base, 'meter');
-      items.push({ type:'meter', item: sel.value, desc: sel.textContent, qty, unit: 'Nos', baseRate: rate, gstPercent: getGstFor('meter') });
+      items.push({
+  type: 'meter',
+  item: 'Bi-Directional Meter',
+  desc: sel.value === 'single' ? 'Single Phase' : 'Three Phase',
+  qty,
+  unit: 'Nos',
+  baseRate: rate,
+  gstPercent: getGstFor('meter')
+});
     }
   }
 
@@ -713,7 +737,7 @@ function buildLineItemsForQuotation() {
       const dealer = n(sel.dataset.price);
       const base = computeBasePrice('acdb', dealer);
       const rate = applyMarginTo(base, 'acdb');
-      items.push({ type:'acdb', item: sel.value, desc: sel.textContent, qty, unit:'Nos', baseRate: rate, gstPercent: getGstFor('acdb') });
+      items.push({ type:'acdb', item: sel.value, desc: sel.value, qty, unit:'Nos', baseRate: rate, gstPercent: getGstFor('acdb') });
     }
   }
 
@@ -725,7 +749,7 @@ function buildLineItemsForQuotation() {
       const dealer = n(sel.dataset.price);
       const base = computeBasePrice('dcdb', dealer);
       const rate = applyMarginTo(base, 'dcdb');
-      items.push({ type:'dcdb', item: sel.value, desc: sel.textContent, qty, unit:'Nos', baseRate: rate, gstPercent: getGstFor('dcdb') });
+      items.push({ type:'dcdb', item: sel.value, desc: sel.value, qty, unit:'Nos', baseRate: rate, gstPercent: getGstFor('dcdb') });
     }
   }
 
