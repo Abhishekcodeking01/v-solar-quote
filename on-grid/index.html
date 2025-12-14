@@ -551,6 +551,72 @@
         </section>
 
         <!-- =================================================== -->
+<!--          EARTHING SET (COMPLETE KIT)                -->
+<!-- =================================================== -->
+<section class="card" id="earthingSetCard">
+  <div class="card-header">
+    <h2>Earthing Set (Complete Kit)</h2>
+    <label class="switch">
+      <input type="checkbox" id="enableEarthingSet" checked onclick="toggleProduct('earthingSet')">
+      <span class="slider round"></span>
+    </label>
+  </div>
+
+  <div class="row">
+    <div class="col">
+      <label>Quantity</label>
+      <input type="number" id="earthingSetQty" value="1" min="1" oninput="updateEarthingSetData()" />
+    </div>
+
+    <div class="col">
+      <label>Dealer Price (Auto)</label>
+      <input type="number" id="earthingSetDealer" value="3000" readonly />
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col">
+      <label>Manual Price Override</label>
+      <label class="switch-small">
+        <input type="checkbox" id="earthingSetOverrideToggle" onclick="toggleOverrideUI('earthingSet')">
+        <span class="slider-small round"></span>
+      </label>
+      <input type="number" id="earthingSetOverridePrice" class="hidden"
+             placeholder="Enter override price" oninput="updateEarthingSetData()" />
+    </div>
+
+    <div class="col">
+      <label>Use Common Margin?</label>
+      <label class="switch-small">
+        <input type="checkbox" id="earthingSetUseCommonMargin" checked onclick="updateEarthingSetData()">
+        <span class="slider-small round"></span>
+      </label>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col">
+      <label>Custom Margin (%)</label>
+      <input type="number" id="earthingSetCustomMargin" value="0" disabled
+             oninput="updateEarthingSetData()" />
+    </div>
+
+    <div class="col">
+      <label>GST (18%)</label>
+      <input type="number" id="earthingSetGST" readonly />
+    </div>
+  </div>
+
+  <div class="row result-row">
+    <div class="col">
+      <label>Total Amount</label>
+      <input type="number" id="earthingSetTotal" readonly />
+    </div>
+  </div>
+</section>
+
+
+        <!-- =================================================== -->
         <!--        INSTALLATION CHARGES (FULL CARD)             -->
         <!-- =================================================== -->
         <section class="card" id="installationCard">
