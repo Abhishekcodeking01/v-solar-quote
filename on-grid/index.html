@@ -10,6 +10,18 @@
 
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- ✅ Layout-only enhancement (SAFE) -->
+    <style>
+        body {
+            background: #f4f6f8;
+        }
+        .layout-wrapper {
+            max-width: 1200px;   /* prevents full stretch */
+            margin: 0 auto;      /* centers content */
+            padding: 0 16px 40px;
+        }
+    </style>
 </head>
 
 <body>
@@ -17,6 +29,9 @@
         <h1>On-Grid Solar Quotation Builder</h1>
         <a class="back-home" href="../index.html">← Back to Home</a>
     </header>
+
+    <!-- ✅ ONLY NEW WRAPPER -->
+    <div class="layout-wrapper">
 
     <main class="container">
 
