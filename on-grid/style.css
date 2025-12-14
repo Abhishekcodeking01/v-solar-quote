@@ -1,110 +1,330 @@
+/* ======================================================
+   V-SUSTAIN SOLAR SOLUTIONS
+   Quotation Builder — Global Styles
+   Clean | Centered | Print-Ready
+====================================================== */
+
+/* --------------------
+   RESET & BASE
+-------------------- */
 * {
   box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 
 body {
+  margin: 0;
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
   background: #f1f5f9;
   color: #0f172a;
+  line-height: 1.45;
 }
 
-.page {
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 24px;
-}
-
-.header {
+/* --------------------
+   PAGE HEADER
+-------------------- */
+.page-header {
+  max-width: 1100px;
+  margin: 24px auto 12px;
+  padding: 0 20px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 24px;
 }
 
-.header h1 {
-  font-size: 26px;
-  color: #075985;
+.page-header h1 {
+  font-size: 22px;
+  font-weight: 700;
+  margin: 0;
 }
 
-.back-btn {
+.back-home {
   text-decoration: none;
-  background: #075985;
-  color: #fff;
-  padding: 6px 12px;
-  border-radius: 6px;
   font-size: 14px;
+  color: #2563eb;
 }
 
+/* --------------------
+   MAIN CONTAINER
+-------------------- */
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 24px 20px 80px;
+}
+
+/* --------------------
+   CARD
+-------------------- */
 .card {
   background: #ffffff;
-  padding: 18px;
   border-radius: 14px;
-  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12);
-  border: 1px solid #cbd5e1;
-  margin-bottom: 20px;
+  padding: 20px 22px;
+  margin-bottom: 22px;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
 }
 
+.card h2 {
+  font-size: 17px;
+  font-weight: 600;
+  margin: 0;
+}
+
+/* --------------------
+   CARD HEADER
+-------------------- */
 .card-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-bottom: 14px;
 }
 
-.toggle {
+/* --------------------
+   GRID ROWS
+-------------------- */
+.row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px 18px;
+  margin-bottom: 14px;
+}
+
+.row.small {
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.result-row {
+  background: #f8fafc;
+  border-radius: 10px;
+  padding: 12px;
+}
+
+/* --------------------
+   COLUMNS
+-------------------- */
+.col {
   display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 13px;
+  flex-direction: column;
 }
 
-input[type="checkbox"] {
-  width: 18px;
-  height: 18px;
+/* --------------------
+   LABELS
+-------------------- */
+label {
+  font-size: 12px;
+  font-weight: 500;
+  color: #475569;
+  margin-bottom: 6px;
 }
 
+/* --------------------
+   INPUTS & SELECTS
+-------------------- */
 input,
 select {
   width: 100%;
-  margin-top: 8px;
-  margin-bottom: 14px;
-  padding: 10px;
-  border-radius: 8px;
-  border: 1px solid #cbd5e1;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+  font-size: 14px;
+  transition: border 0.2s ease, box-shadow 0.2s ease;
+}
+
+input[readonly] {
   background: #f8fafc;
+  color: #475569;
 }
 
-.add-btn {
-  background: #22c55e;
-  color: #fff;
-  padding: 10px;
-  border-radius: 8px;
-  width: 100%;
-  border: none;
+input:focus,
+select:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.12);
 }
 
-.button-row {
-  display: flex;
-  gap: 16px;
-  margin-top: 24px;
+/* --------------------
+   TOGGLES (SWITCH)
+-------------------- */
+.switch,
+.switch-small {
+  position: relative;
+  display: inline-block;
 }
 
-button {
-  flex: 1;
-  padding: 14px;
-  background: #1d4ed8;
-  color: white;
+.switch {
+  width: 42px;
+  height: 22px;
+}
+
+.switch-small {
+  width: 36px;
+  height: 18px;
+}
+
+.switch input,
+.switch-small input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider,
+.slider-small {
+  position: absolute;
+  cursor: pointer;
+  inset: 0;
+  background-color: #cbd5f5;
+  transition: 0.3s;
+  border-radius: 999px;
+}
+
+.slider:before,
+.slider-small:before {
+  position: absolute;
+  content: "";
+  background-color: white;
+  transition: 0.3s;
+  border-radius: 50%;
+}
+
+.slider:before {
+  height: 18px;
+  width: 18px;
+  left: 2px;
+  bottom: 2px;
+}
+
+.slider-small:before {
+  height: 14px;
+  width: 14px;
+  left: 2px;
+  bottom: 2px;
+}
+
+input:checked + .slider,
+input:checked + .slider-small {
+  background-color: #2563eb;
+}
+
+input:checked + .slider:before {
+  transform: translateX(20px);
+}
+
+input:checked + .slider-small:before {
+  transform: translateX(18px);
+}
+
+/* --------------------
+   BUTTONS
+-------------------- */
+.btn {
+  padding: 10px 16px;
   border-radius: 10px;
   border: none;
-  font-size: 16px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease;
 }
 
-button.alt {
-  background: #334155;
+.btn.primary {
+  background: #2563eb;
+  color: white;
 }
 
-.note {
-  font-size: 12px;
-  color: #64748b;
+.btn.primary:hover {
+  background: #1d4ed8;
+}
+
+.btn.secondary {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+
+.btn.secondary:hover {
+  background: #cbd5f5;
+}
+
+.btn.danger {
+  background: #ef4444;
+  color: white;
+}
+
+.btn.danger:hover {
+  background: #dc2626;
+}
+
+/* --------------------
+   GENERATE BUTTON CARD
+-------------------- */
+.generate-card {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+}
+
+.generate-card button {
+  min-width: 260px;
+}
+
+/* --------------------
+   CUSTOM PRODUCT
+-------------------- */
+.custom-row {
+  margin-bottom: 10px;
+}
+
+/* --------------------
+   HELPERS
+-------------------- */
+.hidden {
+  display: none;
+}
+
+/* --------------------
+   MOBILE RESPONSIVE
+-------------------- */
+@media (max-width: 900px) {
+  .row {
+    grid-template-columns: 1fr;
+  }
+
+  .row.small {
+    grid-template-columns: 1fr;
+  }
+
+  .generate-card {
+    flex-direction: column;
+  }
+
+  .generate-card button {
+    width: 100%;
+  }
+
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+}
+
+/* --------------------
+   PRINT SAFETY
+-------------------- */
+@media print {
+  body {
+    background: white;
+  }
+
+  .page-header,
+  .generate-card {
+    display: none;
+  }
+
+  .card {
+    box-shadow: none;
+    page-break-inside: avoid;
+  }
 }
