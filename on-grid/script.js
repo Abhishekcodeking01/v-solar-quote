@@ -871,9 +871,195 @@ function generateSummaryQuote() {
   const html = buildSummaryQuotationHtml(totals, 'On-Grid');
   openInNewWindow(html);
 }
+function buildDetailedQuotationHtml(totals, systemType) {
+  const plantKw = Math.max(0, n($('systemKw').value));
+  const customerName = $('customerName')?.value || 'Customer Name';
+  const customerAddress = $('customerAddress')?.value || '';
+  const customerCity = $('customerCity')?.value || '';
+  const date = new Date();
+  const proposalDate = date.toLocaleDateString('en-IN', { day:'2-digit', month:'long', year:'numeric' });
+  const proposalNo = `VS/${date.getFullYear()}/${String(date.getMonth()+1).padStart(2,'0')}${date.getDate()}`;
+
+  /* ===============================
+     SYSTEM SPECIFICATION ROWS
+     =============================== */
+  const specRows = totals.items.map(it => `
+    <tr class="odd:bg-white/50 even:bg-gray-50/50">
+      <td class="p-2 border font-semibold">${it.item}</td>
+      <td class="p-2 border">${it.desc || '-'}</td>
+      <td class="p-2 border">Luminous / Standard</td>
+      <td class="p-2 border text-center">${it.qty}</td>
+      <td class="p-2 border text-center">${it.unit}</td>
+    </tr>
+  `).join('');
+
+  /* ===============================
+     COMMERCIAL TABLE ROWS
+     =============================== */
+  const commercialRows = totals.items.map((it, idx) => {
+    const amount = round2(it.qty * it.baseRate);
+    return `
+      <tr class="odd:bg-white/50 even:bg-gray-50/50">
+        <td class="p-3 border text-center">${idx + 1}</td>
+        <td class="p-3 border">${it.item}</td>
+        <td class="p-3 border text-center">${it.unit}</td>
+        <td class="p-3 border text-center">${it.qty}</td>
+        <td class="p-3 border text-right">${fmt(amount)}</td>
+      </tr>
+    `;
+  }).join('');
+
+  return `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>${plantKw} KW Solar Proposal</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+@media print {
+  .page-break { page-break-before: always; }
+  body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}
+body { background:#e5e7eb; }
+.page-container {
+  width:210mm; min-height:297mm;
+  margin:2rem auto; background:white;
+}
+</style>
+</head>
+
+<body class="font-sans text-gray-800">
+
+<!-- PAGE 1: COVER -->
+<div class="page-container flex flex-col justify-between">
+  <div class="p-8 flex justify-between">
+    <div>
+      <h2 class="font-bold text-lg">V-Sustain Solar Solutions</h2>
+      <p class="text-xs">Authorized Luminous Partner</p>
+      <p class="text-xs">Bengaluru</p>
+    </div>
+    <div class="text-right text-xs">
+      <p><strong>Proposal No:</strong> ${proposalNo}</p>
+      <p>${proposalDate}</p>
+    </div>
+  </div>
+
+  <div class="flex-grow flex items-center justify-center bg-gray-100">
+    <div class="text-center">
+      <h1 class="text-4xl font-bold">Techno-Commercial Offer</h1>
+      <p class="text-xl mt-4">${plantKw} KW Rooftop Solar Solution</p>
+      <p class="mt-4 font-semibold">${customerName}</p>
+      <p class="text-sm">${customerCity}</p>
+    </div>
+  </div>
+
+  <div class="p-8 bg-gray-900 text-white">
+    <p class="text-sm">Clean Energy • Smart Investment • Sustainable Future</p>
+  </div>
+</div>
+
+<!-- PAGE 2: PROJECT OVERVIEW -->
+<div class="page-container page-break p-12">
+  <h2 class="text-3xl font-bold mb-6">Project Explanation</h2>
+
+  <div class="bg-gray-50 p-6 rounded shadow">
+    <p class="mb-4"><strong>System Size:</strong> ${plantKw} KW On-Grid Rooftop Solar System</p>
+    <p class="mb-4"><strong>Customer Location:</strong> ${customerAddress}, ${customerCity}</p>
+    <p class="mb-4"><strong>System Type:</strong> On-Grid (Net Metering)</p>
+    <p><strong>Quotation Validity:</strong> 15 Days from proposal date</p>
+  </div>
+</div>
+
+<!-- PAGE 3: TECHNO-COMMERCIAL OFFER -->
+<div class="page-container page-break p-12">
+
+  <h2 class="text-3xl font-bold mb-6 border-b-2 pb-2">Techno-Commercial Offer</h2>
+
+  <!-- SYSTEM SPECIFICATION -->
+  <h3 class="text-lg font-bold text-green-700 mb-3">1. System Specifications</h3>
+  <table class="w-full text-sm border-collapse mb-8">
+    <thead class="bg-green-600 text-white">
+      <tr>
+        <th class="p-3 border">Component</th>
+        <th class="p-3 border">Description</th>
+        <th class="p-3 border">Make</th>
+        <th class="p-3 border">Qty</th>
+        <th class="p-3 border">UoM</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${specRows}
+    </tbody>
+  </table>
+
+  <!-- COMMERCIAL PROPOSAL -->
+  <h3 class="text-lg font-bold text-green-700 mb-3">2. Commercial Proposal</h3>
+  <table class="w-full text-sm border-collapse">
+    <thead class="bg-blue-700 text-white">
+      <tr>
+        <th class="p-3 border">#</th>
+        <th class="p-3 border">Description</th>
+        <th class="p-3 border">UOM</th>
+        <th class="p-3 border">Qty</th>
+        <th class="p-3 border text-right">Price (₹)</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${commercialRows}
+      <tr class="font-bold bg-blue-50">
+        <td colspan="4" class="p-3 border text-right">GRAND TOTAL (Incl. GST)</td>
+        <td class="p-3 border text-right text-lg">${fmt(totals.grandTotal)}</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- SUBSIDY NOTE -->
+  <div class="mt-6 text-xs bg-yellow-50 border border-yellow-300 p-4 rounded">
+    <strong>Subsidy Note (MNRE):</strong><br>
+    • Up to 2 kW system: ₹38,000 subsidy applicable<br>
+    • 3 kW and above: ₹78,000 subsidy applicable<br>
+    <em>Subsidy amount is not deducted from the above quotation and is subject to government approval.</em>
+  </div>
+
+</div>
+
+<!-- PAGE 4: PAYMENT & WARRANTY -->
+<div class="page-container page-break p-12">
+  <h2 class="text-3xl font-bold mb-6">Payment Terms</h2>
+
+  <ul class="list-disc ml-6 mb-10">
+    <li>25% Advance with Purchase Order</li>
+    <li>65% on Material Delivery</li>
+    <li>5% after Installation & Commissioning</li>
+  </ul>
+
+  <h2 class="text-3xl font-bold mb-6">Warranty</h2>
+  <ul class="list-disc ml-6">
+    <li>Solar Modules: 25+ Years Performance Warranty</li>
+    <li>Inverter: As per OEM (Typically 8 Years)</li>
+    <li>Workmanship: 5 Years</li>
+  </ul>
+</div>
+
+<!-- PAGE 5: CONTACT -->
+<div class="page-container page-break p-12 flex flex-col justify-center text-center">
+  <h2 class="text-3xl font-bold mb-4">Proposal Submitted By</h2>
+  <p class="font-bold">V-Sustain Solar Solutions</p>
+  <p class="text-sm">Authorized Luminous Partner</p>
+  <p class="mt-4">Pravesh Kumar Tiwari</p>
+  <p>Email: vsustainsolarsolutions@gmail.com</p>
+  <p>Phone: +91 99-000-00476</p>
+</div>
+
+</body>
+</html>
+`;
+}
 
 /* builds a multi-page detailed quotation HTML (editable content) */
-function buildDetailedQuotationHtml(totals, systemType) {
+/*function buildDetailedQuotationHtml(totals, systemType) {
   const plantKw = Math.max(0, n($('systemKw').value));
   const customerName = ($('customerName') || {}).value || 'Customer Name';
   const customerAddress = ($('customerAddress') || {}).value || '';
@@ -931,7 +1117,7 @@ function buildDetailedQuotationHtml(totals, systemType) {
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <style>
     /* Minimal inline styles for the printed quotation */
-    body { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; color:#0f172a; margin:0; padding:0; background:#f3f4f6; }
+   /* body { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; color:#0f172a; margin:0; padding:0; background:#f3f4f6; }
     .doc { max-width:900px; margin:18px auto; background:#fff; border-radius:12px; box-shadow:0 10px 30px rgba(2,6,23,0.08); overflow:hidden; }
     .page { padding:28px 34px; min-height:1120px; position:relative; }
     .page + .page { page-break-before: always; }
@@ -1130,7 +1316,7 @@ function buildDetailedQuotationHtml(totals, systemType) {
 </html>`;
 
   return html;
-}
+} */
 
 /* builds a compact summary quotation (items + qty + total) */
 function buildSummaryQuotationHtml(totals, systemType) {
@@ -1156,7 +1342,7 @@ function buildSummaryQuotationHtml(totals, systemType) {
   </body></html>`;
 
   return html;
-}
+} 
 
 /* open the generated html in a new tab */
 function openInNewWindow(html) {
@@ -1175,7 +1361,7 @@ function escapeHtml(text) {
   return String(text || '').replace(/[&<>"']/g, function (m) {
     return ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' })[m];
   });
-}
+} 
 
 /* ===========================
    9. Finish / Helpers & Boot
