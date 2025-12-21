@@ -78,7 +78,7 @@ const n = v => (isNaN(parseFloat(v)) ? 0 : parseFloat(v));
 const round2 = v => Math.round((v + Number.EPSILON) * 100) / 100;
 const fmt = v => {
   const num = n(v);
-  return num.toLocaleString("en-IN", { maximumFractionDigits: 2 });
+  return "₹" + num.toLocaleString("en-IN", { maximumFractionDigits: 2 });
 };
 
 function $(id) { return document.getElementById(id); }
@@ -101,7 +101,7 @@ function populateSelects() {
     o.value = inv.model;
     o.dataset.price = inv.price;
     o.dataset.capacity = inv.capacityKw;
-    o.textContent = `${inv.model} — ${inv.capacityKw} kW — ₹${fmt(inv.price)}`;
+    o.textContent = `${inv.model} — ${inv.capacityKw} kW — ${fmt(inv.price)}`;
     invSel.appendChild(o);
   });
 
@@ -111,7 +111,7 @@ function populateSelects() {
     o.value = p.model;
     o.dataset.watt = p.watt;
     o.dataset.price = p.price;
-    o.textContent = `${p.model} — ${p.watt} W — ₹${fmt(p.price)}`;
+    o.textContent = `${p.model} — ${p.watt} W — ${fmt(p.price)}`;
     panelSel.appendChild(o);
   });
 
@@ -120,7 +120,7 @@ function populateSelects() {
     const o = document.createElement('option');
     o.value = a.sku;
     o.dataset.price = a.price;
-    o.textContent = `${a.desc} — ₹${fmt(a.price)}`;
+    o.textContent = `${a.desc} — ${fmt(a.price)}`;
     acdbSel.appendChild(o);
   });
 
@@ -129,7 +129,7 @@ function populateSelects() {
     const o = document.createElement('option');
     o.value = d.sku;
     o.dataset.price = d.price;
-    o.textContent = `${d.desc} — ₹${fmt(d.price)}`;
+    o.textContent = `${d.desc} — ${fmt(d.price)}`;
     dcdbSel.appendChild(o);
   });
 
@@ -138,7 +138,7 @@ function populateSelects() {
     const o = document.createElement('option');
     o.value = m.code;
     o.dataset.price = m.price;
-    o.textContent = `${m.label} — ₹${fmt(m.price)}`;
+    o.textContent = `${m.label} — ${fmt(m.price)}`;
     meterSel.appendChild(o);
   });
 }
@@ -925,6 +925,10 @@ function buildDetailedQuotationHtml(totals, systemType) {
   // Proposal No: VS/Year/Month/001 -> simple randomized or logic
   const proposalNo = `VS/${date.getFullYear()}/001`;
 
+  // CHECK SUBSIDY RADIO BUTTON
+  const subsidyRadio = document.querySelector('input[name="subsidyEligible"]:checked');
+  const isSubsidyYes = subsidyRadio && subsidyRadio.value === 'yes';
+
   /* ===============================
      1. SYSTEM SPECIFICATION ROWS
      Matches Green header style from user design
@@ -975,6 +979,21 @@ function buildDetailedQuotationHtml(totals, systemType) {
       <td class="p-4 border text-right text-xl text-brand-blue">${fmt(totals.grandTotal)}</td>
     </tr>
   `;
+
+  // BUILD SUBSIDY DISCLAIMER BLOCK
+  let subsidyDisclaimerHtml = '';
+  if (isSubsidyYes) {
+    subsidyDisclaimerHtml = `
+      <div class="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg text-xs text-green-800 shadow-sm">
+          <strong class="block mb-1 text-green-900 border-b border-green-200 pb-1">Subsidy Eligibility (PM Surya Ghar):</strong>
+          <ul class="list-disc list-inside space-y-1 mt-1">
+              <li><strong>₹60,000 subsidy</strong> for 2kW systems.</li>
+              <li><strong>₹78,000 subsidy</strong> for 3kW and above systems.</li>
+          </ul>
+          <div class="mt-2 italic text-[10px] text-green-700">*Subject to government approval and DBT transfer directly to customer. Not deducted from invoice.</div>
+      </div>
+    `;
+  }
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -1148,8 +1167,8 @@ function buildDetailedQuotationHtml(totals, systemType) {
 
     <!-- PAGE 1: COVER -->
     <div class="page-container relative flex flex-col justify-between">
-        <!-- Header Design (Top 20% -> Reduced for more space) -->
-        <div class="h-[18%] w-full flex justify-between items-start p-8 relative z-20 bg-white/90">
+        <!-- Header Design (Top Reduced to 15%, padding reduced to p-4) -->
+        <div class="h-[15%] w-full flex justify-between items-start p-4 relative z-20 bg-white/90">
              <!-- Logo (TOP LEFT) -->
              <div class="w-40">
                 <img src="https://github.com/Abhishekcodeking01/v-solar-quote/blob/9ae39ab1ba9eb2eedc38678b5d67f65a93283d84/Uplodes/v%20sustain%20logo.png?raw=true" alt="V Sustain Logo" class="w-full object-contain">
@@ -1176,7 +1195,7 @@ function buildDetailedQuotationHtml(totals, systemType) {
         </div>
 
         <!-- Footer Dark Blue Block (Bottom 35% -> Reduced slightly to fit) -->
-        <div class="h-[32%] w-full bg-[#001f3f] text-white p-12 flex flex-col justify-center relative overflow-hidden">
+        <div class="h-[35%] w-full bg-[#001f3f] text-white p-12 flex flex-col justify-center relative overflow-hidden">
             <!-- Decorative Dots -->
             <div class="dots-pattern bottom-20 left-10"></div>
             <div class="dots-pattern bottom-20 right-10"></div>
@@ -1217,9 +1236,6 @@ function buildDetailedQuotationHtml(totals, systemType) {
                     <h2 class="text-3xl font-bold text-brand-blue">Project Explanation</h2>
                 </div>
                 
-                <!-- Removed Text as requested -->
-                <!-- <h3 class="text-center text-brand-green font-bold text-xl mb-8">On-Grid Solar Working Methodology</h3> -->
-
                 <!-- DIAGRAM (Enlarged) -->
                 <div class="flex items-center justify-center mb-8 relative h-[450px]">
                     <img src="https://github.com/Abhishekcodeking01/v-solar-quote/blob/d2ac544338d64714fdc75e8008f2a733bb61ab83/Uplodes/on%20grid%20plannnt%20explained.png?raw=true" alt="On Grid Plant Explained" class="h-full w-full object-contain shadow-lg rounded-lg bg-white/50">
@@ -1358,6 +1374,9 @@ function buildDetailedQuotationHtml(totals, systemType) {
                             </tr>
                         </tbody>
                     </table>
+                    
+                    <!-- SUBSIDY DISCLAIMER INSERTED HERE -->
+                    ${subsidyDisclaimerHtml}
                </div>
 
                <!-- Notes -->
@@ -1368,7 +1387,6 @@ function buildDetailedQuotationHtml(totals, systemType) {
                         <li>Standard structure height.</li>
                         <li>Elevated structure extra.</li>
                         <li>Discom charges excluded.</li>
-                        ${totals.subsidy > 0 ? `<li>Estimated Subsidy: ₹${fmt(totals.subsidy)} (subject to approval)</li>` : ''}
                     </ul>
                </div>
            </div>
