@@ -157,9 +157,9 @@ function attachEventListeners() {
   $('inverterUseCommonMargin').addEventListener('change', toggleCustomMarginInput.bind(null, 'inverter'));
   $('inverterCustomMargin').addEventListener('input', updateInverterData);
 
-  // Panels
+  // Panels (FIXED: use 'panel' for override ID, 'panels' for margins)
   $('panelModel').addEventListener('change', updatePanelData);
-  $('panelOverrideToggle').addEventListener('change', () => toggleOverrideUI('panels'));
+  $('panelOverrideToggle').addEventListener('change', () => toggleOverrideUI('panel'));
   $('panelOverridePrice').addEventListener('input', updatePanelData);
   $('panelsUseCommonMargin').addEventListener('change', toggleCustomMarginInput.bind(null, 'panels'));
   $('panelsCustomMargin').addEventListener('input', updatePanelData);
@@ -387,8 +387,10 @@ function updatePanelData() {
   const qty = Math.ceil(totalWatt / Math.max(1, watt));
   const dcCapacityKw = round2((qty * watt) / 1000);
 
-  const base = computeBasePrice('panels', dealer);
-  const finalRate = applyMarginTo(base, 'panels'); // rate per panel after margin
+  // FIXED: computeBasePrice uses 'panel' (singular) to match input ID
+  const base = computeBasePrice('panel', dealer);
+  // Margin uses 'panels' (plural) to match input ID
+  const finalRate = applyMarginTo(base, 'panels'); 
   const amount = round2(finalRate * qty);
   const gstPct = getGstFor('panels');
   const gstAmt = round2(amount * gstPct / 100);
@@ -1146,8 +1148,8 @@ function buildDetailedQuotationHtml(totals, systemType) {
 
     <!-- PAGE 1: COVER -->
     <div class="page-container relative flex flex-col justify-between">
-        <!-- Header Design (Top 20%) -->
-        <div class="h-[20%] w-full flex justify-between items-start p-8 relative z-20 bg-white/90">
+        <!-- Header Design (Top 20% -> Reduced for more space) -->
+        <div class="h-[18%] w-full flex justify-between items-start p-8 relative z-20 bg-white/90">
              <!-- Logo (TOP LEFT) -->
              <div class="w-40">
                 <img src="https://github.com/Abhishekcodeking01/v-solar-quote/blob/9ae39ab1ba9eb2eedc38678b5d67f65a93283d84/Uplodes/v%20sustain%20logo.png?raw=true" alt="V Sustain Logo" class="w-full object-contain">
@@ -1155,16 +1157,16 @@ function buildDetailedQuotationHtml(totals, systemType) {
 
             <!-- Header Text -->
             <div class="text-right text-brand-blue">
-                <h2 class="font-bold text-lg">V-Sustain Solar Solutions</h2>
-                <p class="text-xs">Authorized Luminous Partner</p>
-                <p class="text-xs">Bengaluru</p>
-                <p class="text-xs mt-2">Proposal No: ${proposalNo}</p>
-                <p class="text-xs">${proposalDate}</p>
+                <h2 class="font-bold text-xl">V-Sustain Solar Solutions</h2>
+                <p class="text-sm">Authorized Luminous Partner</p>
+                <p class="text-sm">Bengaluru</p>
+                <p class="text-sm mt-2 font-bold">Proposal No: ${proposalNo}</p>
+                <p class="text-sm">${proposalDate}</p>
             </div>
         </div>
 
-        <!-- Main Image Area (Middle 45%) -->
-        <div class="h-[45%] w-full overflow-hidden relative">
+        <!-- Main Image Area (Middle 45% -> Increased to 50%) -->
+        <div class="h-[50%] w-full overflow-hidden relative">
             <img src="https://images.unsplash.com/photo-1509391366360-2e959784a276?q=80&w=2072&auto=format&fit=crop" alt="Solar Panels" class="w-full h-full object-cover">
             
             <!-- 2025 Badge -->
@@ -1173,8 +1175,8 @@ function buildDetailedQuotationHtml(totals, systemType) {
             </div>
         </div>
 
-        <!-- Footer Dark Blue Block (Bottom 35%) -->
-        <div class="h-[35%] w-full bg-[#001f3f] text-white p-12 flex flex-col justify-center relative overflow-hidden">
+        <!-- Footer Dark Blue Block (Bottom 35% -> Reduced slightly to fit) -->
+        <div class="h-[32%] w-full bg-[#001f3f] text-white p-12 flex flex-col justify-center relative overflow-hidden">
             <!-- Decorative Dots -->
             <div class="dots-pattern bottom-20 left-10"></div>
             <div class="dots-pattern bottom-20 right-10"></div>
@@ -1186,9 +1188,9 @@ function buildDetailedQuotationHtml(totals, systemType) {
                 <div class="space-y-1">
                     <h3 class="text-xl font-bold">${plantKw} KW Rooftop Solar</h3>
                     <h3 class="text-xl font-bold border-b border-gray-500 pb-2 mb-2 w-1/2">Solution</h3>
-                    <p class="text-sm text-gray-300">Proposal for</p>
-                    <p class="text-lg font-semibold">${customerName}</p>
-                    <p class="text-sm text-gray-300">${customerCity || 'Bengaluru'}</p>
+                    <p class="text-xl text-gray-300">Proposal for</p>
+                    <p class="text-2xl font-semibold">${customerName}</p>
+                    <p class="text-lg text-gray-300">${customerCity || 'Bengaluru'}</p>
                 </div>
             </div>
         </div>
@@ -1215,11 +1217,12 @@ function buildDetailedQuotationHtml(totals, systemType) {
                     <h2 class="text-3xl font-bold text-brand-blue">Project Explanation</h2>
                 </div>
                 
-                <h3 class="text-center text-brand-green font-bold text-xl mb-8">On-Grid Solar Working Methodology</h3>
+                <!-- Removed Text as requested -->
+                <!-- <h3 class="text-center text-brand-green font-bold text-xl mb-8">On-Grid Solar Working Methodology</h3> -->
 
-                <!-- DIAGRAM -->
-                <div class="flex items-center justify-center mb-8 relative h-60">
-                    <img src="https://github.com/Abhishekcodeking01/v-solar-quote/blob/d2ac544338d64714fdc75e8008f2a733bb61ab83/Uplodes/on%20grid%20plannnt%20explained.png?raw=true" alt="On Grid Plant Explained" class="h-full object-contain shadow-lg rounded-lg bg-white/50">
+                <!-- DIAGRAM (Enlarged) -->
+                <div class="flex items-center justify-center mb-8 relative h-[450px]">
+                    <img src="https://github.com/Abhishekcodeking01/v-solar-quote/blob/d2ac544338d64714fdc75e8008f2a733bb61ab83/Uplodes/on%20grid%20plannnt%20explained.png?raw=true" alt="On Grid Plant Explained" class="h-full w-full object-contain shadow-lg rounded-lg bg-white/50">
                 </div>
 
                 <!-- Project Details - Centered and Enlarged -->
@@ -1257,7 +1260,7 @@ function buildDetailedQuotationHtml(totals, systemType) {
         </div>
     </div>
 
-    <!-- PAGE 3: OFFER -->
+    <!-- PAGE 3: TECHNO-COMMERCIAL OFFER (SYSTEM SPECS ONLY) -->
     <div class="page-container page-break relative flex flex-col">
         <!-- Minimal Header Shape -->
         <div class="absolute top-0 left-0 w-full h-12 bg-gradient-to-r from-brand-blue to-brand-lightBlue z-10"></div>
@@ -1267,9 +1270,9 @@ function buildDetailedQuotationHtml(totals, systemType) {
             <img src="https://github.com/Abhishekcodeking01/v-solar-quote/blob/9ae39ab1ba9eb2eedc38678b5d67f65a93283d84/Uplodes/v%20sustain%20logo.png?raw=true" alt="V Sustain Logo" class="w-full object-contain">
         </div>
 
-        <div class="relative z-20 mt-16 px-12 h-full flex flex-col justify-between pb-12">
-           <!-- Header -->
-           <div class="flex items-center justify-between mb-8 border-b-2 border-brand-orange pb-2">
+        <div class="relative z-20 mt-16 px-12 h-full flex flex-col justify-start pb-12">
+           <!-- Header with Shortened Line -->
+           <div class="flex items-center justify-between mb-8 border-b-2 border-brand-orange pb-2 w-[80%]">
                <div class="flex items-center gap-3">
                     <i class="far fa-file-alt text-3xl text-brand-blue"></i>
                     <h2 class="text-3xl font-bold text-brand-blue">Techno-Commercial Offer</h2>
@@ -1294,10 +1297,30 @@ function buildDetailedQuotationHtml(totals, systemType) {
                    </tbody>
                </table>
            </div>
+        </div>
+    </div>
+
+    <!-- PAGE 4: COMMERCIAL PROPOSAL (SEPARATE PAGE) -->
+    <div class="page-container page-break relative flex flex-col">
+        <!-- Minimal Header Shape -->
+        <div class="absolute top-0 left-0 w-full h-12 bg-gradient-to-r from-brand-blue to-brand-lightBlue z-10"></div>
+        
+        <!-- Logo (TOP RIGHT) -->
+        <div class="absolute top-4 right-8 z-30 w-32">
+            <img src="https://github.com/Abhishekcodeking01/v-solar-quote/blob/9ae39ab1ba9eb2eedc38678b5d67f65a93283d84/Uplodes/v%20sustain%20logo.png?raw=true" alt="V Sustain Logo" class="w-full object-contain">
+        </div>
+
+        <div class="relative z-20 mt-16 px-12 h-full flex flex-col justify-between pb-12">
+             <!-- Header with Shortened Line -->
+           <div class="flex items-center justify-between mb-8 border-b-2 border-brand-orange pb-2 w-[80%]">
+               <div class="flex items-center gap-3">
+                    <i class="fas fa-rupee-sign text-3xl text-brand-blue"></i>
+                    <h2 class="text-3xl font-bold text-brand-blue">Commercial Proposal</h2>
+               </div>
+           </div>
 
            <!-- 2. Commercial Offer Table -->
            <div class="mb-8" contenteditable="true">
-                <h3 class="text-lg font-bold text-brand-green mb-3 pl-2 border-l-4 border-brand-green">2. Commercial Proposal</h3>
                 <table class="w-full text-sm border-collapse shadow-lg bg-white/90">
                     <thead>
                         <tr class="bg-brand-blue text-white">
@@ -1318,7 +1341,7 @@ function buildDetailedQuotationHtml(totals, systemType) {
            <!-- 3. Chargeable Services & Notes Row -->
            <div class="flex gap-6 mt-auto">
                <div class="w-2/3" contenteditable="true">
-                    <h3 class="text-sm font-bold text-brand-green mb-2">3. Optional Services</h3>
+                    <h3 class="text-sm font-bold text-brand-green mb-2">Optional Services</h3>
                     <table class="w-full text-xs border-collapse shadow-sm bg-white/90">
                         <thead>
                             <tr class="bg-gray-600 text-white">
@@ -1352,7 +1375,7 @@ function buildDetailedQuotationHtml(totals, systemType) {
         </div>
     </div>
 
-    <!-- PAGE 4: WHY CHOOSE US -->
+    <!-- PAGE 5: WHY CHOOSE US -->
     <div class="page-container page-break relative">
         <!-- Abstract Top Shape -->
         <div class="wave-corner-top-left-accent h-[150px]"></div>
@@ -1375,9 +1398,8 @@ function buildDetailedQuotationHtml(totals, systemType) {
                 Empowering your home with eco-friendly solutions and a sustainable future through trusted technology.
             </p>
 
-            <!-- New Clean Grid Layout -->
+            <!-- Grid Layout (Unchanged) -->
             <div class="grid grid-cols-2 gap-y-12 gap-x-12">
-                
                 <!-- Item 1 -->
                 <div class="flex items-start gap-5 content-card-bg p-4 rounded-lg shadow-sm">
                     <div class="flex-shrink-0 w-16 h-16 rounded-full bg-brand-green/10 flex items-center justify-center text-brand-green border border-brand-green/20">
@@ -1460,14 +1482,14 @@ function buildDetailedQuotationHtml(totals, systemType) {
         </div>
     </div>
 
-    <!-- PAGE 5: PAYMENT & WARRANTY -->
+    <!-- PAGE 6: PAYMENT & WARRANTY -->
     <div class="page-container page-break relative">
         <!-- Top Wave -->
         <div class="wave-top-accent"></div>
         <div class="wave-top"></div>
         
-        <!-- Logo (TOP RIGHT) -->
-        <div class="absolute top-8 right-8 z-30 w-32">
+        <!-- Logo (CENTERED) -->
+        <div class="absolute top-4 left-1/2 -translate-x-1/2 z-30 w-32">
             <img src="https://github.com/Abhishekcodeking01/v-solar-quote/blob/9ae39ab1ba9eb2eedc38678b5d67f65a93283d84/Uplodes/v%20sustain%20logo.png?raw=true" alt="V Sustain Logo" class="w-full object-contain">
         </div>
 
@@ -1573,14 +1595,14 @@ function buildDetailedQuotationHtml(totals, systemType) {
         </div>
     </div>
 
-     <!-- PAGE 6: TERMS & CONDITIONS -->
+     <!-- PAGE 7: TERMS & CONDITIONS -->
      <div class="page-container page-break relative">
         <!-- Top Wave -->
         <div class="wave-top-accent h-[120px]"></div>
         <div class="wave-top h-[140px]"></div>
 
-        <!-- Logo (TOP RIGHT) -->
-        <div class="absolute top-8 right-8 z-30 w-32">
+        <!-- Logo (CENTERED) -->
+        <div class="absolute top-4 left-1/2 -translate-x-1/2 z-30 w-32">
             <img src="https://github.com/Abhishekcodeking01/v-solar-quote/blob/9ae39ab1ba9eb2eedc38678b5d67f65a93283d84/Uplodes/v%20sustain%20logo.png?raw=true" alt="V Sustain Logo" class="w-full object-contain">
         </div>
 
@@ -1629,7 +1651,7 @@ function buildDetailedQuotationHtml(totals, systemType) {
         </div>
     </div>
 
-    <!-- PAGE 7: PROPOSAL BY / CONTACT (Enhanced) -->
+    <!-- PAGE 8: PROPOSAL BY / CONTACT (Enhanced) -->
     <div class="page-container page-break relative flex flex-col">
         <!-- Top Image Section REPLACED WITH BG 3.png -->
         <div class="h-[40%] w-full relative overflow-hidden">
@@ -1643,8 +1665,8 @@ function buildDetailedQuotationHtml(totals, systemType) {
             </div>
         </div>
 
-         <!-- Logo (TOP RIGHT - Integrated into image area via absolute positioning) -->
-         <div class="absolute top-8 right-8 z-30 w-32 bg-white/90 p-2 rounded shadow-lg">
+         <!-- Logo (CENTERED) -->
+         <div class="absolute top-4 left-1/2 -translate-x-1/2 z-30 w-32 bg-white/90 p-2 rounded shadow-lg">
             <img src="https://github.com/Abhishekcodeking01/v-solar-quote/blob/9ae39ab1ba9eb2eedc38678b5d67f65a93283d84/Uplodes/v%20sustain%20logo.png?raw=true" alt="V Sustain Logo" class="w-full object-contain">
         </div>
 
