@@ -1034,6 +1034,10 @@ function buildDetailedQuotationHtml(totals, systemType) {
     <style>
         /* Print styles to ensure one section per page */
         @media print {
+            @page {
+                size: A4;
+                margin: 0;
+            }
             .page-break { 
                 page-break-before: always; 
                 break-before: page; 
@@ -1046,9 +1050,10 @@ function buildDetailedQuotationHtml(totals, systemType) {
             .page-container {
                 box-shadow: none;
                 margin: 0;
-                width: 100%;
-                height: 100vh; /* Force full height for cover pages */
-                overflow: hidden;
+                width: 210mm;
+                height: 297mm; /* Strict A4 Height */
+                max-height: 297mm;
+                overflow: hidden; /* Strict overflow hidden */
                 border: none;
             }
             /* Remove edit capability visual cues when printing */
@@ -1056,6 +1061,16 @@ function buildDetailedQuotationHtml(totals, systemType) {
                 outline: none;
             }
             .no-print { display: none !important; }
+
+            /* Mobile Print Specifics */
+            body.print-mobile .page-container {
+                transform: scale(0.92); /* Shrink slightly to fit mobile viewports */
+                transform-origin: top left;
+                width: 108%; /* Compensate width */
+                height: auto;
+                overflow: visible; /* Allow flow but controlled by scale */
+                page-break-after: always;
+            }
         }
 
         body {
@@ -1155,22 +1170,34 @@ function buildDetailedQuotationHtml(totals, systemType) {
             background-color: rgba(255, 255, 255, 0.9);
         }
     </style>
+    <script>
+        function printMode(mode) {
+            document.body.className = 'font-sans text-gray-800'; // Reset
+            if (mode === 'mobile') {
+                document.body.classList.add('print-mobile');
+            }
+            window.print();
+        }
+    </script>
 </head>
 <body class="font-sans text-gray-800">
 
-    <!-- FLOATING PRINT BUTTON -->
-    <div class="fixed bottom-8 right-8 z-50 no-print">
-        <button onclick="window.print()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-6 rounded-full shadow-2xl flex items-center gap-2 transition-all transform hover:scale-105">
-            <i class="fas fa-print text-xl"></i> Print Quote
+    <!-- FLOATING PRINT BUTTONS -->
+    <div class="fixed bottom-8 right-8 z-50 no-print flex flex-col gap-3">
+        <button onclick="printMode('laptop')" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-full shadow-2xl flex items-center gap-2 transition-all transform hover:scale-105">
+            <i class="fas fa-laptop text-xl"></i> Print (Laptop)
+        </button>
+        <button onclick="printMode('mobile')" class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-full shadow-2xl flex items-center gap-2 transition-all transform hover:scale-105">
+            <i class="fas fa-mobile-alt text-xl"></i> Print (Mobile)
         </button>
     </div>
 
     <!-- PAGE 1: COVER -->
     <div class="page-container relative flex flex-col justify-between">
-        <!-- Header Design (Top Reduced to 15%, padding reduced to p-4) -->
-        <div class="h-[15%] w-full flex justify-between items-start p-4 relative z-20 bg-white/90">
+        <!-- Header Design (Reduced Height to 13% and Padding to p-2) -->
+        <div class="h-[13%] w-full flex justify-between items-start p-2 relative z-20 bg-white/90">
              <!-- Logo (TOP LEFT) -->
-             <div class="w-40">
+             <div class="w-36">
                 <img src="https://github.com/Abhishekcodeking01/v-solar-quote/blob/9ae39ab1ba9eb2eedc38678b5d67f65a93283d84/Uplodes/v%20sustain%20logo.png?raw=true" alt="V Sustain Logo" class="w-full object-contain">
             </div>
 
@@ -1179,13 +1206,13 @@ function buildDetailedQuotationHtml(totals, systemType) {
                 <h2 class="font-bold text-xl">V-Sustain Solar Solutions</h2>
                 <p class="text-sm">Authorized Luminous Partner</p>
                 <p class="text-sm">Bengaluru</p>
-                <p class="text-sm mt-2 font-bold">Proposal No: ${proposalNo}</p>
+                <p class="text-sm mt-1 font-bold">Proposal No: ${proposalNo}</p>
                 <p class="text-sm">${proposalDate}</p>
             </div>
         </div>
 
-        <!-- Main Image Area (Middle 45% -> Increased to 50%) -->
-        <div class="h-[50%] w-full overflow-hidden relative">
+        <!-- Main Image Area (Reduced to 45% height) -->
+        <div class="h-[45%] w-full overflow-hidden relative">
             <img src="https://images.unsplash.com/photo-1509391366360-2e959784a276?q=80&w=2072&auto=format&fit=crop" alt="Solar Panels" class="w-full h-full object-cover">
             
             <!-- 2025 Badge -->
@@ -1194,8 +1221,8 @@ function buildDetailedQuotationHtml(totals, systemType) {
             </div>
         </div>
 
-        <!-- Footer Dark Blue Block (Bottom 35% -> Reduced slightly to fit) -->
-        <div class="h-[35%] w-full bg-[#001f3f] text-white p-12 flex flex-col justify-center relative overflow-hidden">
+        <!-- Footer Dark Blue Block (Increased to 42% to balance layout) -->
+        <div class="h-[42%] w-full bg-[#001f3f] text-white p-12 flex flex-col justify-center relative overflow-hidden">
             <!-- Decorative Dots -->
             <div class="dots-pattern bottom-20 left-10"></div>
             <div class="dots-pattern bottom-20 right-10"></div>
