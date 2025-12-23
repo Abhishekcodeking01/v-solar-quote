@@ -647,6 +647,7 @@ function addCustomProduct() {
       <div class="col"><input type="number" class="cp-price" placeholder="Price" /></div>
       <div class="col"><label class="switch-small"><input type="checkbox" class="cp-use-common" checked><span class="slider-small round"></span></label></div>
       <div class="col"><input type="number" class="cp-custom-margin" placeholder="Margin %" disabled /></div>
+      <div class="col"><input type="number" class="cp-gst" placeholder="GST %" value="18" /></div>
       <div class="col"><button class="btn danger" onclick="removeCustomProduct(this)">Delete</button></div>
     </div>
   `;
@@ -661,6 +662,7 @@ function addCustomProduct() {
   row.querySelector('.cp-qty').addEventListener('input', recalcAllCards);
   row.querySelector('.cp-price').addEventListener('input', recalcAllCards);
   row.querySelector('.cp-custom-margin').addEventListener('input', recalcAllCards);
+  row.querySelector('.cp-gst').addEventListener('input', recalcAllCards);
 }
 
 function removeCustomProduct(btn) {
@@ -685,13 +687,15 @@ function gatherCustomItems() {
     if (!qty || !price) return;
     const useCommon = row.querySelector('.cp-use-common').checked;
     const customMargin = n(row.querySelector('.cp-custom-margin').value);
+    const gstInput = row.querySelector('.cp-gst');
+    const gstPct = gstInput ? n(gstInput.value) : 18; // Read per-row GST or default 18
+
     let rate = price;
     if (useCommon) {
       rate = round2(price * (1 + getCommonMargin()/100));
     } else if (customMargin > 0) {
       rate = round2(price * (1 + customMargin/100));
     }
-    const gstPct = getGstFor('custom'); // custom -> 18% default
     items.push({
       type: 'custom',
       item: name,
@@ -1034,10 +1038,6 @@ function buildDetailedQuotationHtml(totals, systemType) {
     <style>
         /* Print styles to ensure one section per page */
         @media print {
-            @page {
-                size: A4;
-                margin: 0;
-            }
             .page-break { 
                 page-break-before: always; 
                 break-before: page; 
@@ -1070,6 +1070,14 @@ function buildDetailedQuotationHtml(totals, systemType) {
                 height: auto;
                 overflow: visible; /* Allow flow but controlled by scale */
                 page-break-after: always;
+            }
+            
+            /* Laptop Mode: Reset to allow user control */
+            body.print-laptop .page-container {
+                width: 100%;
+                height: auto;
+                overflow: visible;
+                max-height: none;
             }
         }
 
@@ -1175,8 +1183,12 @@ function buildDetailedQuotationHtml(totals, systemType) {
             document.body.className = 'font-sans text-gray-800'; // Reset
             if (mode === 'mobile') {
                 document.body.classList.add('print-mobile');
+                window.print();
+            } else if (mode === 'laptop') {
+                document.body.classList.add('print-laptop');
+                // Give user control by simply calling print, but with laptop-specific reset style
+                window.print();
             }
-            window.print();
         }
     </script>
 </head>
