@@ -756,14 +756,109 @@ function getCommonHtml(totals, type, isSummary, isShort) {
 
     <!-- P5: Why Us -->
     <div class="page-container page-break relative">
-        <div class="wave-corner-top-left-accent h-[150px]"></div><div class="wave-corner-top-left h-[130px]"></div>
-        <div class="absolute top-8 right-8 z-30 w-32"><img src="https://github.com/Abhishekcodeking01/v-solar-quote/blob/9ae39ab1ba9eb2eedc38678b5d67f65a93283d84/Uplodes/v%20sustain%20logo.png?raw=true" class="w-full"></div>
-        <div class="absolute top-8 left-12 z-30 flex items-center gap-3"><i class="far fa-star text-3xl text-white"></i><h2 class="text-3xl font-bold text-white">Why Choose Us?</h2></div>
-        <div class="relative z-20 mt-40 px-12 h-full pb-12 flex flex-col"><p class="text-lg text-gray-600 mb-12 border-l-4 border-brand-orange pl-4 italic bg-white/60 p-2 rounded">Empowering your home with eco-friendly solutions.</p>
-        <div class="grid grid-cols-2 gap-12">
-            <div class="flex items-start gap-5 content-card-bg p-4 rounded-lg shadow-sm"><div class="flex-shrink-0 w-16 h-16 rounded-full bg-brand-green/10 flex items-center justify-center text-brand-green"><i class="fas fa-drafting-compass text-2xl"></i></div><div><h3 class="font-bold text-xl text-brand-blue mb-2">Customized Solution</h3><p class="text-sm text-gray-600">Tailored specifically to your energy needs.</p></div></div>
-            <div class="flex items-start gap-5 content-card-bg p-4 rounded-lg shadow-sm"><div class="flex-shrink-0 w-16 h-16 rounded-full bg-brand-blue/10 flex items-center justify-center text-brand-blue"><i class="fas fa-tools text-2xl"></i></div><div><h3 class="font-bold text-xl text-brand-blue mb-2">Minimal Maintenance</h3><p class="text-sm text-gray-600">Built to last with minimal upkeep.</p></div></div>
-        </div></div>
+        <!-- Abstract Top Shape -->
+        <div class="wave-corner-top-left-accent h-[150px]"></div>
+        <div class="wave-corner-top-left h-[130px]"></div>
+        
+        <!-- Logo (TOP RIGHT) -->
+        <div class="absolute top-8 right-8 z-30 w-32">
+            <img src="https://github.com/Abhishekcodeking01/v-solar-quote/blob/9ae39ab1ba9eb2eedc38678b5d67f65a93283d84/Uplodes/v%20sustain%20logo.png?raw=true" alt="V Sustain Logo" class="w-full object-contain">
+        </div>
+
+        <!-- Shifted Header -->
+        <div class="absolute top-8 left-12 z-30 flex items-center gap-3">
+             <i class="far fa-star text-3xl text-white"></i>
+             <h2 class="text-3xl font-bold text-white">Why Choose Us?</h2>
+        </div>
+
+        <div class="relative z-20 mt-40 px-12 h-full pb-12 flex flex-col">
+            
+            <p class="text-lg text-gray-600 mb-12 border-l-4 border-brand-orange pl-4 italic bg-white/60 p-2 rounded">
+                Empowering your home with eco-friendly solutions and a sustainable future through trusted technology.
+            </p>
+
+            <!-- Grid Layout (Unchanged) -->
+            <div class="grid grid-cols-2 gap-y-12 gap-x-12">
+                <!-- Item 1 -->
+                <div class="flex items-start gap-5 content-card-bg p-4 rounded-lg shadow-sm">
+                    <div class="flex-shrink-0 w-16 h-16 rounded-full bg-brand-green/10 flex items-center justify-center text-brand-green border border-brand-green/20">
+                        <i class="fas fa-drafting-compass text-2xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-xl text-brand-blue mb-2">Customized Solution</h3>
+                        <p class="text-sm text-gray-600 leading-relaxed">
+                            We don't believe in one-size-fits-all. Our team designs a solar power system tailored specifically to your roof structure and energy needs, ensuring maximum efficiency.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Item 2 -->
+                <div class="flex items-start gap-5 content-card-bg p-4 rounded-lg shadow-sm">
+                    <div class="flex-shrink-0 w-16 h-16 rounded-full bg-brand-blue/10 flex items-center justify-center text-brand-blue border border-brand-blue/20">
+                        <i class="fas fa-tools text-2xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-xl text-brand-blue mb-2">Minimal Maintenance</h3>
+                        <p class="text-sm text-gray-600 leading-relaxed">
+                            Our systems are built to last with minimal upkeep. High-quality components and optional anti-dust coatings mean you spend less time cleaning and more time saving.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Item 3 -->
+                <div class="flex items-start gap-5 content-card-bg p-4 rounded-lg shadow-sm">
+                    <div class="flex-shrink-0 w-16 h-16 rounded-full bg-brand-orange/10 flex items-center justify-center text-brand-orange border border-brand-orange/20">
+                        <i class="fas fa-medal text-2xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-xl text-brand-blue mb-2">Quality Assurance</h3>
+                        <p class="text-sm text-gray-600 leading-relaxed">
+                            We use only Tier-1 modules and top-rated inverters from trusted global brands. Every installation undergoes rigorous quality checks before commissioning.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Item 4 -->
+                <div class="flex items-start gap-5 content-card-bg p-4 rounded-lg shadow-sm">
+                    <div class="flex-shrink-0 w-16 h-16 rounded-full bg-brand-green/10 flex items-center justify-center text-brand-green border border-brand-green/20">
+                        <i class="fas fa-shield-alt text-2xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-xl text-brand-blue mb-2">Highest Safety</h3>
+                        <p class="text-sm text-gray-600 leading-relaxed">
+                            Safety is our priority. We adhere to strict electrical safety standards, using advanced protection devices (ACDB/DCDB) to safeguard your home and family.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Item 5 -->
+                <div class="flex items-start gap-5 content-card-bg p-4 rounded-lg shadow-sm">
+                    <div class="flex-shrink-0 w-16 h-16 rounded-full bg-brand-blue/10 flex items-center justify-center text-brand-blue border border-brand-blue/20">
+                        <i class="fas fa-chart-line text-2xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-xl text-brand-blue mb-2">Quick ROI</h3>
+                        <p class="text-sm text-gray-600 leading-relaxed">
+                            Start saving from day one. With substantial electricity bill reductions, most of our customers recover their initial investment within just 3-4 years.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Item 6 -->
+                <div class="flex items-start gap-5 content-card-bg p-4 rounded-lg shadow-sm">
+                    <div class="flex-shrink-0 w-16 h-16 rounded-full bg-brand-orange/10 flex items-center justify-center text-brand-orange border border-brand-orange/20">
+                        <i class="fas fa-hand-holding-usd text-2xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-xl text-brand-blue mb-2">Smart Investment</h3>
+                        <p class="text-sm text-gray-600 leading-relaxed">
+                            Solar is an asset that appreciates. Increase your property value while hedging against future hikes in utility electricity tariffs.
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
     </div>
     
     <!-- P6: Payment -->
