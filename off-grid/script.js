@@ -718,7 +718,7 @@ function getCommonHtml(totals, type, isSummary, isShort) {
     <!-- P2: Project Explanation -->
     <div class="page-container page-break relative">
         <div class="wave-corner-top-left-accent h-[150px]"></div><div class="wave-corner-top-left h-[130px]"></div>
-        <div class="absolute top-8 right-8 z-30 w-32"><img src="https://github.com/Abhishekcodeking01/v-solar-quote/blob/9ae39ab1ba9eb2eedc38678b5d67f65a93283d84/Uplodes/v%20sustain%20logo.png?raw=true" class="w-full"></div>
+        <div class="absolute top-8 right-8 z-30 w-32"><img src="https://github.com/Abhishekcodeking01/v-solar-quote/blob/9ae39ab1ba9eb2eedc38678b5d67f65a93283d84/Uplodes/v%20sustain%20logo.png?raw=true" class="w-full object-contain"></div>
         <div class="relative z-20 pt-40 px-12 pb-12 flex flex-col h-full justify-between">
             <div>
                 <div class="flex items-center gap-3 mb-8"><i class="far fa-arrow-alt-circle-right text-3xl text-brand-blue"></i><h2 class="text-3xl font-bold text-brand-blue">Project Explanation</h2></div>
@@ -736,7 +736,7 @@ function getCommonHtml(totals, type, isSummary, isShort) {
     <!-- P3: Specs -->
     <div class="page-container page-break relative flex flex-col">
        <div class="absolute top-0 left-0 w-full h-12 bg-gradient-to-r from-brand-blue to-brand-lightBlue z-10"></div>
-       <div class="absolute top-4 right-8 z-30 w-32"><img src="https://github.com/Abhishekcodeking01/v-solar-quote/blob/9ae39ab1ba9eb2eedc38678b5d67f65a93283d84/Uplodes/v%20sustain%20logo.png?raw=true" class="w-full"></div>
+       <div class="absolute top-4 right-8 z-30 w-32"><img src="https://github.com/Abhishekcodeking01/v-solar-quote/blob/9ae39ab1ba9eb2eedc38678b5d67f65a93283d84/Uplodes/v%20sustain%20logo.png?raw=true" class="w-full object-contain"></div>
        <div class="relative z-20 mt-16 px-12 h-full flex flex-col justify-start pb-12">
            <div class="flex items-center justify-between mb-8 border-b-2 border-brand-orange pb-2 w-[80%]"><div class="flex items-center gap-3"><i class="far fa-file-alt text-3xl text-brand-blue"></i><h2 class="text-3xl font-bold text-brand-blue">Techno-Commercial Offer</h2></div></div>
            <div class="mb-8"><h3 class="text-lg font-bold text-brand-green mb-3 pl-2 border-l-4 border-brand-green">1. System Specifications</h3><table class="w-full text-sm border-collapse shadow-sm bg-white/90"><thead><tr class="bg-brand-green text-white"><th class="p-3 border text-left">Component</th><th class="p-3 border text-left">Description</th><th class="p-3 border">Make</th><th class="p-3 border text-center">Qty</th><th class="p-3 border text-center">UoM</th></tr></thead><tbody>${specRows}</tbody></table></div>
@@ -746,15 +746,15 @@ function getCommonHtml(totals, type, isSummary, isShort) {
     <!-- P4: Commercial -->
     <div class="page-container page-break relative flex flex-col">
        <div class="absolute top-0 left-0 w-full h-12 bg-gradient-to-r from-brand-blue to-brand-lightBlue z-10"></div>
-       <div class="absolute top-4 right-8 z-30 w-32"><img src="https://github.com/Abhishekcodeking01/v-solar-quote/blob/9ae39ab1ba9eb2eedc38678b5d67f65a93283d84/Uplodes/v%20sustain%20logo.png?raw=true" class="w-full"></div>
+       <div class="absolute top-4 right-8 z-30 w-32"><img src="https://github.com/Abhishekcodeking01/v-solar-quote/blob/9ae39ab1ba9eb2eedc38678b5d67f65a93283d84/Uplodes/v%20sustain%20logo.png?raw=true" class="w-full object-contain"></div>
        <div class="relative z-20 mt-16 px-12 h-full flex flex-col justify-between pb-12">
            <div class="flex items-center justify-between mb-8 border-b-2 border-brand-orange pb-2 w-[80%]"><div class="flex items-center gap-3"><i class="fas fa-rupee-sign text-3xl text-brand-blue"></i><h2 class="text-3xl font-bold text-brand-blue">Commercial Proposal</h2></div></div>
            <div class="mb-8"><table class="w-full text-sm border-collapse shadow-lg bg-white/90"><thead><tr class="bg-brand-blue text-white"><th class="p-3 border w-12">#</th><th class="p-3 border text-left">Description</th><th class="p-3 border text-center">UOM</th><th class="p-3 border text-center">Qty</th><th class="p-3 border text-right">Price (INR)</th></tr></thead><tbody>${commRows}${footer}</tbody></table></div>
-           <div class="flex gap-6 mt-auto"><div class="w-2/3"><h3 class="text-sm font-bold text-brand-green mb-2">Optional Services</h3><table class="w-full text-xs border-collapse shadow-sm bg-white/90"><thead><tr class="bg-gray-600 text-white"><th class="p-2 text-left">Description</th><th class="p-2 text-center">Tenure</th><th class="p-2 text-right">Cost</th></tr></thead><tbody><tr class="bg-gray-50/50 border-b"><td class="p-2 font-semibold">AMC</td><td class="p-2 text-center">5 Years</td><td class="p-2 text-right">10,000</td></tr></tbody></table></div></div>
+           <div class="flex gap-6 mt-auto"><div class="w-2/3"><h3 class="text-sm font-bold text-brand-green mb-2">Optional Services</h3><table class="w-full text-xs border-collapse shadow-sm bg-white/90"><thead><tr class="bg-gray-600 text-white"><th class="p-2 text-left">Description</th><th class="p-2 text-center">Tenure</th><th class="p-2 text-right">Cost (INR)</th></tr></thead><tbody><tr class="bg-gray-50/50 border-b"><td class="p-2 font-semibold">AMC</td><td class="p-2 text-center">5 Years</td><td class="p-2 text-right">10,000</td></tr></tbody></table></div></div>
        </div>
     </div>
 
-    <!-- P5: Why Us -->
+    <!-- P5: Why Choose Us -->
     <div class="page-container page-break relative">
         <!-- Abstract Top Shape -->
         <div class="wave-corner-top-left-accent h-[150px]"></div>
@@ -777,7 +777,7 @@ function getCommonHtml(totals, type, isSummary, isShort) {
                 Empowering your home with eco-friendly solutions and a sustainable future through trusted technology.
             </p>
 
-            <!-- Grid Layout (Unchanged) -->
+            <!-- Grid Layout -->
             <div class="grid grid-cols-2 gap-y-12 gap-x-12">
                 <!-- Item 1 -->
                 <div class="flex items-start gap-5 content-card-bg p-4 rounded-lg shadow-sm">
@@ -856,48 +856,262 @@ function getCommonHtml(totals, type, isSummary, isShort) {
                         </p>
                     </div>
                 </div>
-
             </div>
         </div>
     </div>
     
-    <!-- P6: Payment -->
+    <!-- P6: Payment & Warranty -->
     <div class="page-container page-break relative">
-        <div class="wave-top-accent"></div><div class="wave-top"></div>
-        <div class="absolute top-4 left-1/2 -translate-x-1/2 z-30 w-32"><img src="https://github.com/Abhishekcodeking01/v-solar-quote/blob/9ae39ab1ba9eb2eedc38678b5d67f65a93283d84/Uplodes/v%20sustain%20logo.png?raw=true" class="w-full"></div>
+        <!-- Top Wave -->
+        <div class="wave-top-accent"></div>
+        <div class="wave-top"></div>
+        
+        <!-- Logo (CENTERED) -->
+        <div class="absolute top-4 left-1/2 -translate-x-1/2 z-30 w-32">
+            <img src="https://github.com/Abhishekcodeking01/v-solar-quote/blob/9ae39ab1ba9eb2eedc38678b5d67f65a93283d84/Uplodes/v%20sustain%20logo.png?raw=true" alt="V Sustain Logo" class="w-full object-contain">
+        </div>
+
         <div class="relative z-20 pt-48 px-12 pb-12">
-            <div class="flex items-center gap-3 mb-16 mt-8"><i class="far fa-credit-card text-3xl text-brand-blue"></i><h2 class="text-3xl font-bold text-brand-blue">Payment Terms</h2></div>
-            <div class="relative px-4 mb-20"><div class="absolute top-[35%] left-0 w-full h-1 bg-gray-200 z-0 -translate-y-1/2 rounded-full"></div>
-            <div class="flex justify-between items-start relative z-10">
-                <div class="flex flex-col items-center w-1/3"><div class="bg-white p-2 rounded-full shadow-lg border-4 border-brand-blue w-32 h-32 flex items-center justify-center mb-6"><i class="fas fa-file-contract text-5xl text-brand-blue"></i></div><div class="bg-white p-4 rounded-xl shadow-md border-b-4 border-brand-blue w-4/5 text-center"><span class="block text-3xl font-bold text-brand-blue">25%</span><span class="block text-sm">Advance</span></div></div>
-                <div class="flex flex-col items-center w-1/3"><div class="bg-white p-2 rounded-full shadow-lg border-4 border-brand-orange w-32 h-32 flex items-center justify-center mb-6"><i class="fas fa-truck-fast text-5xl text-brand-orange"></i></div><div class="bg-white p-4 rounded-xl shadow-md border-b-4 border-brand-orange w-4/5 text-center"><span class="block text-3xl font-bold text-brand-orange">65%</span><span class="block text-sm">Delivery</span></div></div>
-                <div class="flex flex-col items-center w-1/3"><div class="bg-white p-2 rounded-full shadow-lg border-4 border-brand-green w-32 h-32 flex items-center justify-center mb-6"><i class="fas fa-clipboard-check text-5xl text-brand-green"></i></div><div class="bg-white p-4 rounded-xl shadow-md border-b-4 border-brand-green w-4/5 text-center"><span class="block text-3xl font-bold text-brand-green">10%</span><span class="block text-sm">Completion</span></div></div>
-            </div></div>
+            <!-- Payment Terms - Shifted Down -->
+            <div class="flex items-center gap-3 mb-16 mt-8">
+                <i class="far fa-credit-card text-3xl text-brand-blue"></i>
+                <h2 class="text-3xl font-bold text-brand-blue">Payment Terms</h2>
+            </div>
+
+            <!-- Redesigned Payment Steps with FontAwesome Icons -->
+            <div class="relative px-4 mb-20">
+                <!-- Connecting Line Base -->
+                <div class="absolute top-[35%] left-0 w-full h-1 bg-gray-200 z-0 -translate-y-1/2 rounded-full"></div>
+                <!-- Connecting Line Highlight -->
+                <div class="absolute top-[35%] left-0 w-2/3 h-1 bg-brand-lightBlue/50 z-0 -translate-y-1/2 rounded-full"></div>
+
+                <div class="flex justify-between items-start relative z-10">
+                    <!-- Step 1 -->
+                    <div class="flex flex-col items-center w-1/3">
+                        <div class="bg-white p-2 rounded-full shadow-lg border-4 border-brand-blue w-32 h-32 flex items-center justify-center mb-6 transform hover:scale-105 transition-transform duration-300">
+                             <i class="fas fa-file-contract text-5xl text-brand-blue"></i>
+                        </div>
+                        <div class="bg-white p-4 rounded-xl shadow-md border-b-4 border-brand-blue w-4/5 text-center">
+                            <span class="block text-3xl font-bold text-brand-blue leading-none mb-1">25%</span>
+                            <span class="block font-bold text-gray-700 text-sm uppercase tracking-wider mb-1">Advance</span>
+                            <span class="block text-xs text-gray-500 font-medium">With Purchase Order</span>
+                        </div>
+                    </div>
+
+                    <!-- Step 2 -->
+                    <div class="flex flex-col items-center w-1/3">
+                        <div class="bg-white p-2 rounded-full shadow-lg border-4 border-brand-orange w-32 h-32 flex items-center justify-center mb-6 transform hover:scale-105 transition-transform duration-300">
+                            <i class="fas fa-truck-fast text-5xl text-brand-orange"></i>
+                        </div>
+                        <div class="bg-white p-4 rounded-xl shadow-md border-b-4 border-brand-orange w-4/5 text-center">
+                             <span class="block text-3xl font-bold text-brand-orange leading-none mb-1">65%</span>
+                             <span class="block font-bold text-gray-700 text-sm uppercase tracking-wider mb-1">Delivery</span>
+                             <span class="block text-xs text-gray-500 font-medium">On Material Arrival</span>
+                        </div>
+                    </div>
+
+                    <!-- Step 3 -->
+                    <div class="flex flex-col items-center w-1/3">
+                        <div class="bg-white p-2 rounded-full shadow-lg border-4 border-brand-green w-32 h-32 flex items-center justify-center mb-6 transform hover:scale-105 transition-transform duration-300">
+                            <i class="fas fa-clipboard-check text-5xl text-brand-green"></i>
+                        </div>
+                        <div class="bg-white p-4 rounded-xl shadow-md border-b-4 border-brand-green w-4/5 text-center">
+                             <span class="block text-3xl font-bold text-brand-green leading-none mb-1">5%</span>
+                             <span class="block font-bold text-gray-700 text-sm uppercase tracking-wider mb-1">Completion</span>
+                             <span class="block text-xs text-gray-500 font-medium">After Installation</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Warranty Terms -->
+            <div class="flex items-center gap-3 mb-8">
+                <i class="fas fa-shield-alt text-3xl text-brand-blue"></i>
+                <h2 class="text-3xl font-bold text-brand-blue">Warranty Terms</h2>
+            </div>
+
+            <div class="bg-gradient-to-r from-brand-blue to-[#004080] w-full p-8 rounded-2xl flex justify-between items-center text-white mb-8 shadow-2xl relative overflow-hidden">
+                <!-- Background decorative icons -->
+                <i class="fas fa-shield-alt absolute -right-10 -bottom-10 text-9xl text-white opacity-10"></i>
+
+                <!-- Item 1 -->
+                <div class="flex flex-col items-center flex-1 relative z-10">
+                    <div class="flex items-center gap-2 mb-2">
+                        <i class="fas fa-solar-panel text-3xl text-brand-orange"></i>
+                        <span class="text-4xl font-bold">25+</span>
+                    </div>
+                    <span class="font-semibold tracking-wide text-center">YEARS PERFORMANCE</span>
+                    <span class="text-xs opacity-75 mt-1">On PV Modules</span>
+                </div>
+                 <!-- Divider -->
+                 <div class="h-16 w-px bg-white/30"></div>
+                 <!-- Item 2 -->
+                 <div class="flex flex-col items-center flex-1 relative z-10">
+                    <div class="flex items-center gap-2 mb-2">
+                        <i class="fas fa-charging-station text-3xl text-brand-orange"></i>
+                        <span class="text-4xl font-bold">8</span>
+                    </div>
+                    <span class="font-semibold tracking-wide text-center">YEARS WARRANTY</span>
+                    <span class="text-xs opacity-75 mt-1">On Inverter</span>
+                </div>
+                 <!-- Divider -->
+                 <div class="h-16 w-px bg-white/30"></div>
+                 <!-- Item 3 -->
+                 <div class="flex flex-col items-center flex-1 relative z-10">
+                    <div class="flex items-center gap-2 mb-2">
+                        <i class="fas fa-tools text-3xl text-brand-orange"></i>
+                        <span class="text-4xl font-bold">5</span>
+                    </div>
+                    <span class="font-semibold tracking-wide text-center">YEARS SERVICE</span>
+                    <span class="text-xs opacity-75 mt-1">On System</span>
+                </div>
+            </div>
+
+            <p class="text-xs text-gray-500 bg-gray-50 p-4 rounded-lg border border-gray-200 leading-relaxed">
+                <strong class="text-brand-blue">Note:</strong> Please refer to the T&C and warranty documents for further details. Warranty is as per OEM terms & conditions. The warranty period depends on the make of the specific inverter selected.
+            </p>
         </div>
     </div>
-    
-    <!-- P7: Terms -->
-    <div class="page-container page-break relative">
-        <div class="wave-top-accent h-[120px]"></div><div class="wave-top h-[140px]"></div>
-        <div class="absolute top-4 left-1/2 -translate-x-1/2 z-30 w-32"><img src="https://github.com/Abhishekcodeking01/v-solar-quote/blob/9ae39ab1ba9eb2eedc38678b5d67f65a93283d84/Uplodes/v%20sustain%20logo.png?raw=true" class="w-full"></div>
+
+     <!-- PAGE 7: TERMS & CONDITIONS -->
+     <div class="page-container page-break relative">
+        <!-- Top Wave -->
+        <div class="wave-top-accent h-[120px]"></div>
+        <div class="wave-top h-[140px]"></div>
+
+        <!-- Logo (CENTERED) -->
+        <div class="absolute top-4 left-1/2 -translate-x-1/2 z-30 w-32">
+            <img src="https://github.com/Abhishekcodeking01/v-solar-quote/blob/9ae39ab1ba9eb2eedc38678b5d67f65a93283d84/Uplodes/v%20sustain%20logo.png?raw=true" alt="V Sustain Logo" class="w-full object-contain">
+        </div>
+
         <div class="relative z-20 mt-40 px-12">
-            <div class="flex items-center gap-3 mb-6"><i class="fas fa-gavel text-3xl text-brand-blue"></i><h2 class="text-3xl font-bold text-brand-blue">Terms & Conditions</h2></div>
-            <div class="grid grid-cols-1 gap-4 text-xs text-gray-800 bg-white/80 p-4 rounded">
-                <div class="bg-gray-50/80 p-3 rounded border"><h4 class="font-bold text-brand-blue">1. Validity</h4><p>15 Days.</p></div>
-                <div class="bg-gray-50/80 p-3 rounded border"><h4 class="font-bold text-brand-blue">2. Taxes</h4><p>Included as per norms.</p></div>
-                <div class="bg-gray-50/80 p-3 rounded border"><h4 class="font-bold text-brand-blue">3. Warranty</h4><p>As per OEM.</p></div>
+            <!-- Header -->
+            <div class="flex items-center gap-3 mb-6">
+                <i class="fas fa-gavel text-3xl text-brand-blue"></i>
+                <h2 class="text-3xl font-bold text-brand-blue">General Terms & Conditions</h2>
+            </div>
+
+            <p class="text-sm text-gray-600 mb-6 italic border-b pb-2">These General Terms and Conditions have been agreed between the customer/consumer and the Channel Partner only.</p>
+
+            <div class="grid grid-cols-1 gap-4 text-xs text-gray-800 text-justify leading-relaxed bg-white/80 p-4 rounded">
+                <div class="bg-gray-50/80 p-3 rounded border border-gray-100">
+                    <h4 class="font-bold text-brand-blue mb-1">1. Validity</h4>
+                    <p>Quotation is valid for <span class="font-bold">15 Days</span> from the date of submission.</p>
+                </div>
+
+                <div class="bg-gray-50/80 p-3 rounded border border-gray-100">
+                    <h4 class="font-bold text-brand-blue mb-1">2. Taxes & Duties</h4>
+                    <p>On Materials, if acceptance of Purchase Order due to change of government policy if any new taxes are applicable, such rates will be to the Consumer's account. Prices are inclusive of Standard Packing.</p>
+                </div>
+
+                <div class="bg-gray-50/80 p-3 rounded border border-gray-100">
+                    <h4 class="font-bold text-brand-blue mb-1">3. Delivery Period</h4>
+                    <p>The goods will be delivered as per the agreed terms & conditions as per duly accepted PO. Deliveries are subject to "Force Majeure".</p>
+                </div>
+
+                <div class="bg-gray-50/80 p-3 rounded border border-gray-100">
+                    <h4 class="font-bold text-brand-blue mb-1">4. Cancellation</h4>
+                    <p>Order received and acknowledged by us shall not be subject to cancellation, either wholly or partly for any reason whatsoever, without our consent. Cancellation may attract cancellation charges as per company policy.</p>
+                </div>
+
+                <div class="bg-gray-50/80 p-3 rounded border border-gray-100">
+                    <h4 class="font-bold text-brand-blue mb-1">5. Exclusions</h4>
+                    <p class="mb-1">The warranty shall not apply to defects resulting from:</p>
+                    <ul class="list-disc list-inside pl-2 space-y-1 text-gray-600">
+                        <li>Any materials, components, tools, design, or software provided by Consumers.</li>
+                        <li>Negligence or willful misconduct of Consumers.</li>
+                        <li>Parts, accessories or attachments other than those supplied by Consumers</li>
+                        <li>Improper service work carried out by Consumers without written consent.</li>
+                        <li>Use of unsuitable material or consumables by Consumers.</li>
+                    </ul>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- P8: Contact -->
+    <!-- PAGE 8: PROPOSAL BY / CONTACT (Enhanced) -->
     <div class="page-container page-break relative flex flex-col">
-        <div class="h-[40%] w-full relative overflow-hidden"><img src="https://github.com/Abhishekcodeking01/v-solar-quote/blob/8f2c0c796ba02307c87dda837a906dc9c079aa05/Uplodes/bg%203.png?raw=true" class="w-full h-full object-cover"></div>
-        <div class="absolute top-4 left-1/2 -translate-x-1/2 z-30 w-32 bg-white/90 p-2 rounded shadow-lg"><img src="https://github.com/Abhishekcodeking01/v-solar-quote/blob/9ae39ab1ba9eb2eedc38678b5d67f65a93283d84/Uplodes/v%20sustain%20logo.png?raw=true" class="w-full"></div>
+        <!-- Top Image Section REPLACED WITH BG 3.png -->
+        <div class="h-[40%] w-full relative overflow-hidden">
+            <img src="https://github.com/Abhishekcodeking01/v-solar-quote/blob/8f2c0c796ba02307c87dda837a906dc9c079aa05/Uplodes/bg%203.png?raw=true" alt="Office Meeting" class="w-full h-full object-cover">
+            <div class="absolute inset-0 bg-gradient-to-t from-brand-blue/80 to-transparent"></div>
+            
+            <div class="absolute inset-0 flex flex-col items-center justify-center text-white z-10 text-center p-8">
+                <i class="fas fa-check-circle text-5xl mb-4 text-brand-green drop-shadow-lg"></i>
+                <h1 class="text-4xl font-bold mb-2 drop-shadow-md">Let's Go Solar</h1>
+                <p class="text-xl opacity-90 font-light max-w-lg drop-shadow-md">Thank you for considering our proposal. We look forward to powering your journey to sustainability.</p>
+            </div>
+        </div>
+
+         <!-- Logo (CENTERED) -->
+         <div class="absolute top-4 left-1/2 -translate-x-1/2 z-30 w-32 bg-white/90 p-2 rounded shadow-lg">
+            <img src="https://github.com/Abhishekcodeking01/v-solar-quote/blob/9ae39ab1ba9eb2eedc38678b5d67f65a93283d84/Uplodes/v%20sustain%20logo.png?raw=true" alt="V Sustain Logo" class="w-full object-contain">
+        </div>
+
+        <!-- Bottom Content -->
         <div class="h-[60%] w-full bg-white px-12 pt-16 relative flex flex-col items-center">
-             <div class="w-full max-w-2xl bg-white rounded-2xl shadow-2xl p-8 -mt-24 z-20 flex items-start gap-8 border-t-8 border-brand-orange">
-                <div class="flex-grow"><h2 class="text-2xl font-bold text-brand-blue">V-Sustain Solar Solutions</h2><p class="text-gray-800 font-bold">Pravesh Kumar Tiwari</p><p class="text-gray-800">+91 99-000-00476</p></div>
-             </div>
+            
+            <!-- Contact Card - Floating overlapping the image boundary -->
+            <div class="w-full max-w-2xl bg-white rounded-2xl shadow-2xl p-8 -mt-24 z-20 flex items-start gap-8 border-t-8 border-brand-orange">
+                
+                <!-- Profile Photo Placeholder -->
+                <div class="flex-shrink-0">
+                    <div class="w-28 h-28 bg-gray-200 rounded-full overflow-hidden border-4 border-white shadow-md">
+                        <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?q=80&w=1000&auto=format&fit=crop" alt="Profile" class="w-full h-full object-cover">
+                    </div>
+                </div>
+
+                <div class="flex-grow">
+                    <p class="text-sm text-gray-500 uppercase tracking-wide font-bold mb-1">Proposal Submitted By</p>
+                    <h2 class="text-2xl font-bold text-brand-blue">V-Sustain Solar Solutions</h2>
+                    <p class="text-xs text-white bg-brand-green px-2 py-1 rounded inline-block mb-6 font-semibold">Authorized Luminous Partner</p>
+
+                    <div class="space-y-4">
+                        <div class="flex items-center gap-4 group">
+                            <div class="w-10 h-10 bg-blue-50 rounded-full flex items-center justify-center text-brand-blue group-hover:bg-brand-blue group-hover:text-white transition-colors">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <div>
+                                <p class="text-xs text-gray-400 font-bold uppercase">Contact Person</p>
+                                <p class="text-gray-800 font-bold">Pravesh Kumar Tiwari</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-4 group">
+                             <div class="w-10 h-10 bg-blue-50 rounded-full flex items-center justify-center text-brand-blue group-hover:bg-brand-blue group-hover:text-white transition-colors">
+                                <i class="fas fa-envelope"></i>
+                            </div>
+                            <div>
+                                <p class="text-xs text-gray-400 font-bold uppercase">Email</p>
+                                <p class="text-gray-800">vsustainsolarsolutions@gmail.com</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-4 group">
+                             <div class="w-10 h-10 bg-blue-50 rounded-full flex items-center justify-center text-brand-blue group-hover:bg-brand-blue group-hover:text-white transition-colors">
+                                <i class="fas fa-phone-alt"></i>
+                            </div>
+                            <div>
+                                <p class="text-xs text-gray-400 font-bold uppercase">Phone</p>
+                                <p class="text-gray-800 font-mono text-lg">+91 99-000-00476</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Address Footer -->
+            <div class="mt-auto mb-8 text-center w-full border-t border-gray-200 pt-6">
+                 <p class="text-xs text-gray-400 mb-2">Office Address</p>
+                 <p class="text-sm text-gray-600 max-w-lg mx-auto leading-relaxed">NO.33/1, 6th main, Kanteerava Studio Peenya, Rajagopalnagar Main Rd, Nandini Layout, Bengaluru, Karnataka 560096</p>
+                 
+                 <div class="flex justify-center gap-4 mt-6 opacity-50">
+                     <i class="fab fa-facebook text-xl text-brand-blue"></i>
+                     <i class="fab fa-instagram text-xl text-brand-blue"></i>
+                     <i class="fab fa-linkedin text-xl text-brand-blue"></i>
+                     <i class="fab fa-whatsapp text-xl text-brand-green"></i>
+                 </div>
+            </div>
         </div>
     </div>
   </body></html>`;
