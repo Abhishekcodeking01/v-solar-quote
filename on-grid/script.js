@@ -157,7 +157,7 @@ function attachEventListeners() {
   $('inverterUseCommonMargin').addEventListener('change', toggleCustomMarginInput.bind(null, 'inverter'));
   $('inverterCustomMargin').addEventListener('input', updateInverterData);
 
-  // Panels
+  // Panels (FIXED: use 'panel' for override ID, 'panels' for margins)
   $('panelModel').addEventListener('change', updatePanelData);
   $('panelOverrideToggle').addEventListener('change', () => toggleOverrideUI('panel'));
   $('panelOverridePrice').addEventListener('input', updatePanelData);
@@ -1281,8 +1281,8 @@ function buildDetailedQuotationHtml(totals, systemType) {
                     <h2 class="text-3xl font-bold text-brand-blue">Project Explanation</h2>
                 </div>
                 
-                <!-- DIAGRAM (Enlarged) -->
-                <div class="flex items-center justify-center mb-8 relative h-[450px]">
+                <!-- DIAGRAM (Reduced Height to 350px) -->
+                <div class="flex items-center justify-center mb-8 relative h-[350px]">
                     <img src="https://github.com/Abhishekcodeking01/v-solar-quote/blob/d2ac544338d64714fdc75e8008f2a733bb61ab83/Uplodes/on%20grid%20plannnt%20explained.png?raw=true" alt="On Grid Plant Explained" class="h-full w-full object-contain shadow-lg rounded-lg bg-white/50">
                 </div>
 
@@ -2159,8 +2159,8 @@ function buildSummaryQuotationHtml(totals, systemType) {
                     <h2 class="text-3xl font-bold text-brand-blue">Project Explanation</h2>
                 </div>
                 
-                <!-- DIAGRAM (Enlarged) -->
-                <div class="flex items-center justify-center mb-8 relative h-[450px]">
+                <!-- DIAGRAM (Reduced Height to 350px) -->
+                <div class="flex items-center justify-center mb-8 relative h-[350px]">
                     <img src="https://github.com/Abhishekcodeking01/v-solar-quote/blob/d2ac544338d64714fdc75e8008f2a733bb61ab83/Uplodes/on%20grid%20plannnt%20explained.png?raw=true" alt="On Grid Plant Explained" class="h-full w-full object-contain shadow-lg rounded-lg bg-white/50">
                 </div>
 
@@ -2678,150 +2678,6 @@ function buildSummaryQuotationHtml(totals, systemType) {
         </div>
     </div>
 
-</body>
-</html>`;
-} 
-
-function buildShortQuotationHtml(totals, systemType) {
-  const plantKw = Math.max(0, n($('systemKw').value));
-  const customerName = $('customerName')?.value || 'Customer Name';
-  const proposalDate = new Date().toLocaleDateString('en-IN', { day:'2-digit', month:'long', year:'numeric' });
-  const proposalNo = `VS/${new Date().getFullYear()}/001`;
-
-  // CHECK SUBSIDY RADIO BUTTON
-  const subsidyRadio = document.querySelector('input[name="subsidyEligible"]:checked');
-  const isSubsidyYes = subsidyRadio && subsidyRadio.value === 'yes';
-
-  // Subsidy Disclaimer
-  let subsidyBlock = '';
-  if (isSubsidyYes) {
-    subsidyBlock = `
-      <div class="mt-6 p-4 bg-green-50 border border-green-200 rounded-lg">
-          <h4 class="font-bold text-green-800 text-sm mb-2 flex items-center gap-2"><i class="fas fa-check-circle"></i> PM Surya Ghar Subsidy Eligible</h4>
-          <ul class="list-disc list-inside text-xs text-green-700 space-y-1">
-              <li><strong>₹60,000</strong> subsidy for systems up to 2kW.</li>
-              <li><strong>₹78,000</strong> subsidy for systems 3kW and above.</li>
-          </ul>
-          <p class="text-[10px] text-green-600 mt-2 italic">* Direct Benefit Transfer (DBT) to customer account upon approval.</p>
-      </div>
-    `;
-  }
-
-  return `<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Short Quote</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <script>
-      tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter', 'sans-serif'] }, colors: { brand: { blue: '#005bac', orange: '#ff9933', green: '#8cc63f' } } } } }
-    </script>
-    <style>
-      @media print {
-        @page { margin: 0; }
-        .no-print { display: none !important; }
-        body { background: white; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-        .page-container { box-shadow: none; margin: 0; width: 100%; border: none; }
-      }
-      body { background-color: #e5e7eb; font-family: 'Inter', sans-serif; }
-      .page-container { background: white; width: 210mm; min-height: 297mm; margin: 2rem auto; padding: 40px; position: relative; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
-    </style>
-    <script>
-        function printMode(mode) {
-            document.body.className = 'font-sans text-gray-800'; 
-            if (mode === 'mobile') {
-                document.body.classList.add('print-mobile');
-                document.querySelector('.page-container').style.transform = 'scale(0.95)';
-                document.querySelector('.page-container').style.transformOrigin = 'top left';
-            }
-            window.print();
-        }
-    </script>
-</head>
-<body class="text-gray-800">
-    <div class="fixed bottom-8 right-8 z-50 no-print flex flex-col gap-3">
-        <button onclick="printMode('laptop')" class="bg-blue-600 text-white font-bold py-3 px-6 rounded-full shadow-lg hover:bg-blue-700"><i class="fas fa-laptop"></i> Laptop Print</button>
-        <button onclick="printMode('mobile')" class="bg-green-600 text-white font-bold py-3 px-6 rounded-full shadow-lg hover:bg-green-700"><i class="fas fa-mobile-alt"></i> Mobile Print</button>
-    </div>
-
-    <div class="page-container">
-        <!-- Header -->
-        <div class="flex justify-between items-start border-b-2 border-brand-orange pb-6 mb-8">
-            <div class="w-40">
-                <img src="https://github.com/Abhishekcodeking01/v-solar-quote/blob/9ae39ab1ba9eb2eedc38678b5d67f65a93283d84/Uplodes/v%20sustain%20logo.png?raw=true" alt="V Sustain Logo" class="w-full">
-            </div>
-            <div class="text-right">
-                <h1 class="text-3xl font-bold text-brand-blue mb-1">Quotation</h1>
-                <p class="text-sm font-semibold text-gray-600"># ${proposalNo}</p>
-                <p class="text-sm text-gray-500">${proposalDate}</p>
-            </div>
-        </div>
-
-        <!-- Customer & System Info -->
-        <div class="flex justify-between mb-10 bg-gray-50 p-6 rounded-xl border border-gray-100">
-            <div>
-                <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wide mb-1">Proposal For</h3>
-                <p class="text-lg font-bold text-brand-blue">${escapeHtml(customerName)}</p>
-                <p class="text-sm text-gray-600">${$('customerAddress')?.value || ''}</p>
-                <p class="text-sm text-gray-600">${$('customerCity')?.value || 'Bengaluru'}</p>
-            </div>
-            <div class="text-right">
-                <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wide mb-1">System Details</h3>
-                <p class="text-xl font-bold text-brand-green">${plantKw} KW</p>
-                <p class="text-sm text-gray-600">On-Grid Rooftop System</p>
-                <p class="text-xs text-gray-500 mt-1">Luminous Authorized</p>
-            </div>
-        </div>
-
-        <!-- Commercial Offer (Simplified) -->
-        <div class="mb-8">
-            <h3 class="text-lg font-bold text-brand-blue mb-4 border-l-4 border-brand-blue pl-3">Commercial Offer</h3>
-            <table class="w-full text-sm border-collapse">
-                <tr class="bg-gray-100 border-b border-gray-200">
-                    <td class="p-4 font-medium">Supply & Installation of ${plantKw} KW On-Grid Solar System</td>
-                    <td class="p-4 text-right font-bold">${fmt(totals.grandTotal)}</td>
-                </tr>
-            </table>
-            
-            <div class="mt-2 text-right">
-                <p class="text-xs text-gray-500">* Price is inclusive of GST, Installation, and Commissioning.</p>
-            </div>
-        </div>
-
-        ${subsidyBlock}
-
-        <!-- Key Inclusions -->
-        <div class="mt-8">
-            <h3 class="text-lg font-bold text-brand-blue mb-4 border-l-4 border-brand-orange pl-3">Key Inclusions</h3>
-            <div class="grid grid-cols-2 gap-4 text-sm text-gray-700">
-                <div class="flex items-center gap-2"><i class="fas fa-check text-brand-green"></i> Tier-1 Solar Modules</div>
-                <div class="flex items-center gap-2"><i class="fas fa-check text-brand-green"></i> Luminous Grid-Tie Inverter</div>
-                <div class="flex items-center gap-2"><i class="fas fa-check text-brand-green"></i> Bi-Directional Meter</div>
-                <div class="flex items-center gap-2"><i class="fas fa-check text-brand-green"></i> Standard Mounting Structure</div>
-                <div class="flex items-center gap-2"><i class="fas fa-check text-brand-green"></i> ACDB & DCDB Protection</div>
-                <div class="flex items-center gap-2"><i class="fas fa-check text-brand-green"></i> Installation & Commissioning</div>
-            </div>
-        </div>
-
-        <!-- Footer / Contact -->
-        <div class="absolute bottom-0 left-0 w-full bg-[#001f3f] text-white p-8">
-            <div class="flex justify-between items-center max-w-4xl mx-auto">
-                <div>
-                    <h4 class="font-bold text-lg mb-1">V-Sustain Solar Solutions</h4>
-                    <p class="text-xs opacity-75">Authorized Luminous Partner</p>
-                </div>
-                <div class="text-right text-sm">
-                    <p><i class="fas fa-phone-alt mr-2"></i> +91 99-000-00476</p>
-                    <p><i class="fas fa-envelope mr-2"></i> vsustainsolarsolutions@gmail.com</p>
-                    <p class="text-xs opacity-50 mt-1">Bengaluru, Karnataka 560096</p>
-                </div>
-            </div>
-        </div>
-    </div>
 </body>
 </html>`;
 } 
