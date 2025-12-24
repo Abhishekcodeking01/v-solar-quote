@@ -647,6 +647,7 @@ function addCustomProduct() {
       <div class="col"><input type="number" class="cp-price" placeholder="Price" /></div>
       <div class="col"><label class="switch-small"><input type="checkbox" class="cp-use-common" checked><span class="slider-small round"></span></label></div>
       <div class="col"><input type="number" class="cp-custom-margin" placeholder="Margin %" disabled /></div>
+      <div class="col"><input type="number" class="cp-gst" placeholder="GST %" value="18" /></div>
       <div class="col"><button class="btn danger" onclick="removeCustomProduct(this)">Delete</button></div>
     </div>
   `;
@@ -661,6 +662,7 @@ function addCustomProduct() {
   row.querySelector('.cp-qty').addEventListener('input', recalcAllCards);
   row.querySelector('.cp-price').addEventListener('input', recalcAllCards);
   row.querySelector('.cp-custom-margin').addEventListener('input', recalcAllCards);
+  row.querySelector('.cp-gst').addEventListener('input', recalcAllCards);
 }
 
 function removeCustomProduct(btn) {
@@ -685,13 +687,15 @@ function gatherCustomItems() {
     if (!qty || !price) return;
     const useCommon = row.querySelector('.cp-use-common').checked;
     const customMargin = n(row.querySelector('.cp-custom-margin').value);
+    const gstInput = row.querySelector('.cp-gst');
+    const gstPct = gstInput ? n(gstInput.value) : 18; // Read per-row GST or default 18
+
     let rate = price;
     if (useCommon) {
       rate = round2(price * (1 + getCommonMargin()/100));
     } else if (customMargin > 0) {
       rate = round2(price * (1 + customMargin/100));
     }
-    const gstPct = getGstFor('custom'); // custom -> 18% default
     items.push({
       type: 'custom',
       item: name,
@@ -914,6 +918,12 @@ function generateSummaryQuote() {
   openInNewWindow(html);
 }
 
+function generateShortQuote() {
+  const totals = calcTotals();
+  const html = buildShortQuotationHtml(totals, 'On-Grid');
+  openInNewWindow(html);
+}
+
 /* REPLACED WITH NEW DESIGN */
 function buildDetailedQuotationHtml(totals, systemType) {
   const plantKw = Math.max(0, n($('systemKw').value));
@@ -1034,10 +1044,6 @@ function buildDetailedQuotationHtml(totals, systemType) {
     <style>
         /* Print styles to ensure one section per page */
         @media print {
-            @page {
-                size: A4;
-                margin: 0;
-            }
             .page-break { 
                 page-break-before: always; 
                 break-before: page; 
@@ -1070,6 +1076,14 @@ function buildDetailedQuotationHtml(totals, systemType) {
                 height: auto;
                 overflow: visible; /* Allow flow but controlled by scale */
                 page-break-after: always;
+            }
+            
+            /* Laptop Mode: Reset to allow user control */
+            body.print-laptop .page-container {
+                width: 100%;
+                height: auto;
+                overflow: visible;
+                max-height: none;
             }
         }
 
@@ -1175,8 +1189,12 @@ function buildDetailedQuotationHtml(totals, systemType) {
             document.body.className = 'font-sans text-gray-800'; // Reset
             if (mode === 'mobile') {
                 document.body.classList.add('print-mobile');
+                window.print();
+            } else if (mode === 'laptop') {
+                document.body.classList.add('print-laptop');
+                // Give user control by simply calling print, but with laptop-specific reset style
+                window.print();
             }
-            window.print();
         }
     </script>
 </head>
@@ -1785,32 +1803,150 @@ function buildDetailedQuotationHtml(totals, systemType) {
 </body>
 </html>
 `;
-}
+} 
 
-/* builds a compact summary quotation (items + qty + total) */
-function buildSummaryQuotationHtml(totals, systemType) {
+function buildShortQuotationHtml(totals, systemType) {
   const plantKw = Math.max(0, n($('systemKw').value));
-  const customerName = ($('customerName') || {}).value || 'Customer Name';
-  const date = new Date();
-  const proposalDate = date.toLocaleDateString('en-IN');
+  const customerName = $('customerName')?.value || 'Customer Name';
+  const proposalDate = new Date().toLocaleDateString('en-IN', { day:'2-digit', month:'long', year:'numeric' });
+  const proposalNo = `VS/${new Date().getFullYear()}/001`;
 
-  const rows = totals.items.map((it, idx) => {
-    return `<tr><td>${idx+1}</td><td>${it.item}</td><td>${escapeHtml(it.desc||'')}</td><td style="text-align:right">${it.qty}</td><td style="text-align:right">${fmt(round2(it.baseRate*it.qty))}</td></tr>`;
-  }).join('');
+  // CHECK SUBSIDY RADIO BUTTON
+  const subsidyRadio = document.querySelector('input[name="subsidyEligible"]:checked');
+  const isSubsidyYes = subsidyRadio && subsidyRadio.value === 'yes';
 
-  const html = `<!doctype html><html><head><meta charset="utf-8"><title>Summary Quote</title><style>
-    body{font-family:system-ui;padding:18px;color:#0f172a}table{width:100%;border-collapse:collapse}th,td{border:1px solid #e6eef7;padding:8px}
-  </style></head><body>
-    <h2>Summary Quotation - V-Sustain Solar Solutions</h2>
-    <div><strong>For:</strong> ${escapeHtml(customerName)} • ${escapeHtml(systemType)} • ${plantKw} kW</div>
-    <div style="margin-top:12px">
-      <table><thead><tr><th>S.No</th><th>Item</th><th>Description</th><th>Qty</th><th>Value (₹)</th></tr></thead><tbody>${rows}</tbody></table>
+  // Subsidy Disclaimer
+  let subsidyBlock = '';
+  if (isSubsidyYes) {
+    subsidyBlock = `
+      <div class="mt-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+          <h4 class="font-bold text-green-800 text-sm mb-2 flex items-center gap-2"><i class="fas fa-check-circle"></i> PM Surya Ghar Subsidy Eligible</h4>
+          <ul class="list-disc list-inside text-xs text-green-700 space-y-1">
+              <li><strong>₹60,000</strong> subsidy for systems up to 2kW.</li>
+              <li><strong>₹78,000</strong> subsidy for systems 3kW and above.</li>
+          </ul>
+          <p class="text-[10px] text-green-600 mt-2 italic">* Direct Benefit Transfer (DBT) to customer account upon approval.</p>
+      </div>
+    `;
+  }
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Short Quote</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script>
+      tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter', 'sans-serif'] }, colors: { brand: { blue: '#005bac', orange: '#ff9933', green: '#8cc63f' } } } } }
+    </script>
+    <style>
+      @media print {
+        @page { margin: 0; }
+        .no-print { display: none !important; }
+        body { background: white; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+        .page-container { box-shadow: none; margin: 0; width: 100%; border: none; }
+      }
+      body { background-color: #e5e7eb; font-family: 'Inter', sans-serif; }
+      .page-container { background: white; width: 210mm; min-height: 297mm; margin: 2rem auto; padding: 40px; position: relative; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
+    </style>
+    <script>
+        function printMode(mode) {
+            document.body.className = 'font-sans text-gray-800'; 
+            if (mode === 'mobile') {
+                document.body.classList.add('print-mobile');
+                document.querySelector('.page-container').style.transform = 'scale(0.95)';
+                document.querySelector('.page-container').style.transformOrigin = 'top left';
+            }
+            window.print();
+        }
+    </script>
+</head>
+<body class="text-gray-800">
+    <div class="fixed bottom-8 right-8 z-50 no-print flex flex-col gap-3">
+        <button onclick="printMode('laptop')" class="bg-blue-600 text-white font-bold py-3 px-6 rounded-full shadow-lg hover:bg-blue-700"><i class="fas fa-laptop"></i> Laptop Print</button>
+        <button onclick="printMode('mobile')" class="bg-green-600 text-white font-bold py-3 px-6 rounded-full shadow-lg hover:bg-green-700"><i class="fas fa-mobile-alt"></i> Mobile Print</button>
     </div>
-    <div style="margin-top:12px"><strong>Grand Total (incl. GST):</strong> ${fmt(totals.grandTotal)}</div>
-    <div style="margin-top:18px">Proposal Date: ${proposalDate}</div>
-  </body></html>`;
 
-  return html;
+    <div class="page-container">
+        <!-- Header -->
+        <div class="flex justify-between items-start border-b-2 border-brand-orange pb-6 mb-8">
+            <div class="w-40">
+                <img src="https://github.com/Abhishekcodeking01/v-solar-quote/blob/9ae39ab1ba9eb2eedc38678b5d67f65a93283d84/Uplodes/v%20sustain%20logo.png?raw=true" alt="V Sustain Logo" class="w-full">
+            </div>
+            <div class="text-right">
+                <h1 class="text-3xl font-bold text-brand-blue mb-1">Quotation</h1>
+                <p class="text-sm font-semibold text-gray-600"># ${proposalNo}</p>
+                <p class="text-sm text-gray-500">${proposalDate}</p>
+            </div>
+        </div>
+
+        <!-- Customer & System Info -->
+        <div class="flex justify-between mb-10 bg-gray-50 p-6 rounded-xl border border-gray-100">
+            <div>
+                <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wide mb-1">Proposal For</h3>
+                <p class="text-lg font-bold text-brand-blue">${escapeHtml(customerName)}</p>
+                <p class="text-sm text-gray-600">${$('customerAddress')?.value || ''}</p>
+                <p class="text-sm text-gray-600">${$('customerCity')?.value || 'Bengaluru'}</p>
+            </div>
+            <div class="text-right">
+                <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wide mb-1">System Details</h3>
+                <p class="text-xl font-bold text-brand-green">${plantKw} KW</p>
+                <p class="text-sm text-gray-600">On-Grid Rooftop System</p>
+                <p class="text-xs text-gray-500 mt-1">Luminous Authorized</p>
+            </div>
+        </div>
+
+        <!-- Commercial Offer (Simplified) -->
+        <div class="mb-8">
+            <h3 class="text-lg font-bold text-brand-blue mb-4 border-l-4 border-brand-blue pl-3">Commercial Offer</h3>
+            <table class="w-full text-sm border-collapse">
+                <tr class="bg-gray-100 border-b border-gray-200">
+                    <td class="p-4 font-medium">Supply & Installation of ${plantKw} KW On-Grid Solar System</td>
+                    <td class="p-4 text-right font-bold">${fmt(totals.grandTotal)}</td>
+                </tr>
+            </table>
+            
+            <div class="mt-2 text-right">
+                <p class="text-xs text-gray-500">* Price is inclusive of GST, Installation, and Commissioning.</p>
+            </div>
+        </div>
+
+        ${subsidyBlock}
+
+        <!-- Key Inclusions -->
+        <div class="mt-8">
+            <h3 class="text-lg font-bold text-brand-blue mb-4 border-l-4 border-brand-orange pl-3">Key Inclusions</h3>
+            <div class="grid grid-cols-2 gap-4 text-sm text-gray-700">
+                <div class="flex items-center gap-2"><i class="fas fa-check text-brand-green"></i> Tier-1 Solar Modules</div>
+                <div class="flex items-center gap-2"><i class="fas fa-check text-brand-green"></i> Luminous Grid-Tie Inverter</div>
+                <div class="flex items-center gap-2"><i class="fas fa-check text-brand-green"></i> Bi-Directional Meter</div>
+                <div class="flex items-center gap-2"><i class="fas fa-check text-brand-green"></i> Standard Mounting Structure</div>
+                <div class="flex items-center gap-2"><i class="fas fa-check text-brand-green"></i> ACDB & DCDB Protection</div>
+                <div class="flex items-center gap-2"><i class="fas fa-check text-brand-green"></i> Installation & Commissioning</div>
+            </div>
+        </div>
+
+        <!-- Footer / Contact -->
+        <div class="absolute bottom-0 left-0 w-full bg-[#001f3f] text-white p-8">
+            <div class="flex justify-between items-center max-w-4xl mx-auto">
+                <div>
+                    <h4 class="font-bold text-lg mb-1">V-Sustain Solar Solutions</h4>
+                    <p class="text-xs opacity-75">Authorized Luminous Partner</p>
+                </div>
+                <div class="text-right text-sm">
+                    <p><i class="fas fa-phone-alt mr-2"></i> +91 99-000-00476</p>
+                    <p><i class="fas fa-envelope mr-2"></i> vsustainsolarsolutions@gmail.com</p>
+                    <p class="text-xs opacity-50 mt-1">Bengaluru, Karnataka 560096</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>`;
 } 
 
 /* open the generated html in a new tab */
