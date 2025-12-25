@@ -157,12 +157,13 @@ function attachEventListeners() {
   $('inverterUseCommonMargin').addEventListener('change', toggleCustomMarginInput.bind(null, 'inverter'));
   $('inverterCustomMargin').addEventListener('input', updateInverterData);
 
-  // Panels (FIXED: use 'panel' for override ID, 'panels' for margins)
-  $('panelModel').addEventListener('change', updatePanelData);
+  // Panels - Updated listener for quantity input to allow manual editing
+  $('panelModel').addEventListener('change', () => updatePanelData(false));
+  $('panelQty').addEventListener('input', () => updatePanelData(true)); // Pass true for manual edit
   $('panelOverrideToggle').addEventListener('change', () => toggleOverrideUI('panel'));
-  $('panelOverridePrice').addEventListener('input', updatePanelData);
+  $('panelOverridePrice').addEventListener('input', () => updatePanelData(false)); // Recalc with new price
   $('panelsUseCommonMargin').addEventListener('change', toggleCustomMarginInput.bind(null, 'panels'));
-  $('panelsCustomMargin').addEventListener('input', updatePanelData);
+  $('panelsCustomMargin').addEventListener('input', () => updatePanelData(false)); // Recalc with new margin
 
   // Meter
   $('meterType').addEventListener('change', updateMeterData);
@@ -355,7 +356,8 @@ function updateInverterData() {
   $('inverterTotal').value = total;
 }
 
-function updatePanelData() {
+// Updated function to handle manual quantity edits
+function updatePanelData(manual = false) {
   if (!isEnabled('panels')) {
     $('panelDealer').value = '';
     $('panelFinalRate').value = '';
@@ -382,9 +384,16 @@ function updatePanelData() {
   const watt = n(opt.dataset.watt);
   const dealer = n(opt.dataset.price);
 
-  // total watt required = kw * 1000, qty = ceil(totalWatt / watt)
-  const totalWatt = round2(kw * 1000);
-  const qty = Math.ceil(totalWatt / Math.max(1, watt));
+  let qty;
+  if (manual) {
+      qty = Math.max(0, n($('panelQty').value));
+  } else {
+      // total watt required = kw * 1000, qty = ceil(totalWatt / watt)
+      const totalWatt = round2(kw * 1000);
+      qty = Math.ceil(totalWatt / Math.max(1, watt));
+      $('panelQty').value = qty;
+  }
+  
   const dcCapacityKw = round2((qty * watt) / 1000);
 
   // FIXED: computeBasePrice uses 'panel' (singular) to match input ID
@@ -396,7 +405,10 @@ function updatePanelData() {
   const gstAmt = round2(amount * gstPct / 100);
   const total = round2(amount + gstAmt);
 
-  $('panelQty').value = qty;
+  // Only update qty field if NOT manual (to avoid cursor jumping or loop)
+  // But wait, if manual is false, we updated it above. 
+  // If manual is true, we leave it alone as the user is typing.
+
   $('panelCapacity').value = dcCapacityKw;
   $('panelDealer').value = round2(dealer);
   $('panelFinalRate').value = round2(finalRate);
@@ -617,7 +629,8 @@ function updateEarthingSetData() {
 /* recalc all cards */
 function recalcAllCards() {
   updateInverterData();
-  updatePanelData();
+  // Pass false to ensure standard logic on global recalc, but inputs will trigger with true
+  updatePanelData(false); 
   updateMeterData();
   updateACDBData();
   updateDCDBData();
@@ -928,9 +941,9 @@ function generateShortQuote() {
 function buildDetailedQuotationHtml(totals, systemType) {
   const plantKw = Math.max(0, n($('systemKw').value));
   const customerName = $('customerName')?.value || 'Customer Name';
-  const customerEmail = $('customerEmail')?.value || '';
   const customerAddress = $('customerAddress')?.value || 'Bengaluru';
   const customerCity = $('customerCity')?.value || '';
+  const customerEmail = $('customerEmail')?.value || '';
   const date = new Date();
   const proposalDate = date.toLocaleDateString('en-IN', { day:'2-digit', month:'long', year:'numeric' });
   // Proposal No: VS/Year/Month/001 -> simple randomized or logic
@@ -1602,7 +1615,7 @@ function buildDetailedQuotationHtml(totals, systemType) {
                             <i class="fas fa-clipboard-check text-5xl text-brand-green"></i>
                         </div>
                         <div class="bg-white p-4 rounded-xl shadow-md border-b-4 border-brand-green w-4/5 text-center">
-                             <span class="block text-3xl font-bold text-brand-green leading-none mb-1">5%</span>
+                             <span class="block text-3xl font-bold text-brand-green leading-none mb-1">10%</span>
                              <span class="block font-bold text-gray-700 text-sm uppercase tracking-wider mb-1">Completion</span>
                              <span class="block text-xs text-gray-500 font-medium">After Installation</span>
                         </div>
@@ -1800,7 +1813,6 @@ function buildDetailedQuotationHtml(totals, systemType) {
             </div>
         </div>
     </div>
-
 </body>
 </html>`;
 } 
@@ -2082,12 +2094,8 @@ function buildSummaryQuotationHtml(totals, systemType) {
 
     <!-- FLOATING PRINT BUTTONS -->
     <div class="fixed bottom-8 right-8 z-50 no-print flex flex-col gap-3">
-        <button onclick="printMode('laptop')" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-full shadow-2xl flex items-center gap-2 transition-all transform hover:scale-105">
-            <i class="fas fa-laptop text-xl"></i> Print (Laptop)
-        </button>
-        <button onclick="printMode('mobile')" class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-full shadow-2xl flex items-center gap-2 transition-all transform hover:scale-105">
-            <i class="fas fa-mobile-alt text-xl"></i> Print (Mobile)
-        </button>
+        <button onclick="printMode('laptop')" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-full shadow-lg hover:bg-blue-700"><i class="fas fa-laptop"></i> Laptop Print</button>
+        <button onclick="printMode('mobile')" class="bg-green-600 text-white font-bold py-3 px-6 rounded-full shadow-lg hover:bg-green-700"><i class="fas fa-mobile-alt"></i> Mobile Print</button>
     </div>
 
     <!-- PAGE 1: COVER -->
@@ -2481,7 +2489,7 @@ function buildSummaryQuotationHtml(totals, systemType) {
                             <i class="fas fa-clipboard-check text-5xl text-brand-green"></i>
                         </div>
                         <div class="bg-white p-4 rounded-xl shadow-md border-b-4 border-brand-green w-4/5 text-center">
-                             <span class="block text-3xl font-bold text-brand-green leading-none mb-1">5%</span>
+                             <span class="block text-3xl font-bold text-brand-green leading-none mb-1">10%</span>
                              <span class="block font-bold text-gray-700 text-sm uppercase tracking-wider mb-1">Completion</span>
                              <span class="block text-xs text-gray-500 font-medium">After Installation</span>
                         </div>
