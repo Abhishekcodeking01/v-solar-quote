@@ -671,7 +671,7 @@ function getCommonHtml(totals, type, isSummary, isShort) {
 
   // 1-Page Short Quote
   if (isShort) {
-    return `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>${kw}KW Off-Grid ${name} ${email}</title>${commonStyle}</head>
+    return `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>${kw}KW Offgrid ${name} ${email}</title>${commonStyle}</head>
     <body class="font-sans text-gray-800">
       <div class="fixed bottom-8 right-8 z-50 no-print flex flex-col gap-3">
         <button onclick="printMode('laptop')" class="bg-blue-600 text-white font-bold py-3 px-6 rounded-full shadow-lg"><i class="fas fa-laptop"></i> Laptop</button>
@@ -698,7 +698,7 @@ function getCommonHtml(totals, type, isSummary, isShort) {
 
   // Full Quote (Detailed or Summary)
   // Page 2: Reduced diagram height and removed text as requested
-  return `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>${kw}KW Off-Grid ${name} ${email}</title>${commonStyle}</head>
+  return `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>${kw}KW Offgrid ${name} ${email}</title>${commonStyle}</head>
   <body class="font-sans text-gray-800">
     <div class="fixed bottom-8 right-8 z-50 no-print flex flex-col gap-3">
         <button onclick="printMode('laptop')" class="bg-blue-600 text-white font-bold py-3 px-6 rounded-full shadow-lg"><i class="fas fa-laptop"></i> Laptop</button>
@@ -718,7 +718,7 @@ function getCommonHtml(totals, type, isSummary, isShort) {
     <!-- P2: Project Explanation -->
     <div class="page-container page-break relative">
         <div class="wave-corner-top-left-accent h-[150px]"></div><div class="wave-corner-top-left h-[130px]"></div>
-        <div class="absolute top-8 right-8 z-30 w-32"><img src="https://github.com/Abhishekcodeking01/v-solar-quote/blob/9ae39ab1ba9eb2eedc38678b5d67f65a93283d84/Uplodes/v%20sustain%20logo.png?raw=true" class="w-full object-contain"></div>
+        <div class="absolute top-8 right-8 z-30 w-32"><img src="https://github.com/Abhishekcodeking01/v-solar-quote/blob/9ae39ab1ba9eb2eedc38678b5d67f65a93283d84/Uplodes/v%20sustain%20logo.png?raw=true" class="w-full"></div>
         <div class="relative z-20 pt-40 px-12 pb-12 flex flex-col h-full justify-between">
             <div>
                 <div class="flex items-center gap-3 mb-8"><i class="far fa-arrow-alt-circle-right text-3xl text-brand-blue"></i><h2 class="text-3xl font-bold text-brand-blue">Project Explanation</h2></div>
@@ -736,7 +736,7 @@ function getCommonHtml(totals, type, isSummary, isShort) {
     <!-- P3: Specs -->
     <div class="page-container page-break relative flex flex-col">
        <div class="absolute top-0 left-0 w-full h-12 bg-gradient-to-r from-brand-blue to-brand-lightBlue z-10"></div>
-       <div class="absolute top-4 right-8 z-30 w-32"><img src="https://github.com/Abhishekcodeking01/v-solar-quote/blob/9ae39ab1ba9eb2eedc38678b5d67f65a93283d84/Uplodes/v%20sustain%20logo.png?raw=true" class="w-full object-contain"></div>
+       <div class="absolute top-4 right-8 z-30 w-32"><img src="https://github.com/Abhishekcodeking01/v-solar-quote/blob/9ae39ab1ba9eb2eedc38678b5d67f65a93283d84/Uplodes/v%20sustain%20logo.png?raw=true" class="w-full"></div>
        <div class="relative z-20 mt-16 px-12 h-full flex flex-col justify-start pb-12">
            <div class="flex items-center justify-between mb-8 border-b-2 border-brand-orange pb-2 w-[80%]"><div class="flex items-center gap-3"><i class="far fa-file-alt text-3xl text-brand-blue"></i><h2 class="text-3xl font-bold text-brand-blue">Techno-Commercial Offer</h2></div></div>
            <div class="mb-8"><h3 class="text-lg font-bold text-brand-green mb-3 pl-2 border-l-4 border-brand-green">1. System Specifications</h3><table class="w-full text-sm border-collapse shadow-sm bg-white/90"><thead><tr class="bg-brand-green text-white"><th class="p-3 border text-left">Component</th><th class="p-3 border text-left">Description</th><th class="p-3 border">Make</th><th class="p-3 border text-center">Qty</th><th class="p-3 border text-center">UoM</th></tr></thead><tbody>${specRows}</tbody></table></div>
@@ -746,11 +746,11 @@ function getCommonHtml(totals, type, isSummary, isShort) {
     <!-- P4: Commercial -->
     <div class="page-container page-break relative flex flex-col">
        <div class="absolute top-0 left-0 w-full h-12 bg-gradient-to-r from-brand-blue to-brand-lightBlue z-10"></div>
-       <div class="absolute top-4 right-8 z-30 w-32"><img src="https://github.com/Abhishekcodeking01/v-solar-quote/blob/9ae39ab1ba9eb2eedc38678b5d67f65a93283d84/Uplodes/v%20sustain%20logo.png?raw=true" class="w-full object-contain"></div>
+       <div class="absolute top-4 right-8 z-30 w-32"><img src="https://github.com/Abhishekcodeking01/v-solar-quote/blob/9ae39ab1ba9eb2eedc38678b5d67f65a93283d84/Uplodes/v%20sustain%20logo.png?raw=true" class="w-full"></div>
        <div class="relative z-20 mt-16 px-12 h-full flex flex-col justify-between pb-12">
            <div class="flex items-center justify-between mb-8 border-b-2 border-brand-orange pb-2 w-[80%]"><div class="flex items-center gap-3"><i class="fas fa-rupee-sign text-3xl text-brand-blue"></i><h2 class="text-3xl font-bold text-brand-blue">Commercial Proposal</h2></div></div>
            <div class="mb-8"><table class="w-full text-sm border-collapse shadow-lg bg-white/90"><thead><tr class="bg-brand-blue text-white"><th class="p-3 border w-12">#</th><th class="p-3 border text-left">Description</th><th class="p-3 border text-center">UOM</th><th class="p-3 border text-center">Qty</th><th class="p-3 border text-right">Price (INR)</th></tr></thead><tbody>${commRows}${footer}</tbody></table></div>
-           <div class="flex gap-6 mt-auto"><div class="w-2/3"><h3 class="text-sm font-bold text-brand-green mb-2">Optional Services</h3><table class="w-full text-xs border-collapse shadow-sm bg-white/90"><thead><tr class="bg-gray-600 text-white"><th class="p-2 text-left">Description</th><th class="p-2 text-center">Tenure</th><th class="p-2 text-right">Cost (INR)</th></tr></thead><tbody><tr class="bg-gray-50/50 border-b"><td class="p-2 font-semibold">AMC</td><td class="p-2 text-center">5 Years</td><td class="p-2 text-right">10,000</td></tr></tbody></table></div></div>
+           <div class="flex gap-6 mt-auto"><div class="w-2/3"><h3 class="text-sm font-bold text-brand-green mb-2">Optional Services</h3><table class="w-full text-xs border-collapse shadow-sm bg-white/90"><thead><tr class="bg-gray-600 text-white"><th class="p-2 text-left">Description</th><th class="p-2 text-center">Tenure</th><th class="p-2 text-right">Cost</th></tr></thead><tbody><tr class="bg-gray-50/50 border-b"><td class="p-2 font-semibold">AMC</td><td class="p-2 text-center">5 Years</td><td class="p-2 text-right">10,000</td></tr></tbody></table></div></div>
        </div>
     </div>
 
@@ -777,7 +777,7 @@ function getCommonHtml(totals, type, isSummary, isShort) {
                 Empowering your home with eco-friendly solutions and a sustainable future through trusted technology.
             </p>
 
-            <!-- Grid Layout -->
+            <!-- Grid Layout (Unchanged) -->
             <div class="grid grid-cols-2 gap-y-12 gap-x-12">
                 <!-- Item 1 -->
                 <div class="flex items-start gap-5 content-card-bg p-4 rounded-lg shadow-sm">
@@ -856,6 +856,7 @@ function getCommonHtml(totals, type, isSummary, isShort) {
                         </p>
                     </div>
                 </div>
+
             </div>
         </div>
     </div>
@@ -916,7 +917,7 @@ function getCommonHtml(totals, type, isSummary, isShort) {
                             <i class="fas fa-clipboard-check text-5xl text-brand-green"></i>
                         </div>
                         <div class="bg-white p-4 rounded-xl shadow-md border-b-4 border-brand-green w-4/5 text-center">
-                             <span class="block text-3xl font-bold text-brand-green leading-none mb-1">5%</span>
+                             <span class="block text-3xl font-bold text-brand-green leading-none mb-1">10%</span>
                              <span class="block font-bold text-gray-700 text-sm uppercase tracking-wider mb-1">Completion</span>
                              <span class="block text-xs text-gray-500 font-medium">After Installation</span>
                         </div>
@@ -1114,8 +1115,43 @@ function getCommonHtml(totals, type, isSummary, isShort) {
             </div>
         </div>
     </div>
-  </body></html>`;
+</body>
+</html>`;
+} 
+
+/* open the generated html in a new tab */
+function openInNewWindow(html) {
+  const w = window.open("", "_blank");
+  if (!w) {
+    alert("Popup blocked. Allow popups for this site to see the quotation.");
+    return;
+  }
+  w.document.open();
+  w.document.write(html);
+  w.document.close();
 }
-function buildDetailedQuotationHtml(totals, type) { return getCommonHtml(totals, type, false, false); }
-function buildSummaryQuotationHtml(totals, type) { return getCommonHtml(totals, type, true, false); }
-function buildShortQuotationHtml(totals, type) { return getCommonHtml(totals, type, false, true); }
+
+/* small escape to avoid raw HTML breakouts from descriptions */
+function escapeHtml(text) {
+  return String(text || '').replace(/[&<>"']/g, function (m) {
+    return ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' })[m];
+  });
+} 
+
+/* ===========================
+   9. Finish / Helpers & Boot
+   =========================== */
+
+// initialization helper to avoid missing elements in different builds
+function safeGet(id) {
+  const el = document.getElementById(id);
+  return el ? el : { value: '', checked: false };
+}
+
+// Small helper to initialize UI states when file first loads
+(function boot() {
+  // ensure custom margin inputs disabled by default where "use common" is checked
+  ['inverter','panels','meter','acdb','dcdb','installation','structure'].forEach(id => {
+    toggleCustomMarginInput(id);
+  });
+})();
